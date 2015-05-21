@@ -19,6 +19,8 @@ echo Java Version:
 java -version
 echo -------------------------------------------------------------------------
 
+set FART_EXE=%CD%/tools/fart.exe
+
 if "%JWEBSOCKET_HOME%"=="" goto error
 if "%JWEBSOCKET_VER%"=="" goto error
 goto continue
@@ -70,7 +72,7 @@ call 3_createDownloadFiles.bat /y >> %logfile%
 :scan
 rem scan log file for certain error tags
 echo ----------------------------------------------------
-fart -i %logfile% error
+%FART_EXE% -i %logfile% error
 echo ----------------------------------------------------
 echo Please check above section for error messages.
 :end
