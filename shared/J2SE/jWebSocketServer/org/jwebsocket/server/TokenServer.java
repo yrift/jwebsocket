@@ -39,6 +39,7 @@ import org.jwebsocket.listener.WebSocketServerTokenListener;
 import org.jwebsocket.logging.Logging;
 import org.jwebsocket.packetProcessors.JSONProcessor;
 import org.jwebsocket.plugins.TokenPlugInChain;
+import org.jwebsocket.plugins.system.SecurityHelper;
 import org.jwebsocket.spring.JWebSocketBeanFactory;
 import org.jwebsocket.token.BaseToken;
 import org.jwebsocket.token.Token;
@@ -221,6 +222,7 @@ public class TokenServer extends BaseServer {
 	}
 
 	/**
+	 * Broadcast a token to all connectors that share the session storage.
 	 *
 	 * @param aSenderId
 	 * @param aSessionId
@@ -236,6 +238,38 @@ public class TokenServer extends BaseServer {
 			}
 
 			sendToken(lConnector, aToken);
+		}
+	}
+
+	/**
+	 * Broadcast a token to all connectors that share the login credentials.
+	 *
+	 * @param aUsername
+	 * @param aToken
+	 */
+	public void broadcastToSharedUser(String aUsername, Token aToken) {
+		Iterator<WebSocketConnector> lConnectors = getAllConnectorsIterator();
+		while (lConnectors.hasNext()) {
+			WebSocketConnector lConnector = lConnectors.next();
+			if (aUsername.equals(lConnector.getUsername())) {
+				sendToken(lConnector, aToken);
+			}
+		}
+	}
+
+	/**
+	 * Broadcast a token to all the connectors that share a custom role (authority)
+	 *
+	 * @param aRole
+	 * @param aToken
+	 */
+	public void broadcastToSharedRole(String aRole, Token aToken) {
+		Iterator<WebSocketConnector> lConnectors = getAllConnectorsIterator();
+		while (lConnectors.hasNext()) {
+			WebSocketConnector lConnector = lConnectors.next();
+			if (SecurityHelper.userHasAuthority(lConnector, aRole)) {
+				sendToken(lConnector, aToken);
+			}
 		}
 	}
 
@@ -287,11 +321,6 @@ public class TokenServer extends BaseServer {
 		// is the data packet supposed to be interpreted as token?
 		if (!WebSocketFrameType.BINARY.equals(aDataPacket.getFrameType())) {
 			if (aConnector.supportTokens()) {
-//				// avoid too much debug logs
-//				if (mLog.isDebugEnabled()) {
-//					mLog.debug("Processing packet as token...");
-//				}
-
 				final Token lToken = packetToToken(aConnector, aDataPacket);
 				if (lToken != null) {
 					boolean lRunReqInOwnThread
@@ -322,12 +351,6 @@ public class TokenServer extends BaseServer {
 					mLog.error("Packet '" + Logging.getTokenStr(aDataPacket.toString())
 							+ "' could not be converted into token.");
 				}
-			} else {
-//				// avoid too much debug logs
-//				if (mLog.isDebugEnabled()) {
-//					mLog.debug("Processing packet as custom packet...");
-//				}
-				// TODO: implement
 			}
 		}
 		super.processPacket(aEngine, aConnector, aDataPacket);
@@ -876,7 +899,7 @@ public class TokenServer extends BaseServer {
 	}
 
 	/**
-	 * iterates through all connectors of all engines and sends the token to
+	 * Iterate through all connectors of all engines and sends the token to
 	 * each connector. The token format is considered for each connection
 	 * individually so that the application can broadcast a token to all kinds
 	 * of clients.
@@ -891,7 +914,7 @@ public class TokenServer extends BaseServer {
 		}
 
 		// before sending the token push it through filter chain
-		FilterResponse lFilterResponse = getFilterChain().processTokenOut(aSource, null, aToken);
+		getFilterChain().processTokenOut(aSource, null, aToken);
 
 		// converting the token within the loop is removed in this method!
 		WebSocketPacket lPacket;
