@@ -1253,6 +1253,10 @@ public class Tools {
 			if (lZE.isDirectory()) {
 				lNewFile.mkdir();
 			} else {
+				if(!lNewFile.getParentFile().exists()) {
+					lNewFile.getParentFile().mkdirs();
+				}
+				
 				FileOutputStream lFOS = new FileOutputStream(lNewFile);
 				int lLength;
 				while ((lLength = lZIS.read(lBuffer)) > 0) {
