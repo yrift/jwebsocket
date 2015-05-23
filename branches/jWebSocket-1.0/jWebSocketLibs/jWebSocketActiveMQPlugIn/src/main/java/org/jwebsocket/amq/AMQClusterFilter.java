@@ -67,7 +67,7 @@ public class AMQClusterFilter extends BrokerFilter {
 	/**
 	 *
 	 */
-	private Map<String, DBCollection> mCachedCollections;
+	private final Map<String, DBCollection> mCachedCollections;
 
 	/**
 	 *
@@ -139,6 +139,10 @@ public class AMQClusterFilter extends BrokerFilter {
 						}
 						// caching collection instance
 						mCachedCollections.put(lDatabaseName, lDatabase.getCollection(COLLECTION_NAME));
+						// setting the collection as capped to ensure data expiration
+						lDatabase.command(new BasicDBObject()
+								.append("convertToCapped", COLLECTION_NAME)
+								.append("max", 1000000)); 
 					}
 
 					// getting cached collection instance
