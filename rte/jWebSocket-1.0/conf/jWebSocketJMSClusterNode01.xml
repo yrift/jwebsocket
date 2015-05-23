@@ -291,7 +291,7 @@
 			</server-assignments>
 		</plugin>
 		
-		<!-- ClusterAdmin plug-in for JMS cluster administration -->
+		<!-- ClusterAdmin plug-in for JMS cluster administration 
 		<plugin>
 			<name>org.jwebsocket.enterprise.cluster.jms.JMSClusterAdminPlugIn</name>
 			<id>jWebSocketJMSClusterAdminPlugInEE</id>
@@ -305,6 +305,7 @@
 				<server-assignment>ts0</server-assignment>
 			</server-assignments>
 		</plugin>
+		-->
 	</plugins>
 
 	<filters>
