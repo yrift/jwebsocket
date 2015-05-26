@@ -13,9 +13,12 @@
 
 		<!-- JQUERY DEPENDENCIES -->
 		<link rel="stylesheet" href="../lib/jQuery/jquery-ui/blue-theme/jquery-ui.css" type="text/css"/>
+		<link rel="stylesheet" href="../lib/jQuery/plugins/loadmask/css/jquery.loadmask.css" type="text/css"/>
         <script type="text/javascript" src='../lib/jQuery/jquery.js'></script>
         <script type="text/javascript" src='../lib/jQuery/jquery-ui/jquery-ui.js'></script>
 		<script type="text/javascript" src='../res/js/widgets/dialogs.js'></script>
+		<script type="text/javascript" src='../lib/jQuery/plugins/loadmask/jquery.loadmask.js'></script>
+
 
 		<!-- jWebSocket style sheet -->
 		<link rel="stylesheet" type="text/css" href="../res/css/demos.css">
@@ -190,8 +193,12 @@
 			</table>
 		</div>
 		<script type="text/javascript">
-			var lCategories = $("#categories");
-			var lCategoriesSelectStr = "<select id='test_set'><option value='__ALL__'>All</option>";
+			var lCategories = $("#categories"),
+					NS_SYSTEM = "org.jwebsocket.plugins.system",
+					lEngines = [],
+					lPlugInsInfo = [],
+					TT_GET_PLUGINS_INFO = "getPlugInsInfo",
+					lCategoriesSelectStr = "<select id='test_set'><option value='__ALL__'>All</option>";
 			var lTests = initTestsIndex();
 			$.each(lTests.categories, function (aIndex, aCategory) {
 				lCategoriesSelectStr += "<option value'" + aCategory + "'>" + aCategory + "</option>";
@@ -200,20 +207,72 @@
 			lCategories.html(lCategoriesSelectStr);
 			// rendering category tests
 			var lCombo = $('#test_set');
-			var lState = restorePageState();
-			renderTests(lTests.getTestsByCategory(lCombo.val()), $("#tests"));
-			if (null != lState) {
-				selectTests(lState.selectedTests);
-			}
 			lCombo.bind('change', function (aSelect) {
 				var lCategory = $(aSelect.target).val();
-				renderTests(lTests.getTestsByCategory(lCategory), $("#tests"), lCategory);
+				renderTests(lTests.getTestsByCategory(lCategory), $("#tests"), lCategory, lPlugInsEnginesInfo);
 			});
 			function runBenchmarkTests() {
 				lCombo.val('Server Benchmarks');
-				renderTests(lTests.getTestsByCategory($(lCombo).val()), $("#tests"));
+				renderTests(lTests.getTestsByCategory($(lCombo).val()), $("#tests"), $(lCombo).val(), lPlugInsEnginesInfo);
 				run();
 			}
+			// This section will try to bring the possible modules that can be tested in the server
+			jws.Tests.setAdminConn(new jws.jWebSocketJSONClient());
+			var lResponse = {}, lWasOpen = false;
+			$("#demo_box").mask("Retrieving tests information from the server, please wait...");
+			// open a separate control connection
+			jws.Tests.getAdminConn().logon(jws.getDefaultServerURL(),
+					jws.Tests.ADMIN_USER,
+					jws.Tests.ADMIN_PWD, {
+						OnToken: function (aToken) {
+							lWasOpen = true;
+							if (NS_SYSTEM === aToken.ns) {
+								if ("welcome" === aToken.type) {
+									lEngines = aToken.engines;
+								}
+								if ("login" === aToken.reqType) {
+									// Successfully authenticated, proceed to get the tests
+									jws.Tests.getAdminConn().sendToken({
+										ns: NS_SYSTEM,
+										type: TT_GET_PLUGINS_INFO
+									}, {
+										OnSuccess: function (aToken) {
+											console.log(aToken);
+											lPlugInsEnginesInfo = lEngines.concat(aToken.data);
+											$("#demo_box").unmask();
+											var lState = restorePageState();
+											renderTests(lTests.getTestsByCategory(lCombo.val()), $("#tests"), lCombo.val(), lPlugInsEnginesInfo);
+											if (null !== lState) {
+												selectTests(lState.selectedTests);
+											}
+										},
+										OnFailure: function (aToken) {
+											$("#demo_box").unmask();
+											// Notify the user we could not load the 
+											// plug-ins info from the server
+											wsDialog("Failed to load tests from the " +
+													"server, this may lead to test failures.<br/>" +
+													"The server returned the following message: <br/>" +
+													aToken.msg, "Failure loading tests from the server",
+													true, "alert", null, null, 400);
+										}
+									});
+								}
+							}
+						},
+						OnClose: function () {
+							$("#demo_box").unmask();
+							if (!lWasOpen) {
+								jwsDialog("Please check your connection with the server, it " +
+										"may not be running properly. jWebSocket Tests Executor " +
+										"could not load the tests information from the server, " +
+										"this may lead to test failures.",
+										"Failure loading tests from the server",
+										true, "alert", null, null, 400);
+							}
+						}
+					});
+
 
 			function run() {
 				if (!jws.browserSupportsWebSockets()) {

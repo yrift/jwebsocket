@@ -18,76 +18,75 @@
 //	---------------------------------------------------------------------------
 
 jws.tests.JMS = {
-
 	title: "JMS plug-in",
 	description: "jWebSocket JMS plug-in",
 	category: "Community Edition",
-
+	dependsOn: [{
+			plugInId: "jws.jms"
+		}],
 	// this spec tests the listen method of the JMS plug-in
-	testListen: function() {
+	testListen: function () {
 		var lSpec = "listen (no Pub/Sub)";
-		
-		it( lSpec, function () {
+
+		it(lSpec, function () {
 
 			var lResponse = {};
-			jws.Tests.getAdminTestConn().listenJms( 
-				"connectionFactory",	// aConnectionFactoryName, 
-				"testQueue",			// aDestinationName, 
-				false,					// aPubSubDomain,
-				{	OnResponse: function( aToken ) {
-						lResponse = aToken;
+			jws.Tests.getAdminTestConn().listenJms(
+					"connectionFactory", // aConnectionFactoryName, 
+					"testQueue", // aDestinationName, 
+					false, // aPubSubDomain,
+					{OnResponse: function (aToken) {
+							lResponse = aToken;
+						}
 					}
-				}
 			);
 
 			waitsFor(
-				function() {
-					return( 0 === lResponse.code );
-				},
-				lSpec,
-				3000
-			);
+					function () {
+						return(0 === lResponse.code);
+					},
+					lSpec,
+					3000
+					);
 
-			runs( function() {
-				expect( lResponse.code ).toEqual( 0 );
+			runs(function () {
+				expect(lResponse.code).toEqual(0);
 			});
 
 		});
 	},
-
 	// this spec tests the listen method of the JMS plug-in
-	testUnlisten: function() {
+	testUnlisten: function () {
 		var lSpec = "unlisten (no Pub/Sub)";
-		
-		it( lSpec, function () {
+
+		it(lSpec, function () {
 
 			var lResponse = {};
-			jws.Tests.getAdminTestConn().unlistenJms( 
-				"connectionFactory",	// aConnectionFactoryName, 
-				"testQueue",			// aDestinationName, 
-				false,					// aPubSubDomain,
-				{	OnResponse: function( aToken ) {
-						lResponse = aToken;
+			jws.Tests.getAdminTestConn().unlistenJms(
+					"connectionFactory", // aConnectionFactoryName, 
+					"testQueue", // aDestinationName, 
+					false, // aPubSubDomain,
+					{OnResponse: function (aToken) {
+							lResponse = aToken;
+						}
 					}
-				}
 			);
 
 			waitsFor(
-				function() {
-					return( 0 === lResponse.code );
-				},
-				lSpec,
-				3000
-			);
+					function () {
+						return(0 === lResponse.code);
+					},
+					lSpec,
+					3000
+					);
 
-			runs( function() {
-				expect( lResponse.code ).toEqual( 0 );
+			runs(function () {
+				expect(lResponse.code).toEqual(0);
 			});
 
 		});
 	},
-	
-	runSpecs: function() {
+	runSpecs: function () {
 		jws.tests.JMS.testListen();
 		jws.tests.JMS.testUnlisten();
 	}

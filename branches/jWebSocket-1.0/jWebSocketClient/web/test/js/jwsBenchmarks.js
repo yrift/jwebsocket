@@ -18,8 +18,6 @@
 //	---------------------------------------------------------------------------
 
 jws.tests.Benchmarks = {
-
-	
 	/*  TODO: Finish this TestCase
 	 *	this.NS: jws.NS_BASE  + ".plugins.benchmark",
 	 *
@@ -43,6 +41,9 @@ jws.tests.Benchmarks = {
 	description: "jWebSocket Benchmark plug-in.",
 	category: "Server Benchmarks",
 	enabled: false,
+	dependsOn: [{
+		plugInId: "jws.benchmark"
+	}],
 	
 	MAX_CONNECTIONS: 50,
 	

@@ -18,63 +18,62 @@
 //	---------------------------------------------------------------------------
 
 jws.tests.RPC = {
-
 	title: "RPC plug-in",
 	description: "jWebSocket RPC plug-in",
 	category: "Community Edition",
-	
-	TEST_STRING: "This is a string to be MD5'ed", 
-
+	TEST_STRING: "This is a string to be MD5'ed",
+	dependsOn: [{
+			plugInId: "jws.rpc"
+		}],
 	// this spec tests the file save method of the fileSystem plug-in
-	testMD5Demo: function() {
-		
+	testMD5Demo: function () {
+
 		var lSpec = "MD5 demo (admin)";
-		
-		it( lSpec, function () {
-			
+
+		it(lSpec, function () {
+
 			// init response
 			var lResponse = {};
 
 			var lClassName = "org.jwebsocket.rpc.sample.SampleRPCLibrary";
 			var lMethodName = "getMD5";
 			var lArguments = jws.tests.RPC.TEST_STRING;
-			var lMD5 = jws.tools.calcMD5( jws.tests.RPC.TEST_STRING );
+			var lMD5 = jws.tools.calcMD5(jws.tests.RPC.TEST_STRING);
 
 			// perform the Remote Procedure Call...
 			jws.Tests.getAdminTestConn().rpc(
-				// pass class, method and argument for server java method:
-				lClassName,
-				lMethodName,
-				lArguments,
-				{	// run it within the main thread
-					spawnThread: false,
-					// new easy-to-use response callback
-					OnResponse: function( aToken ) {
-						lResponse = aToken;
+					// pass class, method and argument for server java method:
+					lClassName,
+					lMethodName,
+					lArguments,
+					{// run it within the main thread
+						spawnThread: false,
+						// new easy-to-use response callback
+						OnResponse: function (aToken) {
+							lResponse = aToken;
+						}
 					}
-				}
-			);
-			
-			// wait for result, consider reasonably timeout
-			waitsFor(
-				function() {
-					// check response
-					return( lResponse.code !== undefined );
-				},
-				lSpec,
-				3000
 			);
 
+			// wait for result, consider reasonably timeout
+			waitsFor(
+					function () {
+						// check response
+						return(lResponse.code !== undefined);
+					},
+					lSpec,
+					3000
+					);
+
 			// check result if ok
-			runs( function() {
-				expect( lResponse.code ).toEqual( 0 );
-				expect( lResponse.result ).toEqual( lMD5 );
+			runs(function () {
+				expect(lResponse.code).toEqual(0);
+				expect(lResponse.result).toEqual(lMD5);
 			});
 
 		});
 	},
-
-	runSpecs: function() {
+	runSpecs: function () {
 		// run alls tests within an outer test suite
 		this.testMD5Demo();
 	}

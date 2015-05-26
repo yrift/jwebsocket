@@ -24,79 +24,82 @@ jws.tests.Scripting = {
 	scriptApps: {},
 	TEST_APP1: "demoApp",
 	TEST_APP2: "someApp",
-	testListScriptApps: function() {
+	dependsOn: [{
+			plugInId: "jws.scripting"
+		}],
+	testListScriptApps: function () {
 		var self = this;
 		var lSpec = "getting script apps list";
 
-		it(lSpec, function() {
+		it(lSpec, function () {
 			var lResponse = null;
 			jws.Tests.getAdminTestConn().listScriptApps({userOnly: true, namesOnly: false,
-				OnResponse: function(aResponse) {
+				OnResponse: function (aResponse) {
 					lResponse = aResponse;
 					self.scriptApps = aResponse.data;
 				}
 			});
 
 			waitsFor(
-					function() {
+					function () {
 						return null !== lResponse;
 					},
 					lSpec,
 					3000
 					);
 
-			runs(function() {
+			runs(function () {
 				expect(null !== lResponse.data[self.TEST_APP1]).toEqual(true);
 				expect(null !== lResponse.data[self.TEST_APP2]).toEqual(true);
 			});
 		});
 	},
-	testGetVersion: function(aAppName) {
+	testGetVersion: function (aAppName) {
 		var self = this;
 		var lSpec = "getting script app version '" + aAppName + "'";
 
-		it(lSpec, function() {
+		it(lSpec, function () {
 			var lResponse = null;
 			jws.Tests.getAdminTestConn().getScriptAppVersion(aAppName, {
-				OnResponse: function(aResponse) {
+				OnResponse: function (aResponse) {
 					lResponse = aResponse;
 				}
 			});
 
 			waitsFor(
-					function() {
+					function () {
 						return null !== lResponse;
 					},
 					lSpec,
 					3000
 					);
 
-			runs(function() {
+			runs(function () {
 				expect(self.scriptApps[aAppName].version).toEqual(lResponse.version);
 			});
 		});
 	},
-	testGetManifest: function(aAppName) {
+	testGetManifest: function (aAppName) {
 		var self = this;
 		var lSpec = "getting script app manifest '" + aAppName + "'";
 
-		it(lSpec, function() {
+		it(lSpec, function () {
 			var lResponse = null;
 			jws.Tests.getAdminTestConn().getScriptAppManifest(aAppName, {
-				OnResponse: function(aResponse) {
+				OnResponse: function (aResponse) {
 					lResponse = aResponse;
 				}
 			});
 
 			waitsFor(
-					function() {
+					function () {
 						return null !== lResponse;
 					},
 					lSpec,
 					3000
 					);
 
-			runs(function() {
+			runs(function () {
 				expect(undefined !== lResponse.data.jws_version).toEqual(true);
 				expect(undefined !== lResponse.data.language_ext).toEqual(true);
 				expect(undefined !== lResponse.data.jws_dependencies).toEqual(true);
@@ -105,50 +108,50 @@ jws.tests.Scripting = {
 			});
 		});
 	},
-	testReload: function(aAppName, aHotReload, aExpectedCode) {
+	testReload: function (aAppName, aHotReload, aExpectedCode) {
 		var self = this;
 		var lSpec = "reloading script app '" + aAppName + "', hot reload: " + aHotReload
 				+ ", expected code: " + aExpectedCode;
 
-		it(lSpec, function() {
+		it(lSpec, function () {
 			var lResponse = null;
 			jws.Tests.getAdminTestConn().reloadScriptApp(aAppName, aHotReload, {
-				OnResponse: function(aResponse) {
+				OnResponse: function (aResponse) {
 					lResponse = aResponse;
 				}
 			});
 
 			waitsFor(
-					function() {
+					function () {
 						return null !== lResponse;
 					},
 					lSpec,
 					3000
 					);
 
-			runs(function() {
+			runs(function () {
 				expect(lResponse.code).toEqual(aExpectedCode);
 			});
 		});
 	},
-	testGetScriptApp: function() {
+	testGetScriptApp: function () {
 		var self = this;
 		var lSpec = "generating script app '" + self.TEST_APP1;
 
-		it(lSpec, function() {
+		it(lSpec, function () {
 			var lApp = null;
 			var lResponse = null;
-			jws.Tests.getAdminTestConn().getScriptApp(self.TEST_APP1, function(aApp) {
+			jws.Tests.getAdminTestConn().getScriptApp(self.TEST_APP1, function (aApp) {
 				lApp = aApp;
 
 				// calling method toMap on Main controller
-				lApp.Main.toMap(function(aResponse) {
+				lApp.Main.toMap(function (aResponse) {
 					lResponse = aResponse;
 				});
 			});
 
 			waitsFor(
-					function() {
+					function () {
 						return null !== lResponse;
 					},
 					lSpec,
@@ -156,7 +159,7 @@ jws.tests.Scripting = {
 					);
 
 
-			runs(function() {
+			runs(function () {
 				expect(lResponse.code).toEqual(0);
 				expect(lResponse.result.name).toEqual("Rolando SM");
 				expect(lResponse.result.email).toEqual("rsantamaria@jwebsocket.org");
@@ -164,7 +167,7 @@ jws.tests.Scripting = {
 			});
 		});
 	},
-	runSpecs: function() {
+	runSpecs: function () {
 		// test list apps
 		this.testListScriptApps();
 		// test get script app version
