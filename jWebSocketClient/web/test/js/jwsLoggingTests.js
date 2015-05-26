@@ -18,29 +18,28 @@
 //	---------------------------------------------------------------------------
 
 jws.tests.Logging = {
-
 	title: "Logging plug-in",
 	description: "jWebSocket logging plug-in",
 	category: "Community Edition",
 	enabled: false,
-	
 	TABLE: "SYSTEM_LOG",
 	PRIMARY_KEY: "ID",
 	SEQUENCE: "SQ_PK_SYSTEM_LOG",
 	MESSAGE: "This is an message from the automated test suite.",
-	
 	mLogId: null,
-
+	dependsOn: [{
+			plugInId: "jws.logging"
+		}],
 	// this spec tests the file save method of the fileSystem plug-in
-	testLog: function() {
+	testLog: function () {
 		var lSpec = "LogEvent";
-		
-		it( lSpec, function () {
+
+		it(lSpec, function () {
 
 			var lResponse = {};
 			var lNow = new Date();
 			var lFlashBridgeVer = "n/a";
-			if( swfobject) {
+			if (swfobject) {
 				var lInfo = swfobject.getFlashPlayerVersion();
 				lFlashBridgeVer = lInfo.major + "." + lInfo.minor + "." + lInfo.release;
 			}
@@ -58,79 +57,78 @@ jws.tests.Logging = {
 				"browser": jws.getBrowserName(),
 				"browser_version": jws.getBrowserVersionString(),
 				"ws_version": (
-					jws.browserSupportsNativeWebSockets 
-					? "native" 
-					: "flash " + lFlashBridgeVer
-				),
+						jws.browserSupportsNativeWebSockets
+						? "native"
+						: "flash " + lFlashBridgeVer
+						),
 				"json": JSON.stringify({
 					userAgent: navigator.userAgent
 				}),
 				"ip": "${ip}",
-				"time_stamp": 
-					// jws.tools.dateToISO( lNow )
-					/* oracle 
-					"TO_DATE('" +
-					lNow.getUTCFullYear().toString() + "/" +
-					jws.tools.zerofill( lNow.getUTCMonth() + 1, 2 ) + "/" +
-					jws.tools.zerofill( lNow.getUTCDate(), 2 ) + " " +
-					jws.tools.zerofill( lNow.getUTCHours(), 2 ) + "/" +
-					jws.tools.zerofill( lNow.getUTCMinutes(), 2 ) + "/" +
-					jws.tools.zerofill( lNow.getUTCSeconds(), 2 ) +
-					"','YYYY/MM/DD HH24/MI/SS')"
-					*/
-					/* mysql */
-					lNow.getUTCFullYear().toString() + "-" +
-					+ jws.tools.zerofill( lNow.getUTCMonth() + 1, 2 ) + "-"
-					+ jws.tools.zerofill( lNow.getUTCDate(), 2 ) + " "
-					+ jws.tools.zerofill( lNow.getUTCHours(), 2 ) + ":"
-					+ jws.tools.zerofill( lNow.getUTCMinutes(), 2 ) + ":"
-					+ jws.tools.zerofill( lNow.getUTCSeconds(), 2 ) + "."
-					+ jws.tools.zerofill( lNow.getUTCMilliseconds(), 3 )
+				"time_stamp":
+						// jws.tools.dateToISO( lNow )
+						/* oracle 
+						 "TO_DATE('" +
+						 lNow.getUTCFullYear().toString() + "/" +
+						 jws.tools.zerofill( lNow.getUTCMonth() + 1, 2 ) + "/" +
+						 jws.tools.zerofill( lNow.getUTCDate(), 2 ) + " " +
+						 jws.tools.zerofill( lNow.getUTCHours(), 2 ) + "/" +
+						 jws.tools.zerofill( lNow.getUTCMinutes(), 2 ) + "/" +
+						 jws.tools.zerofill( lNow.getUTCSeconds(), 2 ) +
+						 "','YYYY/MM/DD HH24/MI/SS')"
+						 */
+						/* mysql */
+						lNow.getUTCFullYear().toString() + "-" +
+						+jws.tools.zerofill(lNow.getUTCMonth() + 1, 2) + "-"
+						+ jws.tools.zerofill(lNow.getUTCDate(), 2) + " "
+						+ jws.tools.zerofill(lNow.getUTCHours(), 2) + ":"
+						+ jws.tools.zerofill(lNow.getUTCMinutes(), 2) + ":"
+						+ jws.tools.zerofill(lNow.getUTCSeconds(), 2) + "."
+						+ jws.tools.zerofill(lNow.getUTCMilliseconds(), 3)
 			};
-			jws.Tests.getAdminTestConn().loggingEvent( jws.tests.Logging.TABLE, lData, {
+			jws.Tests.getAdminTestConn().loggingEvent(jws.tests.Logging.TABLE, lData, {
 				primaryKey: jws.tests.Logging.PRIMARY_KEY,
 				sequence: jws.tests.Logging.SEQUENCE,
-				OnResponse: function( aToken ) {
+				OnResponse: function (aToken) {
 					lResponse = aToken;
 					jws.tests.Logging.mLogId = lResponse.key;
 				}
 			});
 
 			waitsFor(
-				function() {
-					return( lResponse.rowsAffected && lResponse.rowsAffected[0] == 1 && lResponse.key > 0 );
-				},
-				lSpec,
-				1500
-			);
+					function () {
+						return(lResponse.rowsAffected && lResponse.rowsAffected[0] == 1 && lResponse.key > 0);
+					},
+					lSpec,
+					1500
+					);
 
-			runs( function() {
-				expect( lResponse.rowsAffected[0] ).toEqual( 1 );
+			runs(function () {
+				expect(lResponse.rowsAffected[0]).toEqual(1);
 			});
 
 		});
 	},
-
 	// this spec tests the file save method of the fileSystem plug-in
-	testGetLog: function() {
+	testGetLog: function () {
 		var lSpec = "GetLog";
-		
-		it( lSpec, function () {
+
+		it(lSpec, function () {
 
 			var lResponse = {};
 			var lDone = false;
-			jws.Tests.getAdminTestConn().loggingGetEvents( jws.tests.Logging.TABLE, {
+			jws.Tests.getAdminTestConn().loggingGetEvents(jws.tests.Logging.TABLE, {
 				primaryKey: jws.tests.Logging.PRIMARY_KEY,
 				fromKey: jws.tests.Logging.mLogId,
 				toKey: jws.tests.Logging.mLogId,
-				OnResponse: function( aToken ) {
+				OnResponse: function (aToken) {
 					lResponse = aToken;
 					// check if only one row is returned
-					if( lResponse.data.length == 1 ) {
+					if (lResponse.data.length == 1) {
 						// check if the row contains the message previously sent.
 						var lRow = lResponse.data[ 0 ];
-						for( var lIdx = 0, lCnt = lRow.length; lIdx < lCnt; lIdx++ ) {
-							if( lRow[ lIdx ] == jws.tests.Logging.MESSAGE ) {
+						for (var lIdx = 0, lCnt = lRow.length; lIdx < lCnt; lIdx++) {
+							if (lRow[ lIdx ] == jws.tests.Logging.MESSAGE) {
 								lDone = true;
 								break;
 							}
@@ -140,21 +138,20 @@ jws.tests.Logging = {
 			});
 
 			waitsFor(
-				function() {
-					return( lDone == true );
-				},
-				lSpec,
-				1500
-			);
+					function () {
+						return(lDone == true);
+					},
+					lSpec,
+					1500
+					);
 
-			runs( function() {
-				expect( lDone ).toEqual( true );
+			runs(function () {
+				expect(lDone).toEqual(true);
 			});
 
 		});
 	},
-
-	runSpecs: function() {
+	runSpecs: function () {
 		this.testLog();
 		this.testGetLog();
 	}

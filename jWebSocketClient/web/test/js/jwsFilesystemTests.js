@@ -27,12 +27,15 @@ jws.tests.FileSystem = {
 	TEST_FILE_NAME: "test.txt",
 	TEST_BIG_FILE_NAME: "base64BigFile.txt",
 	TEST_BIG_FILE_DATA: "This example is based on the File System PlugIn which allows to submit and receive from the server base64 encoded files.",
-	testFileSave: function(aFilename, aData, aScope) {
+	dependsOn: [{
+			plugInId: "jws.filesystem"
+		}],
+	testFileSave: function (aFilename, aData, aScope) {
 		var lSpec = "FileSave (admin, " + aFilename + ", " + aScope + ")";
 		var lData = aData;
 		var lFilename = aFilename;
 
-		it(lSpec, function() {
+		it(lSpec, function () {
 
 			var lResponse = null;
 
@@ -40,33 +43,33 @@ jws.tests.FileSystem = {
 				encode: true,
 				encoding: 'zipBase64',
 				scope: aScope,
-				OnResponse: function(aToken) {
+				OnResponse: function (aToken) {
 					lResponse = aToken;
 				}
 			});
 
 			waitsFor(
-					function() {
+					function () {
 						return(null !== lResponse);
 					},
 					lSpec,
 					3000
 					);
 
-			runs(function() {
+			runs(function () {
 				expect(lResponse.code).toEqual(0);
 			});
 
 		});
 	},
-	testFileSend: function(aFilename, aData) {
+	testFileSend: function (aFilename, aData) {
 		var lSpec = "FileSend (admin, " + aFilename + ")";
 
-		it(lSpec, function() {
+		it(lSpec, function () {
 
 			var lResponse = null;
 			jws.Tests.getAdminTestConn().setFileSystemCallbacks({
-				OnFileReceived: function(aToken) {
+				OnFileReceived: function (aToken) {
 					lResponse = aToken;
 				}
 			});
@@ -75,48 +78,48 @@ jws.tests.FileSystem = {
 			});
 
 			waitsFor(
-					function() {
+					function () {
 						return(null !== lResponse);
 					},
 					lSpec,
 					3000
 					);
 
-			runs(function() {
+			runs(function () {
 				expect(lResponse.filename).toEqual(aFilename);
 				expect(lResponse.data).toEqual(aData);
 			});
 
 		});
 	},
-	testGetFilelist: function(aAlias, aFilemasks, aRecursive, aExpectedList) {
+	testGetFilelist: function (aAlias, aFilemasks, aRecursive, aExpectedList) {
 		var lSpec = "GetFilelist (admin, " + aAlias + ", " +
 				JSON.stringify(aFilemasks) + ", " + aRecursive + ")";
 
-		it(lSpec, function() {
+		it(lSpec, function () {
 
 			var lResponse = null;
 
 			jws.Tests.getAdminTestConn().fileGetFilelist(aAlias, aFilemasks, {
 				recursive: aRecursive,
-				OnResponse: function(aToken) {
+				OnResponse: function (aToken) {
 					lResponse = aToken;
 				}
 			});
 
 			waitsFor(
-					function() {
+					function () {
 						return(null !== lResponse);
 					},
 					lSpec,
 					3000
 					);
 
-			runs(function() {
+			runs(function () {
 				expect(lResponse.code).toEqual(0);
 
 				var lObtainedKeys = [];
-				lResponse.files.forEach(function(aItem) {
+				lResponse.files.forEach(function (aItem) {
 					lObtainedKeys.push(aItem.filename);
 				});
 
@@ -125,126 +128,126 @@ jws.tests.FileSystem = {
 
 		});
 	},
-	testFileLoad: function(aFilename, aAlias, aExpectedData) {
+	testFileLoad: function (aFilename, aAlias, aExpectedData) {
 		var lSpec = "FileLoad (admin, " + aFilename + ", " + aAlias + ")";
 		var lData = aExpectedData;
 		var lFilename = aFilename;
 
-		it(lSpec, function() {
+		it(lSpec, function () {
 
 			var lResponse = null;
 
 			jws.Tests.getAdminTestConn().fileLoad(lFilename, aAlias, {
 				decode: true,
 				encoding: 'zipBase64',
-				OnResponse: function(aToken) {
+				OnResponse: function (aToken) {
 					lResponse = aToken;
 				}
 			});
 
 			waitsFor(
-					function() {
+					function () {
 						return(null !== lResponse);
 					},
 					lSpec,
 					3000
 					);
 
-			runs(function() {
+			runs(function () {
 				expect(lResponse.data).toEqual(lData);
 			});
 
 		});
 	},
-	testBigFileLoad: function(aFilename, aAlias, aExpectedData, aIterations) {
+	testBigFileLoad: function (aFilename, aAlias, aExpectedData, aIterations) {
 		var lSpec = "Base64 big File Load (admin, " + aFilename + ", " + aAlias + ")";
 		var lData = aExpectedData;
 		var lFilename = aFilename;
 
-		it(lSpec, function() {
+		it(lSpec, function () {
 
 			var lResponse = null;
 
 			jws.Tests.getAdminTestConn().fileLoad(lFilename, aAlias, {
 				decode: true,
 				encoding: 'zipBase64',
-				OnResponse: function(aToken) {
+				OnResponse: function (aToken) {
 					lResponse = aToken;
 				}
 			});
 
 			waitsFor(
-					function() {
+					function () {
 						return(null !== lResponse);
 					},
 					lSpec,
 					3000
 					);
 
-			runs(function() {
+			runs(function () {
 				expect(jws.tests.FileSystem.decodeBigFileData(lData, lResponse.data, aIterations)).toEqual(lData);
 			});
 
 		});
 	},
-	testFileDelete: function(aFilename, aForce, aExpectedCode) {
+	testFileDelete: function (aFilename, aForce, aExpectedCode) {
 		var lSpec = "FileDelete (admin, " + aFilename + ", " + aExpectedCode + ")";
 
-		it(lSpec, function() {
+		it(lSpec, function () {
 
 			var lResponse = null;
 
 			jws.Tests.getAdminTestConn().fileDelete(aFilename, aForce, {
-				OnResponse: function(aToken) {
+				OnResponse: function (aToken) {
 					lResponse = aToken;
 				}
 			});
 
 			waitsFor(
-					function() {
+					function () {
 						return(null !== lResponse);
 					},
 					lSpec,
 					3000
 					);
 
-			runs(function() {
+			runs(function () {
 				expect(lResponse.code).toEqual(aExpectedCode);
 			});
 
 		});
 	},
-	testFileExists: function(aAlias, aFilename, aExpectedValue) {
+	testFileExists: function (aAlias, aFilename, aExpectedValue) {
 		var lSpec = "FileExists (admin, " + aAlias + ", " + aFilename + ")";
 		var lFilename = aFilename;
 		var lAlias = aAlias;
 
-		it(lSpec, function() {
+		it(lSpec, function () {
 
 			var lResponse = null;
 
 			jws.Tests.getAdminTestConn().fileExists(lFilename, lAlias, {
-				OnResponse: function(aToken) {
+				OnResponse: function (aToken) {
 					lResponse = aToken;
 				}
 			});
 
 			waitsFor(
-					function() {
+					function () {
 						return(null !== lResponse);
 					},
 					lSpec,
 					3000
 					);
 
-			runs(function() {
+			runs(function () {
 				expect(lResponse.code).toEqual(0);
 				expect(lResponse.exists).toEqual(aExpectedValue);
 			});
 
 		});
 	},
-	runSpecs: function() {
+	runSpecs: function () {
 		jws.tests.FileSystem.testFileSave(
 				this.TEST_FILE_NAME,
 				this.TEST_FILE_DATA,
@@ -280,7 +283,7 @@ jws.tests.FileSystem = {
 		jws.tests.FileSystem.testBigFileLoad(
 				this.TEST_BIG_FILE_NAME,
 				jws.FileSystemPlugIn.ALIAS_PRIVATE,
-				this.TEST_BIG_FILE_DATA, 
+				this.TEST_BIG_FILE_DATA,
 				1000);
 
 		jws.tests.FileSystem.testFileExists(
@@ -310,7 +313,7 @@ jws.tests.FileSystem = {
 	 * @param {type} aIterations
 	 * @returns {@exp;Base64@pro;encode@pro;output|Base64@pro;_keyStr@call;charAt|String}
 	 */
-	generateBigFile: function(aData, aIterations) {
+	generateBigFile: function (aData, aIterations) {
 		var lIdx = 0, lResult = "";
 		for (lIdx = 0; lIdx < aIterations; lIdx++) {
 			lResult += aData;
@@ -325,7 +328,7 @@ jws.tests.FileSystem = {
 	 * @param {type} aIterations
 	 * @returns {String} the original data encoded or the error data
 	 */
-	decodeBigFileData: function(aOriginalData, aBigData, aIterations) {
+	decodeBigFileData: function (aOriginalData, aBigData, aIterations) {
 		var lIdx = 0,
 				lResult = Base64.decode(aBigData),
 				aOriginalDataLength = aOriginalData.length;

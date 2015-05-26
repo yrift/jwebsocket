@@ -18,74 +18,73 @@
 //	---------------------------------------------------------------------------
 
 jws.tests.Streaming = {
-
 	title: "Streaming plug-in",
 	description: "jWebSocket streaming plug-in",
 	category: "Community Edition",
-
+	dependsOn: [{
+			plugInId: "jws.streaming"
+		}],
 	// this spec tests the register method of the streaming plug-in
-	testRegister: function( aStreamId ) {
+	testRegister: function (aStreamId) {
 		var lSpec = "register (" + aStreamId + ")";
-		
-		it( lSpec, function () {
+
+		it(lSpec, function () {
 
 			var lResponse = {};
-			jws.Tests.getAdminTestConn().registerStream( 
-				aStreamId,
-				{	OnResponse: function( aToken ) {
-						lResponse = aToken;
+			jws.Tests.getAdminTestConn().registerStream(
+					aStreamId,
+					{OnResponse: function (aToken) {
+							lResponse = aToken;
+						}
 					}
-				}
 			);
 
 			waitsFor(
-				function() {
-					return( lResponse.code == 0 );
-				},
-				lSpec,
-				3000
-			);
+					function () {
+						return(lResponse.code == 0);
+					},
+					lSpec,
+					3000
+					);
 
-			runs( function() {
-				expect( lResponse.code ).toEqual( 0 );
+			runs(function () {
+				expect(lResponse.code).toEqual(0);
 			});
 
 		});
 	},
-
 	// this spec tests the unregister method of the streaming plug-in
-	testUnregister: function( aStreamId ) {
+	testUnregister: function (aStreamId) {
 		var lSpec = "unregister (" + aStreamId + ")";
-		
-		it( lSpec, function () {
+
+		it(lSpec, function () {
 
 			var lResponse = {};
-			jws.Tests.getAdminTestConn().unregisterStream( 
-				aStreamId,
-				{	OnResponse: function( aToken ) {
-						lResponse = aToken;
+			jws.Tests.getAdminTestConn().unregisterStream(
+					aStreamId,
+					{OnResponse: function (aToken) {
+							lResponse = aToken;
+						}
 					}
-				}
 			);
 
 			waitsFor(
-				function() {
-					return( lResponse.code == 0 );
-				},
-				lSpec,
-				3000
-			);
+					function () {
+						return(lResponse.code == 0);
+					},
+					lSpec,
+					3000
+					);
 
-			runs( function() {
-				expect( lResponse.code ).toEqual( 0 );
+			runs(function () {
+				expect(lResponse.code).toEqual(0);
 			});
 
 		});
 	},
-
-	runSpecs: function() {
-		jws.tests.Streaming.testRegister( "timeStream" );
-		jws.tests.Streaming.testUnregister( "timeStream" );
+	runSpecs: function () {
+		jws.tests.Streaming.testRegister("timeStream");
+		jws.tests.Streaming.testUnregister("timeStream");
 	}
 };
 

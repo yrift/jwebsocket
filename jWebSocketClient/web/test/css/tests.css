@@ -49,3 +49,37 @@
 #demo_box table {
 	margin-left: 15px;
 }
+
+span#tests{
+	float: left;
+	width: 100%;
+}
+span#tests > div {
+	width: 100%;
+	float: left;
+}
+
+span#tests > div.striped {
+	background-color: #F2F9FF;
+}
+span#tests > div.disabled {
+	color: gray;
+}
+
+span#tests span {
+	float: left;
+	clear: left;
+}
+
+.missing-dependency{
+	font-size: 10px;
+	color: #C68206;
+	float: right;
+	margin: 6px 0 0 10px;
+	background: url(../../res/img/help1.png) no-repeat right 0;
+	padding-right: 18px;
+	cursor: pointer;
+}
+.ui-widget-content a {
+  color: #358CC5;
+}

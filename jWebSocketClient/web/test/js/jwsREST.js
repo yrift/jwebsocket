@@ -22,49 +22,52 @@ jws.tests.REST = {
 	description: "jWebSocket REST support for remote interaction with the jWebSocket server infrastructure",
 	category: "REST",
 	connectionId: new Date().getTime(),
-    checked: false,
-	getURL: function() {
+	checked: false,
+	dependsOn: [{
+			engineId: "org.jwebsocket.tomcat.TomcatEngine"
+		}],
+	getURL: function () {
 		return "http://localhost:8787/jWebSocket/http?connectionId=" + jws.tests.REST.connectionId;
 	},
 	// this spec tests the 'open' feature 
-	testOpen: function() {
+	testOpen: function () {
 
 		var lSpec = "open connection";
-		it(lSpec, function() {
+		it(lSpec, function () {
 			var lResponse = null;
-			$.getJSON(jws.tests.REST.getURL() + "&action=open", function(aJson) {
+			$.getJSON(jws.tests.REST.getURL() + "&action=open", function (aJson) {
 				lResponse = aJson;
 			});
 
 			// wait for result, consider reasonable timeout
-			waitsFor(function() {
+			waitsFor(function () {
 				return(null !== lResponse);
 			}, lSpec, 1500);
 
 			// check the result 
-			runs(function() {
+			runs(function () {
 				expect(true).toEqual(true);
 			});
 
 		});
 	},
 	// this spec tests the 'login' feature 
-	testLogin: function() {
+	testLogin: function () {
 
 		var lSpec = "login (root, root)";
-		it(lSpec, function() {
+		it(lSpec, function () {
 			var lResponse = null;
-			$.getJSON(jws.tests.REST.getURL() + "&action=login&username=root&password=root", function(aJson) {
+			$.getJSON(jws.tests.REST.getURL() + "&action=login&username=root&password=root", function (aJson) {
 				lResponse = aJson;
 			});
 
 			// wait for result, consider reasonable timeout
-			waitsFor(function() {
+			waitsFor(function () {
 				return(null !== lResponse);
 			}, lSpec, 1500);
 
 			// check the result 
-			runs(function() {
+			runs(function () {
 				expect(lResponse.code).toEqual(0);
 				expect(lResponse.username).toEqual("root");
 			});
@@ -72,22 +75,22 @@ jws.tests.REST = {
 		});
 	},
 	// this spec tests the 'sync' feature 
-	testSync: function() {
+	testSync: function () {
 
 		var lSpec = "sync";
-		it(lSpec, function() {
+		it(lSpec, function () {
 			var lResponse = null;
-			$.getJSON(jws.tests.REST.getURL() + "&action=sync", function(aJson) {
+			$.getJSON(jws.tests.REST.getURL() + "&action=sync", function (aJson) {
 				lResponse = aJson;
 			});
 
 			// wait for result, consider reasonable timeout
-			waitsFor(function() {
+			waitsFor(function () {
 				return(null !== lResponse);
 			}, lSpec, 1500);
 
 			// check the result 
-			runs(function() {
+			runs(function () {
 				expect(jws.tools.getType(lResponse)).toEqual("array");
 				expect(lResponse.length > 0).toEqual(true);
 			});
@@ -95,25 +98,25 @@ jws.tests.REST = {
 		});
 	},
 	// this spec tests the 'login' feature 
-	testSend: function() {
+	testSend: function () {
 
 		var lSpec = "send (echo)";
-		it(lSpec, function() {
+		it(lSpec, function () {
 			var lResponse = null;
 			$.getJSON(jws.tests.REST.getURL() + "&action=send&data=" + JSON.stringify({
 				ns: "org.jwebsocket.plugins.system",
 				type: "echo",
-				data: "REST"}), function(aJson) {
+				data: "REST"}), function (aJson) {
 				lResponse = aJson;
 			});
 
 			// wait for result, consider reasonable timeout
-			waitsFor(function() {
+			waitsFor(function () {
 				return(null !== lResponse);
 			}, lSpec, 1500);
 
 			// check the result 
-			runs(function() {
+			runs(function () {
 				expect(lResponse.code).toEqual(0);
 				expect(lResponse.data).toEqual("REST");
 			});
@@ -121,50 +124,50 @@ jws.tests.REST = {
 		});
 	},
 	// this spec tests the 'logout' feature 
-	testLogout: function() {
+	testLogout: function () {
 
 		var lSpec = "logout (root)";
-		it(lSpec, function() {
+		it(lSpec, function () {
 			var lResponse = null;
-			$.getJSON(jws.tests.REST.getURL() + "&action=logout", function(aJson) {
+			$.getJSON(jws.tests.REST.getURL() + "&action=logout", function (aJson) {
 				lResponse = aJson;
 			});
 
 			// wait for result, consider reasonable timeout
-			waitsFor(function() {
+			waitsFor(function () {
 				return(null !== lResponse);
 			}, lSpec, 1500);
 
 			// check the result 
-			runs(function() {
+			runs(function () {
 				expect(lResponse.code).toEqual(0);
 			});
 
 		});
 	},
 	// this spec tests the 'close' feature 
-	testClose: function() {
+	testClose: function () {
 
 		var lSpec = "close connection";
-		it(lSpec, function() {
+		it(lSpec, function () {
 			var lResponse = null;
-			$.get(jws.tests.REST.getURL() + "&action=close", function(aResponse) {
+			$.get(jws.tests.REST.getURL() + "&action=close", function (aResponse) {
 				lResponse = aResponse;
 			});
 
 			// wait for result, consider reasonable timeout
-			waitsFor(function() {
+			waitsFor(function () {
 				return(null !== lResponse);
 			}, lSpec, 1500);
 
 			// check the result 
-			runs(function() {
+			runs(function () {
 				expect(lResponse).toEqual("http.command.close");
 			});
 
 		});
 	},
-	runSpecs: function() {
+	runSpecs: function () {
 		this.testOpen();
 		this.testLogin();
 		this.testSync();
