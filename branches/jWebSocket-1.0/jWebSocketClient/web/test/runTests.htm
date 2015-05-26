@@ -151,7 +151,19 @@
 							<option value="ws">Unsecure (ws)</option>
 							<option value="wss">Secure (wss)</option>
 						</select>
-
+						<div class="toolbar">
+							<div class="button onmouseup" 
+							 onmouseover="this.className = 'button onmouseover'" 
+							 onmousedown="this.className = 'button onmousedown'" 
+							 onmouseup="this.className = 'button onmouseup'" 
+							 onmouseout="this.className = 'button onmouseout'" 
+							 onclick="this.className = 'button onmouseover';"
+							 title="Select all tests">
+							<div class="btn_left"></div>
+							<div class="btn_center"><label><input id="select-all-cb" type="checkbox"><span class="select-all-text">Select all</span></label></div>
+							<div class="btn_right"></div>
+							</div>
+						</div>
 						<p>
 							<label><input id="openConns" type="checkbox" disabled checked="checked"> Open connections for admin and guest</label>
 							<br>
@@ -202,6 +214,11 @@
 					TT_GET_PLUGINS_INFO = "getPlugInsInfo",
 					lCategoriesSelectStr = "<select id='test_set'><option value='__ALL__'>All</option>";
 			var lTests = initTestsIndex();
+			$("#select-all-cb").change(function (aEvent, aValue) {
+				var lIsChecked = $(this).attr("checked");
+				$("#tests").find("input[type=checkbox]:enabled").attr("checked", lIsChecked ? true : false);
+				$(".select-all-text").text(!lIsChecked ? "Select all" : "Unselect all");
+			});
 			$.each(lTests.categories, function (aIndex, aCategory) {
 				lCategoriesSelectStr += "<option value'" + aCategory + "'>" + aCategory + "</option>";
 			});

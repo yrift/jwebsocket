@@ -81,5 +81,28 @@ span#tests span {
 	cursor: pointer;
 }
 .ui-widget-content a {
-  color: #358CC5;
+	color: #358CC5;
+}
+
+.toolbar{
+	font-size: 12px;
+	float: left;
+	clear: left;
+	width: 95%;
+	margin-left: 12px;
+	margin-top: 17px;
+	margin-bottom: 10px;
+}
+
+.toolbar .btn_center{
+	padding-left: 0;
+	padding-right: 4px;
+}
+
+.toolbar .btn_center label, .toolbar .btn_center label input[type=checkbox], .toolbar .btn_center label span{
+	float: left;
+	cursor: pointer;
+}
+.toolbar .btn_center label *{
+	margin-top: 2px;
 }
