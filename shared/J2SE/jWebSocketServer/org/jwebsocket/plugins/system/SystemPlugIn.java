@@ -20,7 +20,6 @@ package org.jwebsocket.plugins.system;
 
 import java.lang.management.ManagementFactory;
 import java.lang.management.MemoryMXBean;
-import java.lang.management.MemoryPoolMXBean;
 import java.lang.management.OperatingSystemMXBean;
 import java.lang.management.RuntimeMXBean;
 import java.util.*;
@@ -38,6 +37,7 @@ import org.jwebsocket.api.WebSocketConnector;
 import org.jwebsocket.api.WebSocketConnectorStatus;
 import org.jwebsocket.api.WebSocketEngine;
 import org.jwebsocket.api.WebSocketPacket;
+import org.jwebsocket.api.WebSocketPlugIn;
 import org.jwebsocket.api.WebSocketPlugInChain;
 import org.jwebsocket.api.WebSocketServer;
 import org.jwebsocket.config.JWebSocketCommonConstants;
@@ -75,7 +75,8 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.GrantedAuthority;
 
 /**
- * Implements the jWebSocket system core features like login, logout, send, broadcast etc...
+ * Implements the jWebSocket system core features like login, logout, send,
+ * broadcast etc...
  *
  * @author Alexander Schulze
  * @author kybernees
@@ -132,6 +133,7 @@ public class SystemPlugIn extends TokenPlugIn {
 	private static final String TT_SESSION_KEYS = "sessionKeys";
 	private static final String TT_SESSION_GETALL = "sessionGetAll";
 	private static final String TT_SESSION_GETMANY = "sessionGetMany";
+	private static final String TT_GET_PLUGINS_INFO = "getPlugInsInfo";
 	// session key subfix for public data storage
 	// other clients can read public connector's session data
 	/**
@@ -334,6 +336,8 @@ public class SystemPlugIn extends TokenPlugIn {
 				sessionPut(aConnector, aToken);
 			} else if (lType.equals(TT_SESSION_REMOVE)) {
 				sessionRemove(aConnector, aToken);
+			} else if (TT_GET_PLUGINS_INFO.equals(lType)) {
+				getPlugInsInfo(aConnector, aToken);
 			}
 			aResponse.abortChain();
 		}
@@ -1023,9 +1027,9 @@ public class SystemPlugIn extends TokenPlugIn {
 	}
 
 	/**
-	 * simply waits for a certain amount of time and does not perform any _ operation. This feature
-	 * is used for debugging and simulation purposes _ only and is not related to any business
-	 * logic.
+	 * simply waits for a certain amount of time and does not perform any _
+	 * operation. This feature is used for debugging and simulation purposes _
+	 * only and is not related to any business logic.
 	 *
 	 * @param aToken
 	 */
@@ -1121,7 +1125,8 @@ public class SystemPlugIn extends TokenPlugIn {
 	}
 
 	/**
-	 * allocates a "non-interruptable" communication channel between two clients.
+	 * allocates a "non-interruptable" communication channel between two
+	 * clients.
 	 *
 	 * @param aConnector
 	 * @param aToken
@@ -1136,7 +1141,8 @@ public class SystemPlugIn extends TokenPlugIn {
 	}
 
 	/**
-	 * deallocates a "non-interruptable" communication channel between two clients.
+	 * deallocates a "non-interruptable" communication channel between two
+	 * clients.
 	 *
 	 * @param aConnector
 	 * @param aToken
@@ -1151,7 +1157,8 @@ public class SystemPlugIn extends TokenPlugIn {
 	}
 
 	/**
-	 * Logon a user given the username and password by using the Spring Security module
+	 * Logon a user given the username and password by using the Spring Security
+	 * module
 	 *
 	 * @param aConnector
 	 * @param aToken The token with the username and password
@@ -1737,6 +1744,42 @@ public class SystemPlugIn extends TokenPlugIn {
 		} catch (Exception lEx) {
 			mLog.error(Logging.getSimpleExceptionMessage(lEx, "notifying 'logoff' "
 					+ "event through the MessageHub"), lEx);
+		}
+	}
+
+	/**
+	 * Iterates throuhg all the active PlugIns returning a list with their
+	 * namespaces to the test interface for test purposes
+	 *
+	 * @param aConnector
+	 * @param aToken
+	 */
+	public void getPlugInsInfo(WebSocketConnector aConnector, Token aToken) {
+		if (SecurityHelper.isUserAuthenticated(aConnector)) {
+			Token lResponse = createResponse(aToken);
+			FastList<Token> lList = new FastList<Token>();
+			Token lData;
+			List<WebSocketPlugIn> lPlugIns
+					= getPlugInChain().getPlugIns();
+			for (WebSocketPlugIn lPlugIn : lPlugIns) {
+				lData = TokenFactory.createToken();
+				lData.setString("namespace", lPlugIn.getNamespace());
+				lData.setString("id", lPlugIn.getId());
+				lData.setString("name", lPlugIn.getName());
+				lData.setString("description", lPlugIn.getDescription());
+				lData.setString("vendor", lPlugIn.getVendor());
+				lData.setString("copyright", lPlugIn.getCopyright());
+				lData.setString("label", lPlugIn.getLabel());
+				lData.setString("version", lPlugIn.getVersion());
+				lData.setString("license", lPlugIn.getLicense());
+				lData.setBoolean("enabled", lPlugIn.getEnabled());
+				lList.add(lData);
+			}
+
+			lResponse.setList("data", lList);
+			sendToken(aConnector, aConnector, lResponse);
+		} else {
+			sendErrorToken(aConnector, aToken, -1, "You are not authenticated to run this action.");
 		}
 	}
 }
