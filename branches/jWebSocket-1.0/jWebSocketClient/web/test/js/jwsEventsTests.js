@@ -18,12 +18,13 @@
 //	---------------------------------------------------------------------------
 
 jws.tests.Events = {
-
 	title: "Events plug-in",
 	description: "jWebSocket events plug-in basic tests.",
 	category: "Community Edition",
-	
 	authenticated: false,
+	dependsOn: [{
+			plugInId: "jws.events.test"
+		}],
 
 	// this spec tests the login operation of the test application
 	testLogon: function() {

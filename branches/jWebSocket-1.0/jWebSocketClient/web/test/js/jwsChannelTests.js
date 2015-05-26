@@ -22,70 +22,73 @@ jws.tests.Channels = {
 	description: "jWebSocket channel plug-in. Designed for server centric communications channels.",
 	category: "Community Edition",
 	TEST_MESSAGE: "this is a test message",
+	dependsOn: [{
+			plugInId: "jws.channels"
+		}],
 	// this spec tests the subscribe method of the Channels plug-in
-	testSubscribe: function(aChannelName, aAccessKey) {
+	testSubscribe: function (aChannelName, aAccessKey) {
 		var lSpec = "subscribe (" + aChannelName + ")";
 
-		it(lSpec, function() {
+		it(lSpec, function () {
 			var lResponse = {};
 			jws.Tests.getAdminTestConn().channelSubscribe(
 					aChannelName,
 					aAccessKey,
 					{
-						OnResponse: function(aToken) {
+						OnResponse: function (aToken) {
 							lResponse = aToken;
 						}
 					}
 			);
 
 			waitsFor(
-					function() {
+					function () {
 						return(lResponse.code == 0);
 					},
 					lSpec,
 					1000
 					);
 
-			runs(function() {
+			runs(function () {
 				expect(lResponse.code).toEqual(0);
 			});
 		});
 	},
 	// this spec tests the unsubscribe method of the Channels plug-in
-	testUnsubscribe: function(aChannelName) {
+	testUnsubscribe: function (aChannelName) {
 		var lSpec = "unsubscribe (" + aChannelName + ")";
 
-		it(lSpec, function() {
+		it(lSpec, function () {
 			var lResponse = {};
 			jws.Tests.getAdminTestConn().channelUnsubscribe(
 					aChannelName,
 					{
-						OnResponse: function(aToken) {
+						OnResponse: function (aToken) {
 							lResponse = aToken;
 						}
 					}
 			);
 
 			waitsFor(
-					function() {
+					function () {
 						return(lResponse.code == 0);
 					},
 					lSpec,
 					1000
 					);
 
-			runs(function() {
+			runs(function () {
 				expect(lResponse.code).toEqual(0);
 			});
 
 		});
 	},
 	// this spec tests the create method for a new channel
-	testChannelCreate: function(aChannelId, aChannelName, aAccessKey, aSecretKey,
+	testChannelCreate: function (aChannelId, aChannelName, aAccessKey, aSecretKey,
 			aIsPrivate, aIsSystem, aComment, aExpectedReturnCode) {
 		var lSpec = "channelCreate (id: " + aChannelId + ", name: " + aChannelName + ", " + aComment + ")";
 
-		it(lSpec, function() {
+		it(lSpec, function () {
 
 			var lResponse = {};
 			jws.Tests.getAdminTestConn().channelCreate(
@@ -96,35 +99,35 @@ jws.tests.Channels = {
 						isSystem: aIsSystem,
 						accessKey: aAccessKey,
 						secretKey: aSecretKey,
-						OnResponse: function(aToken) {
+						OnResponse: function (aToken) {
 							lResponse = aToken;
 						}
 					}
 			);
 
 			waitsFor(
-					function() {
+					function () {
 						return(lResponse.code !== undefined);
 					},
 					lSpec,
 					1000
 					);
 
-			runs(function() {
+			runs(function () {
 				expect(lResponse.code).toEqual(aExpectedReturnCode);
 			});
 
 		});
 	},
 	// this spec tests the modify method for an existing channel
-	testChannelModify: function(aChannelId, aSecretKey,
+	testChannelModify: function (aChannelId, aSecretKey,
 			aOptions, aComment, aExpectedReturnCode) {
 		var lSpec = "channelModify (id: " + aChannelId + ", name: " + aChannelId + ", " + aComment + ")";
 
-		it(lSpec, function() {
+		it(lSpec, function () {
 
 			var lResponse = {};
-			aOptions.OnResponse = function(aToken) {
+			aOptions.OnResponse = function (aToken) {
 				lResponse = aToken;
 			};
 			jws.Tests.getAdminTestConn().channelModify(
@@ -134,25 +137,25 @@ jws.tests.Channels = {
 					);
 
 			waitsFor(
-					function() {
+					function () {
 						return(lResponse.code !== undefined);
 					},
 					lSpec,
 					2000
 					);
 
-			runs(function() {
+			runs(function () {
 				expect(lResponse.code).toEqual(aExpectedReturnCode);
 			});
 
 		});
 	},
 	// this spec tests the create method for a new channel
-	testChannelAuth: function(aChannelId, aAccessKey, aSecretKey,
+	testChannelAuth: function (aChannelId, aAccessKey, aSecretKey,
 			aComment, aExpectedReturnCode) {
 		var lSpec = "channelAuth (id: " + aChannelId + ", " + aComment + ")";
 
-		it(lSpec, function() {
+		it(lSpec, function () {
 
 			var lResponse = {};
 			jws.Tests.getAdminTestConn().channelAuth(
@@ -160,39 +163,39 @@ jws.tests.Channels = {
 					aAccessKey,
 					aSecretKey,
 					{
-						OnResponse: function(aToken) {
+						OnResponse: function (aToken) {
 							lResponse = aToken;
 						}
 					}
 			);
 
 			waitsFor(
-					function() {
+					function () {
 						return(lResponse.code !== undefined);
 					},
 					lSpec,
 					1000
 					);
 
-			runs(function() {
+			runs(function () {
 				expect(lResponse.code).toEqual(aExpectedReturnCode);
 			});
 
 		});
 	},
 	// this spec tests the create method for a new channel
-	testChannelPublish: function(aChannelId, aData,
+	testChannelPublish: function (aChannelId, aData,
 			aComment, aExpectedReturnCode) {
 		var lSpec = "channelPublish (id: " + aChannelId + ", data: " + aData + ", " + aComment + ")";
 
-		it(lSpec, function() {
+		it(lSpec, function () {
 
 			var lResponse = null;
 			var lEvent = null;
 
 			if (0 == aExpectedReturnCode) {
 				jws.Tests.getAdminTestConn().setChannelCallbacks({
-					OnChannelBroadcast: function(aEvent) {
+					OnChannelBroadcast: function (aEvent) {
 						lEvent = aEvent;
 					}
 				});
@@ -204,21 +207,21 @@ jws.tests.Channels = {
 					aData,
 					null,
 					{
-						OnResponse: function(aToken) {
+						OnResponse: function (aToken) {
 							lResponse = aToken;
 						}
 					}
 			);
 
 			waitsFor(
-					function() {
+					function () {
 						return(lResponse != null && lEvent != null);
 					},
 					lSpec,
 					3000
 					);
 
-			runs(function() {
+			runs(function () {
 				expect(lResponse.code).toEqual(aExpectedReturnCode);
 				if (0 == aExpectedReturnCode) {
 					expect(lEvent.data).toEqual(aData);
@@ -228,29 +231,29 @@ jws.tests.Channels = {
 		});
 	},
 	// this spec tests the create method for a new channel
-	testChannelSubscriptions: function(aComment, aExpectedIDs, aExpectedCount) {
+	testChannelSubscriptions: function (aComment, aExpectedIDs, aExpectedCount) {
 		var lSpec = "channelSubscriptions (" + aComment + ")";
 
-		it(lSpec, function() {
+		it(lSpec, function () {
 
 			var lResponse = {};
 			jws.Tests.getAdminTestConn().channelGetSubscriptions(
 					{
-						OnResponse: function(aToken) {
+						OnResponse: function (aToken) {
 							lResponse = aToken;
 						}
 					}
 			);
 
 			waitsFor(
-					function() {
+					function () {
 						return(lResponse.code !== undefined);
 					},
 					lSpec,
 					1000
 					);
 
-			runs(function() {
+			runs(function () {
 				var lChannels = lResponse.channels;
 				var lToBeFound = aExpectedCount;
 				if (lChannels) {
@@ -275,29 +278,29 @@ jws.tests.Channels = {
 		});
 	},
 	// this spec tests to obtain the ids of the 
-	testChannelGetIds: function(aComment, aExpectedIDs, aExpectedCount) {
+	testChannelGetIds: function (aComment, aExpectedIDs, aExpectedCount) {
 		var lSpec = "channelGetIds (" + aComment + ")";
 
-		it(lSpec, function() {
+		it(lSpec, function () {
 
 			var lResponse = {};
 			jws.Tests.getAdminTestConn().channelGetIds(
 					{
-						OnResponse: function(aToken) {
+						OnResponse: function (aToken) {
 							lResponse = aToken;
 						}
 					}
 			);
 
 			waitsFor(
-					function() {
+					function () {
 						return(lResponse.code !== undefined);
 					},
 					lSpec,
 					1000
 					);
 
-			runs(function() {
+			runs(function () {
 				var lChannels = lResponse.channels;
 				var lToBeFound = aExpectedCount;
 				if (lChannels) {
@@ -322,10 +325,10 @@ jws.tests.Channels = {
 		});
 	},
 	// this spec tests the create method for a new channel
-	testChannelComplexTest: function(aComment) {
+	testChannelComplexTest: function (aComment) {
 		var lSpec = "complex test (" + aComment + ")";
 
-		it(lSpec, function() {
+		it(lSpec, function () {
 
 			var lPubCnt = 3, lPubIdx;
 			var lSubCnt = 9, lSubIdx;
@@ -339,7 +342,7 @@ jws.tests.Channels = {
 			var lChId;
 			var lPacketsReceived = 0;
 
-			var lCreateSubs = function() {
+			var lCreateSubs = function () {
 				// now create the given number of subscribers
 				for (lSubIdx = 0; lSubIdx < lSubCnt; lSubIdx++) {
 					lSub = new jws.jWebSocketJSONClient();
@@ -350,7 +353,7 @@ jws.tests.Channels = {
 						status: jws.tests.Channels.INIT
 					};
 					lSub.logon(jws.getDefaultServerURL(), jws.Tests.ADMIN_USER, jws.Tests.ADMIN_PWD, {
-						OnToken: function(aToken) {
+						OnToken: function (aToken) {
 							// jws.console.log( "Subscriber Token: " + JSON.stringify( aToken ) );
 							// once logged in subscribe each client to a certain publisher
 							if ("org.jwebsocket.plugins.system" == aToken.ns
@@ -378,7 +381,7 @@ jws.tests.Channels = {
 										lChId = "ch_" + (lPubIdx + 1);
 										jws.console.log("Publishing at channel " + lChId + "...");
 										lPub.channelPublish(lChId, "Test", null, {
-											OnResponse: function(aToken) {
+											OnResponse: function (aToken) {
 												jws.console.log("Publish Response: " + JSON.stringify(aToken));
 											}
 										});
@@ -398,7 +401,7 @@ jws.tests.Channels = {
 				}
 			}
 
-			var lCreatePubs = function() {
+			var lCreatePubs = function () {
 				// first create the given number of publishers
 				for (lPubIdx = 0; lPubIdx < lPubCnt; lPubIdx++) {
 					lPub = new jws.jWebSocketJSONClient();
@@ -408,7 +411,7 @@ jws.tests.Channels = {
 					};
 
 					lPub.logon(jws.getDefaultServerURL(), jws.Tests.ADMIN_USER, jws.Tests.ADMIN_PWD, {
-						OnToken: function(aToken) {
+						OnToken: function (aToken) {
 							// once logged in the channel can be created
 							if ("org.jwebsocket.plugins.system" == aToken.ns
 									&& "login" == aToken.reqType) {
@@ -435,7 +438,7 @@ jws.tests.Channels = {
 										"testAccessKey",
 										"testSecretKey",
 										{
-											OnResponse: function(aToken) {
+											OnResponse: function (aToken) {
 												jws.console.log("Channel " + aToken.channelId + " authenticated.");
 												if (lPubsCreated == lPubCnt) {
 													// lCreateSubs();
@@ -466,7 +469,7 @@ jws.tests.Channels = {
 			setTimeout(lCreateSubs, 500);
 
 			waitsFor(
-					function() {
+					function () {
 						return(
 								lPubsCreated == lPubCnt
 								&& lPacketsReceived == lSubCnt
@@ -476,7 +479,7 @@ jws.tests.Channels = {
 					3000
 					);
 
-			runs(function() {
+			runs(function () {
 				var lClient;
 				// remove created channels and close opened connections
 				for (var lPubIdx = 0; lPubIdx < lPubCnt; lPubIdx++) {
@@ -488,15 +491,15 @@ jws.tests.Channels = {
 							{
 								accessKey: "testAccessKey",
 								secretKey: "testSecretKey",
-								OnResponse: function(aToken) {
+								OnResponse: function (aToken) {
 									// lResponse = aToken;
 								}
 							}
 					);
 				}
-				
+
 				expect(lPubsCreated).toEqual(lPubCnt);
-				
+
 				for (var lSubIdx = 0; lSubIdx < lSubCnt; lSubIdx++) {
 					var lChId = "ch_" + (lSubIdx + 1);
 					jws.console.log("Closing subscriber ch_" + lChId + "...");
@@ -512,10 +515,10 @@ jws.tests.Channels = {
 					});
 				}
 			});
-			
-			waitsFor(function(){
+
+			waitsFor(function () {
 				for (var lSubIdx = 0; lSubIdx < lSubCnt; lSubIdx++) {
-					if (lSubs[ lSubIdx ].client.isConnected()){
+					if (lSubs[ lSubIdx ].client.isConnected()) {
 						return false;
 					}
 				}
@@ -523,39 +526,39 @@ jws.tests.Channels = {
 					if (lPubs[ lPubIdx ].client.isConnected())
 						return false;
 				}
-				
+
 				return true;
 			}, 'closing channels connections',
-			5000);
+					5000);
 		});
 	},
 	// this spec tests the create method for a new channel
-	testChannelRemove: function(aChannelId, aSecretKey,
+	testChannelRemove: function (aChannelId, aSecretKey,
 			aComment, aExpectedReturnCode) {
 		var lSpec = "channelRemove (id: " + aChannelId + ", " + aComment + ")";
 
-		it(lSpec, function() {
+		it(lSpec, function () {
 
 			var lResponse = {};
 			jws.Tests.getAdminTestConn().channelRemove(
 					aChannelId,
 					{
 						secretKey: aSecretKey,
-						OnResponse: function(aToken) {
+						OnResponse: function (aToken) {
 							lResponse = aToken;
 						}
 					}
 			);
 
 			waitsFor(
-					function() {
+					function () {
 						return(lResponse.code !== undefined);
 					},
 					lSpec,
 					1000
 					);
 
-			runs(function() {
+			runs(function () {
 				expect(lResponse.code).toEqual(aExpectedReturnCode);
 				if (lResponse.code !== undefined
 						&& lResponse.code != aExpectedReturnCode) {
@@ -565,7 +568,7 @@ jws.tests.Channels = {
 
 		});
 	},
-	runSpecs: function() {
+	runSpecs: function () {
 
 		// testing subscribing to existing, pre-defined channels
 		jws.tests.Channels.testSubscribe("systemA", "access");
@@ -669,7 +672,7 @@ jws.tests.Channels = {
 				"Removing private channel with correct credentials (allowed)", 0);
 		jws.tests.Channels.testChannelRemove("myPrivSec", "myPrivateSecret",
 				"Removing private channel that should alredy have been removed (invalid)", -1);
-		jws.tests.Channels.testChannelRemove("myPrivUnsec", "", 
+		jws.tests.Channels.testChannelRemove("myPrivUnsec", "",
 				"Removing channel that should never have existed (invalid)", -1);
 
 	}

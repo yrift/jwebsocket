@@ -29,6 +29,10 @@ jws.tests.FileSystemEE = {
 	
 	TEST_FOLDER: "privFolder",
 	TEST_FILE_NAME: "test.txt",
+	dependsOn: [{
+			plugInId: "jws.filesystem",
+			isEnterprise: true
+		}],
 
 	testFileSave: function(aFilename, aData, aScope) {
 		var lSpec = "FileSave (admin, " + aFilename + ", " + aScope + ")";

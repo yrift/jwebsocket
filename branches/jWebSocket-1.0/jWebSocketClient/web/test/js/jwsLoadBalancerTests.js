@@ -25,6 +25,9 @@ jws.tests.LoadBalancer = {
 	category: "Community Edition",
 	mEndPointId: "",
 	mClusterAlias: "",
+	dependsOn: [{
+			plugInId: "jws.lb"
+		}],
 	mDeregisterConn: null,
 	// this spec tests the clusters information feature	
 	testClustersInfo: function () {
