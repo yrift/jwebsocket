@@ -164,13 +164,15 @@ function renderTests(aTests, aDiv, aCategory, aPlugInsInfo) {
 							lDependencyObj = lDependsOn[lDependencyObj];
 							// if the given dependency is found in the server
 							if (lDependencyObj.plugInId === lServerPlugIn.id ||
-									lDependencyObj.engineId === lServerPlugIn.class) {
+									(lDependencyObj.engineId &&
+											lDependencyObj.engineId === lServerPlugIn.class)) {
 								lDependencyObj.satisfied = true;
 								// If the test belongs to enterprise or not
 								if (lDependencyObj.isEnterprise) {
 									// If the test requires an enterprise plugin to be loaded
 									// and the plugin is not loaded, disable the test
-									if (lServerPlugIn.name.indexOf("enterprise") < 0) {
+									if (lServerPlugIn.name &&
+											lServerPlugIn.name.indexOf("enterprise") < 0) {
 										lDependencyObj.satisfied = false;
 									}
 								}
