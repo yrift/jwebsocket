@@ -1,4 +1,6 @@
 @echo off
+setlocal enableDelayedExpansion
+
 echo -------------------------------------------------------------------------
 echo jWebSocket JavaScript Docs Generator and Obfuscator
 echo (C) Copyright 2013-2015 Innotrade GmbH
@@ -47,6 +49,17 @@ copy /b jWebSocket.js + jWebSocketComet.js + jwsCache.js + jwsWorker.js + jwsAPI
 echo jWebSocket_Bundle.js Community Edition successfully created!
 
 rem switch back to deployment folder
+popd
+set cd=%cd%
+
+rem PROCEEDING TO PACKAGE THE COMMUNITY EDITION TESTS
+cd
+pushd ..\jWebSocketClient\web\test\js
+
+echo Creating jWebSocket_Test_Bundle.js...
+copy /b jwsAutomatedAPITests.js + jwsBackboneTest.js + jwsBenchmarks.js + jwsChannelTests.js + jwsEventsTests.js + jwsFilesystemEETests.js + jwsFilesystemTests.js + jwsIOC.js + jwsItemStorageEETests.js + jwsItemStorageTests.js + jwsJDBCTests.js + jwsJMSTests.js + jwsLoadBalancerTests.js + jwsLoadTests.js + jwsLoggingTests.js + jwsOntologyEETests.js + jwsQuotaTests.js + jwsReportingTests.js + jwsREST.js + jwsRPCTests.js + jwsScriptingPlugInTest.js + jwsSharedTests.js + jwsStreamingTests.js + jwsSystemTests.js jWebSocket_Test_Bundle.js
+echo jWebSocket_Test_Bundle.js successfully created!
+
 popd
 set cd=%cd%
 

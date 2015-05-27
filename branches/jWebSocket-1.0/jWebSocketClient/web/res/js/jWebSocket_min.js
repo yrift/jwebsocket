@@ -41,7 +41,7 @@ jws.JWS_SERVER_SERVLET));},getDefaultSSLServerCometURL:function(){return this.ge
 function(){var iL=location.protocol&&location.protocol.indexOf("https")>=0;return(this.getServerURL((iL?jws.JWS_SERVER_SSL_SCHEMA:
 jws.JWS_SERVER_SCHEMA),jws.JWS_SERVER_HOST,(iL?jws.JWS_SERVER_SSL_PORT:jws.JWS_SERVER_PORT),jws.JWS_SERVER_CONTEXT,
 jws.JWS_SERVER_SERVLET));},browserSupportsWebSockets:function(){return(window.WebSocket!==null&&window.WebSocket!==undefined);},
-enableCometSupportForWebSockets:function(){window.WebSocket=XHRWebSocket;},kj:function(){window.WebSocket=ni;},
+enableCometSupportForWebSockets:function(){window.WebSocket=XHRWebSocket;},sY:function(){window.WebSocket=sN;},
 browserSupportsNativeWebSockets:(function(){if(window.WEB_SOCKET_FORCE_FLASH){return false;}return(window.WebSocket!==null&&
 window.WebSocket!==undefined);})(),browserSupportsJSON:function(){return(window.JSON!==null&&window.JSON!==undefined);},
 browserSupportsNativeJSON:(function(){return(window.JSON!==null&&window.JSON!==undefined);})(),browserSupportsWebWorkers:(function()
@@ -138,9 +138,9 @@ var hexcase=0;var b64pad="";function hex_md5(s){return rstr2hex(rstr_md5(str2rst
 ;if(!('lastIndexOf'in Array.prototype)){Array.prototype.lastIndexOf=function(iS,ef){if(ef===undefined){ef=this.length-1;}if(ef<0){
 ef+=this.length;}if(ef>this.length-1){ef=this.length-1;}for(ef++;ef-- >0;){if(ef in this&&this[ef]===iS){return ef;}}return-1;};}
 String.prototype.getBytes=function(){var hs=[];for(var cI=0;cI<this.length;++cI){hs.push(this.charCodeAt(cI));}return hs;};
-jws.tools={lv:function(ki,kB,kY){kB=kB||'';kY=kY||512;var lx=atob(ki);var kV=[];for(var jP=0;jP<lx.length;jP+=kY){var jZ=lx.slice(
-jP,jP+kY);var ko=new Array(jZ.length);for(var cI=0;cI<jZ.length;cI++){ko[cI]=jZ.charCodeAt(cI);}var lw=new kD(ko);kV.push(lw);}
-var jS=new Blob(kV,{type:kB});return jS;},str2bytes:function(gL){var hs=[];for(var cI=0;cI<gL.length;cI++){hs.push(gL.charCodeAt(cI)
+jws.tools={rD:function(os,mY,jO){mY=mY||'';jO=jO||512;var mB=atob(os);var mT=[];for(var jY=0;jY<mB.length;jY+=jO){var nb=mB.slice(
+jY,jY+jO);var lT=new Array(nb.length);for(var cI=0;cI<nb.length;cI++){lT[cI]=nb.charCodeAt(cI);}var ob=new pM(lT);mT.push(ob);}
+var nG=new Blob(mT,{type:mY});return nG;},str2bytes:function(gL){var hs=[];for(var cI=0;cI<gL.length;cI++){hs.push(gL.charCodeAt(cI)
 );}return hs;},bytes2str:function(gM){var gR="";for(var cI=0;cI<gM.length;cI++){gR+=String.fromCharCode(gM[cI]);}return gR;},
 getUniqueInteger:function(){if(undefined===this.gg||2147483647===this.gg){this.gg=1;}return this.gg++;},zerofill:function(ay,am){
 var bj=ay.toFixed(0);if(bj.length>am){bj=bj.substring(bj.length-am);}else{while(bj.length<am){bj="0"+bj;}}return bj;},parseQuery:
@@ -157,7 +157,7 @@ this.zerofill(du.getUTCMilliseconds(),2);return bj;},string2Date:function(bp){va
 dK.setUTCMonth(bp.substr(4,2)-1);dK.setUTCDate(bp.substr(6,2));dK.setUTCHours(bp.substr(8,2));dK.setUTCMinutes(bp.substr(10,2));
 dK.setUTCSeconds(bp.substr(12,2));dK.setUTCMilliseconds(bp.substr(14,3));return dK;},generateSharedUTID:function(aR){var string=
 JSON.stringify(aR);var chars=string.split('');chars.sort();return hex_md5("{"+chars.toString()+"}");},getType:function(ey){var dM=
-ey;var bj=typeof dM;if("number"===bj){if((parseFloat(dM)===parseInt(dM))){bj="integer";}else{bj="double";}}else if(
+ey;var bj=typeof dM;if("number"===bj){if((parseFloat(dM)===parseInt(dM))){bj="la";}else{bj="double";}}else if(
 Object.prototype.toString.call(dM)==="[object Array]"){bj="array";}else if(dM===null){bj="null";}return bj;},isArrayOf:function(fE,
 bU){if(this.getType(fE)=="array"){return false;}for(var cI in fE){if(this.getType(fE[cI])!==bU){return false;}}return true;},
 setProperties:function(ey,gl,gT){var gi=gT||"";var er=null;var eH=null;for(eH in gl){er="set"+eH.substr(0,1).toUpperCase()+
@@ -314,7 +314,7 @@ aR.ns="org.jwebsocket.plugins.system";}if(jws.NS_SYSTEM===aR.ns){if(aR.type==="w
 this.iR=jws.tools.intersect(this.iR,aR.encodingFormats);this.registerFilters();this.notifyPlugInsOpened();if(this.cC){this.cC(aR);}}
 else if(aR.type==="goodBye"){if(this.fw){this.fw(aR);}this.af=null;}else if(aR.type==="close"){this.close({timeout:0});}else if(
 aR.type==="response"){if(aR.reqType==="login"||aR.reqType==="logon"){if(0===aR.code){this.af=aR.username;if("function"===
-typeof this.gZ){this.gZ(aR);}}}else if(aR.reqType==="logout"||aR.reqType==="logoff"){if(0===aR.code){this.af=null;if("function"===
+typeof this.gZ){this.gZ(aR);}}}else if(aR.reqType==="logout"||aR.reqType==="mc"){if(0===aR.code){this.af=null;if("function"===
 typeof this.hH)this.hH(aR);}}this.checkCallbacks(aR);}else if(aR.type==="event"){if(aR.name==="connect"){this.processConnected(aR);}
 if(aR.name==="disconnect"){this.processDisconnected(aR);}}}else{this.checkCallbacks(aR);}var db,cF,di,cS;di=
 jws.jWebSocketTokenClient.cx;if(di){for(db=0,cF=di.length;db<cF;db++){cS=di[db];if(cS.processToken){cS.processToken.call(this,aR);}}
@@ -339,11 +339,11 @@ this.sendStreamInTransaction(aQ,aA,cB);}else{if(jws.console.isDebugEnabled()){jw
 "...");}this.sendStream(aQ);}}return bj;},sendToken:function(aR,ax){return this.__sendToken(false,aR,ax);},sendTokenInTransaction:
 function(aR,ax,aA){if(!aA){aA={};}if(!aA["getTimeout"]){var aj=ax.timeout||jws.DEF_RESP_TIMEOUT;aA["getTimeout"]=function(){
 return aj;};}if(!aA["OnTimeout"]){aA["OnTimeout"]=function(){};}if(!aA["OnSuccess"]){aA["OnSuccess"]=function(){};}if(!
-aA["OnFailure"]){aA["OnFailure"]=function(){};}return this.__sendToken(true,aR,ax,aA);},sendChunkable:function(jO,ax,aA){try{if(
-undefined===jO.maxFrameSize){jO.maxFrameSize=this.ee-jws.PACKET_TRANSACTION_MAX_BYTES_PREFIXED;}var iz=jO.getChunksIterator();if(!
+aA["OnFailure"]){aA["OnFailure"]=function(){};}return this.__sendToken(true,aR,ax,aA);},sendChunkable:function(kW,ax,aA){try{if(
+undefined===kW.maxFrameSize){kW.maxFrameSize=this.ee-jws.PACKET_TRANSACTION_MAX_BYTES_PREFIXED;}var iz=kW.getChunksIterator();if(!
 iz.hasNext()){throw new Error("The chunks iterator is empty. No data to send!");}var ec=iz.next();if(!ec){throw new Error(
-"Iterator returned null on 'next' method call!");}ec.ns=jO.ns;ec.type=jO.type;ec.isChunk=true;if(!iz.hasNext()){ec.isLastChunk=true;
-}if(!ax){ax={};}ax.fragmentSize=jO.fragmentSize;if(!aA){aA={};}if(!aA["getTimeout"]){var aj=ax.timeout||jws.DEF_RESP_TIMEOUT;
+"Iterator returned null on 'next' method call!");}ec.ns=kW.ns;ec.type=kW.type;ec.isChunk=true;if(!iz.hasNext()){ec.isLastChunk=true;
+}if(!ax){ax={};}ax.fragmentSize=kW.fragmentSize;if(!aA){aA={};}if(!aA["getTimeout"]){var aj=ax.timeout||jws.DEF_RESP_TIMEOUT;
 aA["getTimeout"]=function(){return aj;};}if(!aA["OnTimeout"]){aA["OnTimeout"]=function(){};}if(!aA["OnSuccess"]){aA["OnSuccess"]=
 function(){};}if(!aA["OnFailure"]){aA["OnFailure"]=function(){};}if(!aA["OnChunkDelivered"]){aA["OnChunkDelivered"]=function(){};}
 this.sendTokenInTransaction(ec,ax,{hb:iz,eh:aA,fD:new Date().getTime(),dV:ec,ge:ec.ns,gb:ec.type,gs:ax,getTimeout:function(){var aj=
@@ -354,14 +354,14 @@ function(){this.OnChunkDelivered(this.dV);if(this.hb.hasNext()){try{this.dV=hN.n
 this.sendTokenInTransaction(this.dV,this.gs,this);}catch(dQ){this.eh.OnFailure(dQ);}}else{this.eh.OnSuccess();}},OnChunkDelivered:
 function(hC){this.eh.OnChunkDelivered(hC);}});}catch(dQ){aA.OnFailure(dQ);}},getLastTokenId:function(){return jws.CUR_TOKEN_ID;},
 getNextTokenId:function(){return jws.CUR_TOKEN_ID+1;},sendText:function(bb,aB){var bj=this.checkLoggedIn();if(0===bj.code){
-this.sendToken({ns:jws.NS_SYSTEM,type:"send",targetId:bb,sourceId:this.ai,sender:this.af,data:aB});}return bj;},kt:function(ax){
+this.sendToken({ns:jws.NS_SYSTEM,type:"send",targetId:bb,sourceId:this.ai,sender:this.af,data:aB});}return bj;},rK:function(ax){
 var bj=this.checkLoggedIn();if(0===bj.code){this.sendToken({ns:jws.NS_SYSTEM,type:"getjvminfo"},ax);}return bj;},broadcastText:
 function(aP,aB,ax){var bj=this.checkLoggedIn();var aE=false;var aD=true;if(ax){if(ax.senderIncluded){aE=ax.senderIncluded;}if(
 ax.responseRequested){aD=ax.responseRequested;}}if(0===bj.code){this.sendToken({ns:jws.NS_SYSTEM,type:"broadcast",sourceId:this.ai,
 sender:this.af,pool:aP,data:aB,senderIncluded:aE,responseRequested:aD},ax);}return bj;},broadcastToSharedSession:function(aR,eK,ax){
 var bj=this.checkConnected();if(0===bj.code){aR.ns=jws.NS_SYSTEM;aR.type="broadcastToSharedSession";aR.senderIncluded=eK||false;
 this.sendToken(aR,ax);}return bj;},echo:function(aw,ax){var bj=this.checkWriteable();if(!ax){ax={};}if(0===bj.code){var cg={ns:
-jws.NS_SYSTEM,type:"echo",data:aw};if(ax.delay){cg.delay=ax.delay;}if(ax.jX){cg.jX=ax.jX;}this.sendToken(cg,ax);}return bj;},open:
+jws.NS_SYSTEM,type:"echo",data:aw};if(ax.delay){cg.delay=ax.delay;}if(ax.mW){cg.mW=ax.mW;}this.sendToken(cg,ax);}return bj;},open:
 function(dr,ax){var bj=this.createDefaultResult();try{if(ax&&ax.OnToken&&"function"===typeof ax.OnToken){this.eF=ax.OnToken;}if(ax&&
 ax.OnWelcome&&"function"===typeof ax.OnWelcome){this.cC=ax.OnWelcome;}if(ax&&ax.OnGoodBye&&"function"===typeof ax.OnGoodBye){
 this.fw=ax.OnGoodBye;}if(ax&&ax.OnLogon&&"function"===typeof ax.OnLogon){this.gZ=ax.OnLogon;}if(ax&&ax.OnLogoff&&"function"===
@@ -379,7 +379,7 @@ jws.SystemClientPlugIn={NS:jws.NS_SYSTEM,ALL_CLIENTS:0,AUTHENTICATED:1,NON_AUTHE
 PW_MD5_ENCODED:2,processToken:function(aR){if(jws.NS_SYSTEM===aR.ns){if("login"===aR.reqType){if(0===aR.code){if(this.gK){this.gK(
 aR);}}else{if(this.gq){this.gq(aR);}}}else if("logon"===aR.reqType){if(0===aR.code){if(this.fV){this.fV(aR);}}else{if(this.gr){
 this.gr(aR);}}}else if("logout"===aR.reqType){if(0===aR.code){if(this.fY){this.fY(aR);}}else{if(this.hi){this.hi(aR);}}}else if(
-"logoff"===aR.reqType){if(0===aR.code){if(this.gk){this.gk(aR);}}else{if(this.gu){this.gu(aR);}}}}},login:function(an,aq,ax){var bj=
+"mc"===aR.reqType){if(0===aR.code){if(this.gk){this.gk(aR);}}else{if(this.gu){this.gu(aR);}}}}},login:function(an,aq,ax){var bj=
 this.checkConnected();if(0===bj.code){var cg={ns:jws.SystemClientPlugIn.NS,type:"login",username:an,password:aq};this.sendToken(cg,
 ax);}return bj;},logon:function(dr,an,aq,ax){var bj=this.createDefaultResult();if(!ax){ax={};}if(this.isOpened()){this.login(an,aq,
 ax);}else{var hj=ax.OnWelcome;var dJ=this;ax.OnWelcome=function(cz){if(hj){hj.call(dJ,cz);}dJ.login(an,aq,ax);};this.open(dr,ax);}
@@ -420,14 +420,14 @@ ax.connectionStorage||false},ax);},sessionGetMany:function(gn,jd,ax){if(!ax){ax=
 type:"sessionGetMany",clients:gn,keys:jd,connectionStorage:ax.connectionStorage||false},ax);},forwardJSON:function(bb,fC,bU,bl,iG,
 ax){var ig={ns:fC,type:bU,sourceId:this.ai,utid:this.getNextTokenId(),payload:iG};if(bl){for(var bc in bl){if(undefined===ig[bc]){
 ig[bc]=bl[bc];}}}var cg={ns:"org.jwebsocket.plugins.system",type:"send",sourceId:this.ai,targetId:bb,action:"forward.json",
-responseRequested:false,data:JSON.stringify(ig)};this.sendToken(cg,ax);},kp:function(fC,ax){var bj=this.checkConnected();if(0===
-bj.code){var cg={ns:fC,type:"getAPI"};var self=this;this.sendToken(cg,{OnSuccess:function(la){var cS={};var kT=la.data;for(
-var lz in kT){var jH=kT[lz].name;var jK=[];for(var kI in kT[lz].kb){jK.push(kT[lz].kb[kI].name);}if(ax["filter"]){ax["filter"](jH,
-jK);}var ja="var kg = {ks:function("+jK.join()+((jK.length>0)?",":"")+"ax){";ja+=
-"var bj = self.checkConnected();if (0 === bj.code) {";ja+="var cg = {";ja+="ns: '"+fC+"',";ja+="type: '"+jH+"'";for(var cI in jK){
-ja+=","+jK[cI]+": "+jK[cI];}ja+="};";ja+="self.sendToken(cg,ax);";ja+="}";ja+="return bj; }};";eval(ja);cS[jH]=kg.ks;}if(
+responseRequested:false,data:JSON.stringify(ig)};this.sendToken(cg,ax);},sA:function(fC,ax){var bj=this.checkConnected();if(0===
+bj.code){var cg={ns:fC,type:"getAPI"};var self=this;this.sendToken(cg,{OnSuccess:function(kN){var cS={};var jW=kN.data;for(
+var nd in jW){var kQ=jW[nd].name;var kn=[];for(var pA in jW[nd].nF){kn.push(jW[nd].nF[pA].name);}if(ax["filter"]){ax["filter"](kQ,
+kn);}var km="var oP = {ny:function("+kn.join()+((kn.length>0)?",":"")+"ax){";km+=
+"var bj = self.checkConnected();if (0 === bj.code) {";km+="var cg = {";km+="ns: '"+fC+"',";km+="type: '"+kQ+"'";for(var cI in kn){
+km+=","+kn[cI]+": "+kn[cI];}km+="};";km+="self.sendToken(cg,ax);";km+="}";km+="return bj; }};";eval(km);cS[kQ]=oP.ny;}if(
 ax["OnSuccess"]){ax["OnSuccess"](cS);}else if(ax["OnResponse"]){ax["OnResponse"](cS);}}});}return bj;}};jws.oop.addPlugIn(
-jws.jWebSocketTokenClient,jws.SystemClientPlugIn);jws.oop.declareClass("jws","kl",jws.jWebSocketTokenClient,{tokenToStream:function(
+jws.jWebSocketTokenClient,jws.SystemClientPlugIn);jws.oop.declareClass("jws","kT",jws.jWebSocketTokenClient,{tokenToStream:function(
 aR){aR.utid=aR.utid||jws.CUR_TOKEN_ID;var ak=JSON.stringify(aR);return(ak);},streamToToken:function(de){var bk=JSON.parse(de);
 return bk;}});jws.oop.declareClass("jws","jWebSocketCSVClient",jws.jWebSocketTokenClient,{tokenToStream:function(aR){var ag="utid="+
 jws.CUR_TOKEN_ID;for(var dR in aR){var cY=aR[dR];if(cY===null||cY===undefined){ag+=","+dR+"=";}else if("string"===typeof cY){cY=
