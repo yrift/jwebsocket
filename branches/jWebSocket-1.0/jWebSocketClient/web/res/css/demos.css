@@ -40,7 +40,7 @@
 
 body{
     margin: 0px;
-    font-family: Verdana, sans-serif;
+    font-family: Verdana, Geneva, sans-serif;
 	/*overflow: hidden;*/
 }
 #demo_box{
@@ -48,11 +48,6 @@ body{
     width: 700px;
     height: 100%;
     border: 1px solid #C8C8C8;
-}
-
-@font-face {
-    font-family: Verdana;
-    src: url(verdana.ttf);
 }
 
 /*----------------- CONTAINER --------------*/
@@ -196,7 +191,7 @@ div#container{
 
 
 #login_form label{
-    font-family: Verdana, sans-serif;
+    font-family: Verdana, Geneva, sans-serif;
     font-weight: normal;
     color: white;
     font-size: 10px;
@@ -248,7 +243,7 @@ textarea{
     float: right;
     height: 20px;
     font-size: 10px;
-    font-family: "Verdana";
+    font-family: Verdana, Geneva, sans-serif;
     min-width: 422px;
     background: #ffffff;
     /*margin-left: 300px;*/
@@ -301,7 +296,7 @@ textarea{
 #demo_box_description{
     margin-top: 10px;
     padding: 5px 15px 5px 15px;
-    font-size: 11px;
+    font-size: 12px;
 }
 /*-------------- DEMO_DESCRIPTION ------------*/
 
@@ -349,8 +344,8 @@ textarea{
     color: #0f79c3;
     text-decoration: underline;
     display: inline;
-    font-size: 11px;
-    font-family: Verdana, sans-serif;
+    font-size: 12px;
+    font-family: Verdana, Geneva, sans-serif;
     padding: 5px 5px 3px 10px;
     cursor: pointer;
     float:left;
@@ -434,7 +429,7 @@ textarea{
     height: 25px;
     cursor: pointer;
     font-weight: bold;
-    font-family: Verdana, sans-serif;
+    font-family: Verdana, Geneva, sans-serif;
 	-moz-user-select: -moz-none;
 	-khtml-user-select: none;
 	-webkit-user-select: none;
@@ -461,7 +456,7 @@ textarea{
 }
 
 .button .btn_center{
-    font-family: "Verdana";
+    font-family: Verdana, Geneva, sans-serif;
     font-weight: bold !important;
     color: white;
     text-shadow: 0px 1px #678613;
@@ -528,8 +523,8 @@ textarea{
 }
 
 p{
-    font-family: Verdana, sans-serif;
-    font-size: 11px;
+    font-family: Verdana, Geneva, sans-serif;
+    font-size: 12px;
     font-style: normal;
     margin-top: 17px;
     margin-bottom: 17px;
@@ -558,8 +553,8 @@ p{
 .tooltip .middle{
 	background: url(../../res/img/tooltip_center.png) repeat-y;
 	width: 150px;
-	font-size: 11px;
-	font-family: "Verdana";
+	font-size: 12px;
+	font-family: Verdana, Geneva, sans-serif;
 	color: #FFFFFF;
 	padding: 0 25px 0 14px;
 }
@@ -572,7 +567,6 @@ p{
 
 /* ----------------------- CHECKBOXES PERSONALIZATION -------------------------- */
 input[type="checkbox"]{
-	font-style: "Verdana";
     font-size: 8px !important;
     color: #333333 !important;
 }

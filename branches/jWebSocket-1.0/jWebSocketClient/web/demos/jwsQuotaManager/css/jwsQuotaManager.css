@@ -117,7 +117,7 @@ p.feeds{
     margin-top: 190px;
     margin-left: 140px; 
     float: left;
-    font-family: "Verdana";
+    font-family: Verdana, Geneva, sans-serif;
     font-size: 14px;
     color:#afafaf;
 }

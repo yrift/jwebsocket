@@ -34,7 +34,7 @@
     background: #2584C1 url(../img/header.png) repeat-x;
     height: 20px;
     color: white;
-    font-family: "Verdana";
+    font-family: Verdana, Geneva, sans-serif;
     font-size: 11px;
     padding: 7px 3px 0 10px;
     font-weight: bold;

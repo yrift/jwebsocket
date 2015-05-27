@@ -4,7 +4,7 @@
 }
 
 #demo_box_description p{
-	font-family: "Verdana";
+	font-family: Verdana, Geneva, sans-serif;
     font-size: 11px !important;
 }
 /*-------------- DEMO_DESCRIPTION ------------*/
