@@ -162,7 +162,7 @@ p.pText {
 label{
 	float: left;
 	font-size: 12px;
-	font-family: "Verdana";
+	font-family: Verdana, Geneva, sans-serif;
 }
 
 #radioDiv {

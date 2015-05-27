@@ -25,7 +25,7 @@
     background: #2584C1 url(../img/header.png) repeat-x;
     height: 15px;
     color: white;
-    font-family: "Verdana";
+    font-family: Verdana, Geneva, sans-serif;
     font-size: 11px;
     padding: 3px 3px 3px 10px;
     font-weight: bold;
@@ -48,7 +48,7 @@
     padding: 8px 3px 3px 10px;
     color: #797878;
     font-size: 11px;
-    font-family: "Verdana";
+    font-family: Verdana, Geneva, sans-serif;
 	float: left;
 }
 
@@ -108,7 +108,7 @@
 }
 
 #form_check label{
-    font-style: "Verdana";
+    font-style: Verdana, Geneva, sans-serif;
     font-size: 11px;
     color: #333333;
     float: left;
