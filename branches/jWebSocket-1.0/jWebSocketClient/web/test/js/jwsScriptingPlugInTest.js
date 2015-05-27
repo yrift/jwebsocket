@@ -16,7 +16,9 @@
 //	See the License for the specific language governing permissions and
 //	limitations under the License.
 //	---------------------------------------------------------------------------
-
+if (typeof jws.tests === "undefined") {
+	jws.tests = {};
+}
 jws.tests.Scripting = {
 	title: "Scripting plug-in",
 	description: "jWebSocket Scripting plug-in for server side script apps.",

@@ -16,7 +16,9 @@
 //	See the License for the specific language governing permissions and
 //	limitations under the License.
 //	---------------------------------------------------------------------------
-
+if (typeof jws.tests === "undefined") {
+	jws.tests = {};
+}
 jws.tests.ItemStorageEE = {
 	title: "ItemStorage EE plug-in",
 	description: "jWebSocket itemstorage (enterprise edition) plug-in. Designed for generic data storage.",

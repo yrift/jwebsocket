@@ -16,6 +16,9 @@
 //	See the License for the specific language governing permissions and
 //	limitations under the License.
 //	---------------------------------------------------------------------------
+if (typeof jws.tests === "undefined") {
+	jws.tests = {};
+}
 
 jws.tests.AutomatedAPI = {
 	title: "Automated API plug-in",
@@ -23,11 +26,11 @@ jws.tests.AutomatedAPI = {
 	category: "System",
 	enabled: false,
 	mSpecs: [],
-	testGetAPIDefaults: function() {
+	testGetAPIDefaults: function () {
 
 		var lSpec = "running default API spec";
 
-		it(lSpec, function() {
+		it(lSpec, function () {
 
 			var lDone = false;
 
@@ -39,20 +42,20 @@ jws.tests.AutomatedAPI = {
 
 			// open a separate control connection
 			lConn.open(jws.getDefaultServerURL(), {
-				OnWelcome: function() {
+				OnWelcome: function () {
 					var lAPIPlugIn = new jws.APIPlugIn();
 					lConn.addPlugIn(lAPIPlugIn);
 					// request the API of the benchmark plug-in
 					lAPIPlugIn.getPlugInAPI(
 							"jws.benchmark", {
 								// if API received successfully run the tests...
-								OnResponse: function(aServerPlugIn) {
+								OnResponse: function (aServerPlugIn) {
 									jws.tests.AutomatedAPI.mSpecs =
 											lAPIPlugIn.createSpecFromAPI(lConn, aServerPlugIn);
 									lConn.close();
 									lDone = true;
 								},
-								OnTimeout: function() {
+								OnTimeout: function () {
 									lConn.close();
 									lDone = true;
 								}
@@ -61,14 +64,14 @@ jws.tests.AutomatedAPI = {
 			});
 
 			waitsFor(
-					function() {
+					function () {
 						return lDone == true;
 					},
 					"Running against API...",
 					3000
 					);
 
-			runs(function() {
+			runs(function () {
 				expect(lDone).toEqual(true);
 
 				// stop watch for this spec
@@ -76,8 +79,8 @@ jws.tests.AutomatedAPI = {
 			});
 		});
 	},
-	testRunAPIDefaults: function() {
-		it("running default tests", function() {
+	testRunAPIDefaults: function () {
+		it("running default tests", function () {
 			eval(
 					"  for( var i = 0; i < jws.tests.AutomatedAPI.mSpecs.length; i++ ) { "
 					+ "  jws.tests.AutomatedAPI.mSpecs[ i ]();"
@@ -85,7 +88,7 @@ jws.tests.AutomatedAPI = {
 					);
 		});
 	},
-	runSpecs: function() {
+	runSpecs: function () {
 		// get the default specs from the API
 		this.testGetAPIDefaults();
 		// run all the obtained default specs

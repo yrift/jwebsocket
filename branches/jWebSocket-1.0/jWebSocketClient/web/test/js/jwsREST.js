@@ -16,7 +16,9 @@
 //	See the License for the specific language governing permissions and
 //	limitations under the License.
 //	---------------------------------------------------------------------------
-
+if (typeof jws.tests === "undefined") {
+	jws.tests = {};
+}
 jws.tests.REST = {
 	title: "REST support (http://localhost:8787/jWebSocket/http)",
 	description: "jWebSocket REST support for remote interaction with the jWebSocket server infrastructure",
