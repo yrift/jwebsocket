@@ -37,9 +37,9 @@ if( window.MozWebSocket ) {
 //:d:en:including various utility methods.
 var jws = {
 
-	//:const:*:VERSION:String:1.0.0 RC3 (build 50105)
+	//:const:*:VERSION:String:1.0.0 (build 50512)
 	//:d:en:Version of the jWebSocket JavaScript Client
-	VERSION: "1.0.0 RC3 (build 50105)",
+	VERSION: "1.0.0 (build 50512)",
 
 	//:const:*:NS_BASE:String:org.jwebsocket
 	//:d:en:Base namespace
@@ -1474,7 +1474,7 @@ jws.tools = {
 	},
 	
 	isArrayOf: function( aArray, aType ){
-		if ( !Ext.isArray(aArray) ){
+		if ( this.getType(aArray) == "array" ){
 			return false;
 		}
 		for ( var lIndex in aArray ){
@@ -3635,6 +3635,22 @@ jws.oop.declareClass( "jws", "jWebSocketTokenClient", jws.jWebSocketBaseClient, 
 		}
 		return lRes;
 	},
+	
+	//:m:*:getServerJVMInfo
+	//:d:en:Get the jWebSocket server JVM settings and properties.
+	//:a:en::aOptions:Object:...
+	//:r:*:::void:none
+	getServerJVMInfo: function ( aOptions ){
+		var lRes = this.checkLoggedIn();
+		if( 0 === lRes.code ) {
+			this.sendToken({
+				ns: jws.NS_SYSTEM,
+				type: "getjvminfo"
+			}, aOptions);
+		}
+		
+		return lRes;
+	},
 
 	//:m:*:broadcastText
 	//:d:en:Broadcasts a simple text message to all clients or a limited set _
@@ -4072,7 +4088,7 @@ jws.SystemClientPlugIn = {
 	//:a:en::::none
 	//:r:*:::Boolean:[tt]true[/tt] when the client is authenticated, otherwise [tt]false[/tt].
 	isLoggedIn: function() {
-		return( this.isOpened() && this.fUsername );
+		return( this.isOpened() && null !== this.fUsername && "anonymous" !== this.fUsername);
 	},
 
 	broadcastToken: function( aToken, aOptions ) {
@@ -4507,8 +4523,67 @@ jws.SystemClientPlugIn = {
 			data: JSON.stringify( lData )
 		};
 		this.sendToken( lToken, aOptions );
+	},
+	
+	//:m:*:getActionPlugIn
+	//:d:en:Get the JavaScript object representation of a server side ActionPlugIn
+	//:a:en::aNS:String:The action plug-in namespace
+	//:a:en::aOptions.OnSuccess:function:Function to be called when the plugin instance has been generated.
+	//:a:en::aOptions.filter:function: Function that is called per plugin instance method for customization.
+	//:r:*:::void:none
+	getActionPlugIn: function (aNS, aOptions) {
+		var lRes = this.checkConnected();
+		if (0 === lRes.code) {
+			var lToken = {
+				ns: aNS,
+				type: "getAPI"
+			};
+			var self = this;
+			this.sendToken(lToken, {
+				OnSuccess: function (aResponse) {
+					var lPlugIn = {};
+					var lAPI = aResponse.data;
+					// iterating by app controllers
+					for (var lMethodsIndex in lAPI) {
+						var lMethodName = lAPI[lMethodsIndex].name;
+						var lParams = [];
+						for (var lParamsIndex in lAPI[lMethodsIndex].params) {
+							lParams.push(lAPI[lMethodsIndex].params[lParamsIndex].name);
+						}
+						// allowing custom plug-ins modification
+						if (aOptions["filter"]) {
+							aOptions["filter"](lMethodName, lParams);
+						}
+						var lFn = "var _Fn_ = {fn:function(" + lParams.join() + ((lParams.length > 0) ? "," : "") + "aOptions){";
+						lFn += "var lRes = self.checkConnected();if (0 === lRes.code) {";
+						lFn += "var lToken = {";
+						lFn += "ns: '" + aNS + "',";
+						lFn += "type: '" + lMethodName + "'";
+						
+						for (var lIndex in lParams) {
+							lFn += "," + lParams[lIndex] + ": " + lParams[lIndex];
+						}
+						
+						lFn += "};";
+						lFn += "self.sendToken(lToken,aOptions);";
+						lFn += "}";
+						lFn += "return lRes; }};";
+						
+						eval(lFn);
+						lPlugIn[lMethodName] = _Fn_.fn;
+					}
+
+					if (aOptions["OnSuccess"]) {
+						aOptions["OnSuccess"](lPlugIn);
+					} else
+					if (aOptions["OnResponse"]) {
+						aOptions["OnResponse"](lPlugIn);
+					}
+				}
+			});
+		}
+		return lRes;
 	}
-			
 };
 
 // add the JWebSocket SystemClient PlugIn into the BaseClient class
@@ -5738,326 +5813,6 @@ jws.APIPlugIn = {
 // add the JWebSocket ExtProcess PlugIn into the TokenClient class
 jws.oop.addPlugIn(jws.jWebSocketTokenClient, jws.APIPlugIn);
 //	---------------------------------------------------------------------------
-//	jWebSocket Canvas Plug-in (Community Edition, CE)
-//	---------------------------------------------------------------------------
-//	Copyright 2010-2015 Innotrade GmbH (jWebSocket.org)
-//	Alexander Schulze, Germany (NRW)
-//	
-//	Licensed under the Apache License, Version 2.0 (the "License");
-//	you may not use this file except in compliance with the License.
-//	You may obtain a copy of the License at
-//
-//	http://www.apache.org/licenses/LICENSE-2.0
-//
-//	Unless required by applicable law or agreed to in writing, software
-//	distributed under the License is distributed on an "AS IS" BASIS,
-//	WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-//	See the License for the specific language governing permissions and
-//	limitations under the License.
-//	---------------------------------------------------------------------------
-
-jws.CanvasPlugIn = {
-
-	// namespace for shared objects plugin
-	// if namespace is changed update server plug-in accordingly!
-	NS: jws.NS_BASE + ".plugins.canvas",
-
-	processToken: function( aToken ) {
-		// check if namespace matches
-		if( aToken.reqNS == jws.CanvasPlugIn.NS ) {
-			// here you can handle incomimng tokens from the server
-			// directy in the plug-in if desired.
-			if( "clear" == aToken.reqType ) {
-				this.doClear( aToken.id );
-			} else if( "beginPath" == aToken.reqType ) {
-				this.doBeginPath( aToken.id );
-			} else if( "moveTo" == aToken.reqType ) {
-				this.doMoveTo( aToken.id, aToken.x, aToken.y );
-			} else if( "lineTo" == aToken.reqType ) {
-				this.doLineTo( aToken.id, aToken.x, aToken.y );
-			} else if( "line" == aToken.reqType ) {
-				this.doLine( aToken.id, aToken.x1, aToken.y1,
-					aToken.x2, aToken.y2, { color: aToken.color });
-			} else if( "closePath" == aToken.reqType ) {
-				this.doClosePath( aToken.id );
-			}
-		}
-	},
-
-	fCanvas: {},
-
-	canvasOpen: function( aId, aElementId ) {
-		var lElem = jws.$( aElementId );
-		this.fCanvas[ aId ] = {
-			fDOMElem: lElem,
-			ctx: lElem.getContext( "2d" )
-		};
-	},
-
-	canvasClose: function( aId ) {
-		this.fCanvas[ aId ] = null;
-		delete this.fCanvas[ aId ];
-	},
-
-	doClear: function( aId ) {
-		var lCanvas = this.fCanvas[ aId ];
-		if( lCanvas != null ) {
-			var lW = lCanvas.fDOMElem.getAttribute( "width" );
-			var lH = lCanvas.fDOMElem.getAttribute( "height" );
-			lCanvas.ctx.clearRect( 0, 0, lW, lH );
-			return true;
-		}
-		return false;
-	},
-
-	canvasClear: function( aId ) {
-		if( this.doClear( aId ) ) {
-			var lToken = {
-				reqNS: jws.CanvasPlugIn.NS,
-				reqType: "clear",
-				id: aId
-			};
-			this.broadcastToken(lToken);
-		}
-	},
-
-	canvasGetBase64: function( aId, aMimeType ) {
-		var lRes = {
-			code: -1,
-			msg : "Ok"
-		};
-		var lCanvas = this.fCanvas[ aId ];
-		if( lCanvas != null ) {
-			if( typeof lCanvas.fDOMElem.toDataURL == "function" ) {
-				lRes.code = 0;
-				lRes.encoding = "base64";
-				lRes.data = lCanvas.fDOMElem.toDataURL( aMimeType );
-			} else {
-				lRes.msg = "Retrieving image data from canvas not (yet) supported by browser.";
-			}
-		} else {
-			lRes.msg = "Canvas not found.";
-		}
-		return lRes;
-	},
-
-	doBeginPath: function( aId ) {
-		var lCanvas = this.fCanvas[ aId ];
-		if( lCanvas != null ) {
-			// console.log( "doBeginPath: " + aId);
-			lCanvas.ctx.beginPath();
-			return true;
-		}
-		return false;
-	},
-
-	canvasBeginPath: function( aId ) {
-		if( this.doBeginPath( aId ) ) {
-			var lToken = {
-				reqNS: jws.CanvasPlugIn.NS,
-				reqType: "beginPath",
-				id: aId
-			};
-			this.broadcastToken(lToken);
-		}
-	},
-
-	doMoveTo: function( aId, aX, aY ) {
-		var lCanvas = this.fCanvas[ aId ];
-		if( lCanvas != null ) {
-			// console.log( "doMoveTo: " + aId + ", x:" + aX + ", y: " + aX );
-			lCanvas.ctx.moveTo( aX, aY );
-			return true;
-		}
-		return false;
-	},
-
-	canvasMoveTo: function( aId, aX, aY ) {
-		if( this.doMoveTo( aId, aX, aY ) ) {
-			var lToken = {
-				reqNS: jws.CanvasPlugIn.NS,
-				reqType: "moveTo",
-				id: aId,
-				x: aX,
-				y: aY
-			};
-			this.broadcastToken(lToken);
-		}
-	},
-
-	doLineTo: function( aId, aX, aY ) {
-		var lCanvas = this.fCanvas[ aId ];
-		if( lCanvas != null ) {
-			// console.log( "doLineTo: " + aId + ", x:" + aX + ", y: " + aX );
-			lCanvas.ctx.lineTo( aX, aY );
-			lCanvas.ctx.stroke();
-			return true;
-		}
-		return false;
-	},
-
-	canvasLineTo: function( aId, aX, aY ) {
-		if( this.doLineTo( aId, aX, aY ) ) {
-			var lToken = {
-				reqNS: jws.CanvasPlugIn.NS,
-				reqType: "lineTo",
-				id: aId,
-				x: aX,
-				y: aY
-			};
-			this.broadcastToken(lToken);
-		}
-	},
-
-	doLine: function( aId, aX1, aY1, aX2, aY2, aOptions ) {
-		if( undefined == aOptions ) {
-			aOptions = {};
-		}
-		var lColor = "black";
-		if( aOptions.color ) {
-			lColor = aOptions.color;
-		}
-		var lCanvas = this.fCanvas[ aId ];
-		if( lCanvas != null ) {
-			lCanvas.ctx.beginPath();
-			lCanvas.ctx.moveTo( aX1, aY1 );
-			lCanvas.ctx.strokeStyle = lColor;
-			lCanvas.ctx.lineTo( aX2, aY2 );
-			lCanvas.ctx.stroke();
-			lCanvas.ctx.closePath();
-			return true;
-		}
-		return false;
-	},
-
-	canvasLine: function( aId, aX1, aY1, aX2, aY2, aOptions ) {
-		if( undefined == aOptions ) {
-			aOptions = {};
-		}
-		var lColor = "black";
-		if( aOptions.color ) {
-			lColor = aOptions.color;
-		}
-		if( this.doLine( aId, aX1, aY1, aX2, aY2, aOptions ) ) {
-			var lToken = {
-				reqNS: jws.CanvasPlugIn.NS,
-				reqType: "line",
-				id: aId,
-				x1: aX1,
-				y1: aY1,
-				x2: aX2,
-				y2: aY2,
-				color: lColor
-			};
-			this.broadcastToken(lToken);
-		}
-	},
-
-	doClosePath: function( aId ) {
-		var lCanvas = this.fCanvas[ aId ];
-		if( lCanvas != null ) {
-			// console.log( "doClosePath" );
-			lCanvas.ctx.closePath();
-			return true;
-		}
-		return false;
-	},
-
-	canvasClosePath: function( aId ) {
-		if( this.doClosePath( aId ) ) {
-			var lToken = {
-				reqNS: jws.CanvasPlugIn.NS,
-				reqType: "closePath",
-				id: aId
-			};
-			this.broadcastToken(lToken);
-		}
-	}
-
-}
-
-// add the JWebSocket Canvas PlugIn into the TokenClient class
-jws.oop.addPlugIn( jws.jWebSocketTokenClient, jws.CanvasPlugIn );
-
-// optionally include canvas support for IE8
-if( jws.isIE ) {
-
-	//  <JasobNoObfs>
-	//
-	//	-------------------------------------------------------------------------------
-	//	ExplorerCanvas
-	//
-	//	Google Open Source:
-	//		<http://code.google.com>
-	//		<opensource@google.com>
-	//
-	//	Developers:
-	//		Emil A Eklund <emil@eae.net>
-	//		Erik Arvidsson <erik@eae.net>
-	//		Glen Murphy <glen@glenmurphy.com>
-	//
-	//	-------------------------------------------------------------------------------
-	//	DESCRIPTION
-	//
-	//	Firefox, Safari and Opera 9 support the canvas tag to allow 2D command-based
-	//	drawing operations. ExplorerCanvas brings the same functionality to Internet
-	//	Explorer; web developers only need to include a single script tag in their
-	//	existing canvas webpages to enable this support.
-	//
-	//	-------------------------------------------------------------------------------
-	//	INSTALLATION
-	//
-	//	Include the ExplorerCanvas tag in the same directory as your HTML files, and
-	//	add the following code to your page, preferably in the <head> tag.
-	//
-	//	<!--[if IE]><script type="text/javascript" src="excanvas.js"></script><![endif]-->
-	//
-	//	If you run into trouble, please look at the included example code to see how
-	//	to best implement this
-	//	
-	//	Copyright 2006 Google Inc.
-	//
-	//	Licensed under the Apache License, Version 2.0 (the "License");
-	//	you may not use this file except in compliance with the License.
-	//	You may obtain a copy of the License at
-	//
-	//	http://www.apache.org/licenses/LICENSE-2.0
-	//
-	//	Unless required by applicable law or agreed to in writing, software
-	//	distributed under the License is distributed on an "AS IS" BASIS,
-	//	WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-	//	See the License for the specific language governing permissions and
-	//	limitations under the License.
-	//
-	//	Fullsource code at: http://excanvas.sourceforge.net/
-	//	and http://code.google.com/p/explorercanvas/
-	//
-	//	</JasobNoObfs>
-
-	document.createElement("canvas").getContext||(function(){var s=Math,j=s.round,F=s.sin,G=s.cos,V=s.abs,W=s.sqrt,k=10,v=k/2;function X(){return this.context_||(this.context_=new H(this))}var L=Array.prototype.slice;function Y(b,a){var c=L.call(arguments,2);return function(){return b.apply(a,c.concat(L.call(arguments)))}}var M={init:function(b){if(/MSIE/.test(navigator.userAgent)&&!window.opera){var a=b||document;a.createElement("canvas");a.attachEvent("onreadystatechange",Y(this.init_,this,a))}},init_:function(b){b.namespaces.g_vml_||
-	b.namespaces.add("g_vml_","urn:schemas-microsoft-com:vml","#default#VML");b.namespaces.g_o_||b.namespaces.add("g_o_","urn:schemas-microsoft-com:office:office","#default#VML");if(!b.styleSheets.ex_canvas_){var a=b.createStyleSheet();a.owningElement.id="ex_canvas_";a.cssText="canvas{display:inline-block;overflow:hidden;text-align:left;width:300px;height:150px}g_vml_\\:*{behavior:url(#default#VML)}g_o_\\:*{behavior:url(#default#VML)}"}var c=b.getElementsByTagName("canvas"),d=0;for(;d<c.length;d++)this.initElement(c[d])},
-	initElement:function(b){if(!b.getContext){b.getContext=X;b.innerHTML="";b.attachEvent("onpropertychange",Z);b.attachEvent("onresize",$);var a=b.attributes;if(a.width&&a.width.specified)b.style.width=a.width.nodeValue+"px";else b.width=b.clientWidth;if(a.height&&a.height.specified)b.style.height=a.height.nodeValue+"px";else b.height=b.clientHeight}return b}};function Z(b){var a=b.srcElement;switch(b.propertyName){case "width":a.style.width=a.attributes.width.nodeValue+"px";a.getContext().clearRect();
-	break;case "height":a.style.height=a.attributes.height.nodeValue+"px";a.getContext().clearRect();break}}function $(b){var a=b.srcElement;if(a.firstChild){a.firstChild.style.width=a.clientWidth+"px";a.firstChild.style.height=a.clientHeight+"px"}}M.init();var N=[],B=0;for(;B<16;B++){var C=0;for(;C<16;C++)N[B*16+C]=B.toString(16)+C.toString(16)}function I(){return[[1,0,0],[0,1,0],[0,0,1]]}function y(b,a){var c=I(),d=0;for(;d<3;d++){var f=0;for(;f<3;f++){var h=0,g=0;for(;g<3;g++)h+=b[d][g]*a[g][f];c[d][f]=
-	h}}return c}function O(b,a){a.fillStyle=b.fillStyle;a.lineCap=b.lineCap;a.lineJoin=b.lineJoin;a.lineWidth=b.lineWidth;a.miterLimit=b.miterLimit;a.shadowBlur=b.shadowBlur;a.shadowColor=b.shadowColor;a.shadowOffsetX=b.shadowOffsetX;a.shadowOffsetY=b.shadowOffsetY;a.strokeStyle=b.strokeStyle;a.globalAlpha=b.globalAlpha;a.arcScaleX_=b.arcScaleX_;a.arcScaleY_=b.arcScaleY_;a.lineScale_=b.lineScale_}function P(b){var a,c=1;b=String(b);if(b.substring(0,3)=="rgb"){var d=b.indexOf("(",3),f=b.indexOf(")",d+
-	1),h=b.substring(d+1,f).split(",");a="#";var g=0;for(;g<3;g++)a+=N[Number(h[g])];if(h.length==4&&b.substr(3,1)=="a")c=h[3]}else a=b;return{color:a,alpha:c}}function aa(b){switch(b){case "butt":return"flat";case "round":return"round";case "square":default:return"square"}}function H(b){this.m_=I();this.mStack_=[];this.aStack_=[];this.currentPath_=[];this.fillStyle=this.strokeStyle="#000";this.lineWidth=1;this.lineJoin="miter";this.lineCap="butt";this.miterLimit=k*1;this.globalAlpha=1;this.canvas=b;
-	var a=b.ownerDocument.createElement("div");a.style.width=b.clientWidth+"px";a.style.height=b.clientHeight+"px";a.style.overflow="hidden";a.style.position="absolute";b.appendChild(a);this.element_=a;this.lineScale_=this.arcScaleY_=this.arcScaleX_=1}var i=H.prototype;i.clearRect=function(){this.element_.innerHTML=""};i.beginPath=function(){this.currentPath_=[]};i.moveTo=function(b,a){var c=this.getCoords_(b,a);this.currentPath_.push({type:"moveTo",x:c.x,y:c.y});this.currentX_=c.x;this.currentY_=c.y};
-	i.lineTo=function(b,a){var c=this.getCoords_(b,a);this.currentPath_.push({type:"lineTo",x:c.x,y:c.y});this.currentX_=c.x;this.currentY_=c.y};i.bezierCurveTo=function(b,a,c,d,f,h){var g=this.getCoords_(f,h),l=this.getCoords_(b,a),e=this.getCoords_(c,d);Q(this,l,e,g)};function Q(b,a,c,d){b.currentPath_.push({type:"bezierCurveTo",cp1x:a.x,cp1y:a.y,cp2x:c.x,cp2y:c.y,x:d.x,y:d.y});b.currentX_=d.x;b.currentY_=d.y}i.quadraticCurveTo=function(b,a,c,d){var f=this.getCoords_(b,a),h=this.getCoords_(c,d),g={x:this.currentX_+
-	0.6666666666666666*(f.x-this.currentX_),y:this.currentY_+0.6666666666666666*(f.y-this.currentY_)};Q(this,g,{x:g.x+(h.x-this.currentX_)/3,y:g.y+(h.y-this.currentY_)/3},h)};i.arc=function(b,a,c,d,f,h){c*=k;var g=h?"at":"wa",l=b+G(d)*c-v,e=a+F(d)*c-v,m=b+G(f)*c-v,r=a+F(f)*c-v;if(l==m&&!h)l+=0.125;var n=this.getCoords_(b,a),o=this.getCoords_(l,e),q=this.getCoords_(m,r);this.currentPath_.push({type:g,x:n.x,y:n.y,radius:c,xStart:o.x,yStart:o.y,xEnd:q.x,yEnd:q.y})};i.rect=function(b,a,c,d){this.moveTo(b,
-	a);this.lineTo(b+c,a);this.lineTo(b+c,a+d);this.lineTo(b,a+d);this.closePath()};i.strokeRect=function(b,a,c,d){var f=this.currentPath_;this.beginPath();this.moveTo(b,a);this.lineTo(b+c,a);this.lineTo(b+c,a+d);this.lineTo(b,a+d);this.closePath();this.stroke();this.currentPath_=f};i.fillRect=function(b,a,c,d){var f=this.currentPath_;this.beginPath();this.moveTo(b,a);this.lineTo(b+c,a);this.lineTo(b+c,a+d);this.lineTo(b,a+d);this.closePath();this.fill();this.currentPath_=f};i.createLinearGradient=function(b,
-	a,c,d){var f=new D("gradient");f.x0_=b;f.y0_=a;f.x1_=c;f.y1_=d;return f};i.createRadialGradient=function(b,a,c,d,f,h){var g=new D("gradientradial");g.x0_=b;g.y0_=a;g.r0_=c;g.x1_=d;g.y1_=f;g.r1_=h;return g};i.drawImage=function(b){var a,c,d,f,h,g,l,e,m=b.runtimeStyle.width,r=b.runtimeStyle.height;b.runtimeStyle.width="auto";b.runtimeStyle.height="auto";var n=b.width,o=b.height;b.runtimeStyle.width=m;b.runtimeStyle.height=r;if(arguments.length==3){a=arguments[1];c=arguments[2];h=g=0;l=d=n;e=f=o}else if(arguments.length==
-	5){a=arguments[1];c=arguments[2];d=arguments[3];f=arguments[4];h=g=0;l=n;e=o}else if(arguments.length==9){h=arguments[1];g=arguments[2];l=arguments[3];e=arguments[4];a=arguments[5];c=arguments[6];d=arguments[7];f=arguments[8]}else throw Error("Invalid number of arguments");var q=this.getCoords_(a,c),t=[];t.push(" <g_vml_:group",' coordsize="',k*10,",",k*10,'"',' coordorigin="0,0"',' style="width:',10,"px;height:",10,"px;position:absolute;");if(this.m_[0][0]!=1||this.m_[0][1]){var E=[];E.push("M11=",
-	this.m_[0][0],",","M12=",this.m_[1][0],",","M21=",this.m_[0][1],",","M22=",this.m_[1][1],",","Dx=",j(q.x/k),",","Dy=",j(q.y/k),"");var p=q,z=this.getCoords_(a+d,c),w=this.getCoords_(a,c+f),x=this.getCoords_(a+d,c+f);p.x=s.max(p.x,z.x,w.x,x.x);p.y=s.max(p.y,z.y,w.y,x.y);t.push("padding:0 ",j(p.x/k),"px ",j(p.y/k),"px 0;filter:progid:DXImageTransform.Microsoft.Matrix(",E.join(""),", sizingmethod='clip');")}else t.push("top:",j(q.y/k),"px;left:",j(q.x/k),"px;");t.push(' ">','<g_vml_:image src="',b.src,
-	'"',' style="width:',k*d,"px;"," height:",k*f,'px;"',' cropleft="',h/n,'"',' croptop="',g/o,'"',' cropright="',(n-h-l)/n,'"',' cropbottom="',(o-g-e)/o,'"'," />","</g_vml_:group>");this.element_.insertAdjacentHTML("BeforeEnd",t.join(""))};i.stroke=function(b){var a=[],c=P(b?this.fillStyle:this.strokeStyle),d=c.color,f=c.alpha*this.globalAlpha;a.push("<g_vml_:shape",' filled="',!!b,'"',' style="position:absolute;width:',10,"px;height:",10,'px;"',' coordorigin="0 0" coordsize="',k*10," ",k*10,'"',' stroked="',
-	!b,'"',' path="');var h={x:null,y:null},g={x:null,y:null},l=0;for(;l<this.currentPath_.length;l++){var e=this.currentPath_[l];switch(e.type){case "moveTo":a.push(" m ",j(e.x),",",j(e.y));break;case "lineTo":a.push(" l ",j(e.x),",",j(e.y));break;case "close":a.push(" x ");e=null;break;case "bezierCurveTo":a.push(" c ",j(e.cp1x),",",j(e.cp1y),",",j(e.cp2x),",",j(e.cp2y),",",j(e.x),",",j(e.y));break;case "at":case "wa":a.push(" ",e.type," ",j(e.x-this.arcScaleX_*e.radius),",",j(e.y-this.arcScaleY_*e.radius),
-	" ",j(e.x+this.arcScaleX_*e.radius),",",j(e.y+this.arcScaleY_*e.radius)," ",j(e.xStart),",",j(e.yStart)," ",j(e.xEnd),",",j(e.yEnd));break}if(e){if(h.x==null||e.x<h.x)h.x=e.x;if(g.x==null||e.x>g.x)g.x=e.x;if(h.y==null||e.y<h.y)h.y=e.y;if(g.y==null||e.y>g.y)g.y=e.y}}a.push(' ">');if(b)if(typeof this.fillStyle=="object"){var m=this.fillStyle,r=0,n={x:0,y:0},o=0,q=1;if(m.type_=="gradient"){var t=m.x1_/this.arcScaleX_,E=m.y1_/this.arcScaleY_,p=this.getCoords_(m.x0_/this.arcScaleX_,m.y0_/this.arcScaleY_),
-	z=this.getCoords_(t,E);r=Math.atan2(z.x-p.x,z.y-p.y)*180/Math.PI;if(r<0)r+=360;if(r<1.0E-6)r=0}else{var p=this.getCoords_(m.x0_,m.y0_),w=g.x-h.x,x=g.y-h.y;n={x:(p.x-h.x)/w,y:(p.y-h.y)/x};w/=this.arcScaleX_*k;x/=this.arcScaleY_*k;var R=s.max(w,x);o=2*m.r0_/R;q=2*m.r1_/R-o}var u=m.colors_;u.sort(function(ba,ca){return ba.offset-ca.offset});var J=u.length,da=u[0].color,ea=u[J-1].color,fa=u[0].alpha*this.globalAlpha,ga=u[J-1].alpha*this.globalAlpha,S=[],l=0;for(;l<J;l++){var T=u[l];S.push(T.offset*q+
-	o+" "+T.color)}a.push('<g_vml_:fill type="',m.type_,'"',' method="none" focus="100%"',' color="',da,'"',' color2="',ea,'"',' colors="',S.join(","),'"',' opacity="',ga,'"',' g_o_:opacity2="',fa,'"',' angle="',r,'"',' focusposition="',n.x,",",n.y,'" />')}else a.push('<g_vml_:fill color="',d,'" opacity="',f,'" />');else{var K=this.lineScale_*this.lineWidth;if(K<1)f*=K;a.push("<g_vml_:stroke",' opacity="',f,'"',' joinstyle="',this.lineJoin,'"',' miterlimit="',this.miterLimit,'"',' endcap="',aa(this.lineCap),
-	'"',' weight="',K,'px"',' color="',d,'" />')}a.push("</g_vml_:shape>");this.element_.insertAdjacentHTML("beforeEnd",a.join(""))};i.fill=function(){this.stroke(true)};i.closePath=function(){this.currentPath_.push({type:"close"})};i.getCoords_=function(b,a){var c=this.m_;return{x:k*(b*c[0][0]+a*c[1][0]+c[2][0])-v,y:k*(b*c[0][1]+a*c[1][1]+c[2][1])-v}};i.save=function(){var b={};O(this,b);this.aStack_.push(b);this.mStack_.push(this.m_);this.m_=y(I(),this.m_)};i.restore=function(){O(this.aStack_.pop(),
-	this);this.m_=this.mStack_.pop()};function ha(b){var a=0;for(;a<3;a++){var c=0;for(;c<2;c++)if(!isFinite(b[a][c])||isNaN(b[a][c]))return false}return true}function A(b,a,c){if(!!ha(a)){b.m_=a;if(c)b.lineScale_=W(V(a[0][0]*a[1][1]-a[0][1]*a[1][0]))}}i.translate=function(b,a){A(this,y([[1,0,0],[0,1,0],[b,a,1]],this.m_),false)};i.rotate=function(b){var a=G(b),c=F(b);A(this,y([[a,c,0],[-c,a,0],[0,0,1]],this.m_),false)};i.scale=function(b,a){this.arcScaleX_*=b;this.arcScaleY_*=a;A(this,y([[b,0,0],[0,a,
-	0],[0,0,1]],this.m_),true)};i.transform=function(b,a,c,d,f,h){A(this,y([[b,a,0],[c,d,0],[f,h,1]],this.m_),true)};i.setTransform=function(b,a,c,d,f,h){A(this,[[b,a,0],[c,d,0],[f,h,1]],true)};i.clip=function(){};i.arcTo=function(){};i.createPattern=function(){return new U};function D(b){this.type_=b;this.r1_=this.y1_=this.x1_=this.r0_=this.y0_=this.x0_=0;this.colors_=[]}D.prototype.addColorStop=function(b,a){a=P(a);this.colors_.push({offset:b,color:a.color,alpha:a.alpha})};function U(){}G_vmlCanvasManager=
-	M;CanvasRenderingContext2D=H;CanvasGradient=D;CanvasPattern=U})();
-
-}//	---------------------------------------------------------------------------
 //	jWebSocket Canvas Plug-in (Community Edition, CE)
 //	---------------------------------------------------------------------------
 //	Copyright 2010-2015 Innotrade GmbH (jWebSocket.org)
@@ -7800,6 +7555,226 @@ jws.oop.declareClass('jws', 'ValidatorFilter', jws.EventsBaseFilter, {
 		}
 	}
 });
+//	---------------------------------------------------------------------------
+//	jWebSocket Load Balancer Plug-in (Community Edition, CE)
+//	---------------------------------------------------------------------------
+//	Copyright 2010-2015 Innotrade GmbH (jWebSocket.org)
+//	Alexander Schulze, Germany (NRW)
+//
+//	Licensed under the Apache License, Version 2.0 (the "License");
+//	you may not use this file except in compliance with the License.
+//	You may obtain a copy of the License at
+//
+//	http://www.apache.org/licenses/LICENSE-2.0
+//
+//	Unless required by applicable law or agreed to in writing, software
+//	distributed under the License is distributed on an "AS IS" BASIS,
+//	WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//	See the License for the specific language governing permissions and
+//	limitations under the License.
+//	---------------------------------------------------------------------------
+
+//:package:*:jws
+//:class:*:jws.LoadBalancerPlugIn
+//:ancestor:*:-
+//:d:en:Implementation of the [tt]jws.LoadBalancerPlugIn[/tt] class.
+//:d:en:This client-side plug-in provides the API to access the features of the _
+//:d:en:Load Balancer plug-in on the jWebSocket server.
+jws.LoadBalancerPlugIn = {
+
+	//:const:*:NS:String:org.jwebsocket.plugins.loadbalancer (jws.NS_BASE + ".plugins.loadbalancer")
+	//:d:en:Namespace for the [tt]LoadBalancerPlugIn[/tt] class.
+	// if namespace is changed update server plug-in accordingly!
+	NS: jws.NS_BASE + ".plugins.loadbalancer",
+	
+	//:m:*:lbClustersInfo
+	//:d:en:Gets a list (of maps) with the information about all clusters.
+	//:a:en::aOptions:Object:Optional arguments for the raw client sendToken method.
+	//:r:*:::void:none
+	lbClustersInfo: function(aOptions) {
+		var lRes = this.checkConnected();
+		if (0 === lRes.code) {
+			var lToken = {
+				ns: jws.LoadBalancerPlugIn.NS,
+				type: "clustersInfo"
+			};
+			this.sendToken(lToken, aOptions);
+		}
+		return lRes;
+	},
+	
+	//:m:*:lbStickyRoutes
+	//:d:en:Gets a list of all sticky routes managed by the load balancer.
+	//:a:en::aOptions:Object:Optional arguments for the raw client sendToken method.
+	//:r:*:::void:none
+	lbStickyRoutes: function(aOptions) {
+		var lRes = this.checkConnected();
+		if (0 === lRes.code) {
+			var lToken = {
+				ns: jws.LoadBalancerPlugIn.NS,
+				type: "stickyRoutes"
+			};
+			this.sendToken(lToken, aOptions);
+		}
+		return lRes;
+	},
+	
+	//:m:*:lbChangeAlgorithm
+	//:d:en:Changes the type of algorithm used by the load balancer.
+	//:a:en::aAlgorithm:Integer:The balancer algorithm to be set.
+	//:a:en::aOptions:Object:Optional arguments for the raw client sendToken method.
+	//:r:*:::void:none
+	lbChangeAlgorithm: function(aAlgorithm, aOptions) {
+		var lRes = this.checkConnected();
+		if (0 === lRes.code) {
+			var lToken = {
+				ns: jws.LoadBalancerPlugIn.NS,
+				type: "changeAlgorithm",
+				algorithm: aAlgorithm
+			};
+			this.sendToken(lToken, aOptions);
+		}
+		return lRes;
+	},
+	
+	//:m:*:lbRegisterServiceEndPoint
+	//:d:en:Registers a new service endpoint in specific cluster.
+	//:a:en::aClusterAlias:String:The cluster alias value.
+	//:a:en::aPassword:String:Password to verify privileges.
+	//:a:en::aOptions:Object:Optional arguments for the raw client sendToken method.
+	//:r:*:::void:none
+	lbRegisterServiceEndPoint: function(aClusterAlias, aPassword, aOptions) {
+		var lRes = this.checkConnected();
+		if (0 === lRes.code) {
+			var lToken = {
+				ns: jws.LoadBalancerPlugIn.NS,
+				type: "registerServiceEndPoint",
+				clusterAlias: aClusterAlias,
+				password: aPassword
+			};
+			this.sendToken(lToken, aOptions);
+		}
+		return lRes;
+	},
+	
+	//:m:*:lbDeregisterServiceEndPoint
+	//:d:en:De-registers a connected service endpoint.
+	//:a:en::aClusterAlias:String:The cluster alias that contains the service to be deregistered.
+	//:a:en::aPassword:String:The cluster password.
+	//:a:en::aEndPointId:String:The endpoint to be deregistered.
+	//:a:en::aOptions:Object:Optional arguments for the raw client sendToken method.
+	//:r:*:::void:none
+	lbDeregisterServiceEndPoint: function(aClusterAlias, aPassword, aEndPointId, aOptions) {
+		var lRes = this.checkConnected();
+		if (0 === lRes.code) {
+			var lToken = {
+				ns: jws.LoadBalancerPlugIn.NS,
+				type: "deregisterServiceEndPoint",
+				endPointId: aEndPointId,
+				clusterAlias: aClusterAlias,
+				password: aPassword
+			};
+			this.sendToken(lToken, aOptions);
+		}
+		return lRes;
+	},
+	
+	//:m:*:lbShutdownEndPoint
+	//:d:en:Should send a message to the referenced endpoint to gracefully shutdown.
+	//:a:en::aClusterAlias:String:The cluster alias that contains the service to be shutdown.
+	//:a:en::aPassword:String:The cluster password.
+	//:a:en::aEndPointId:String:The endpoint to be shutdown.
+	//:a:en::aOptions:Object:Optional arguments for the raw client sendToken method.
+	//:r:*:::void:none
+	lbShutdownEndPoint: function(aClusterAlias, aPassword, aEndPointId, aOptions) {
+		var lRes = this.checkConnected();
+		if (0 === lRes.code) {
+			var lToken = {
+				ns: jws.LoadBalancerPlugIn.NS,
+				type: "shutdownServiceEndPoint",
+				endPointId: aEndPointId,
+				clusterAlias: aClusterAlias,
+				password: aPassword
+			};
+			this.sendToken(lToken, aOptions);
+		}
+		return lRes;
+	},
+	
+	//:m:*:lbCreateResponse
+	//:d:en:Create token response with all necessary data to send to remote client.
+	//:a:en::aOptions:Object:Optional arguments for the raw client sendToken method.
+	//:r:*:::void:none
+	lbCreateResponse: function(aToken) {
+		var lResponse = {
+			ns: jws.LoadBalancerPlugIn.NS,
+			type: 'response',
+			utid: aToken.utid,
+			sourceId: aToken.sourceId,
+			reqType: aToken.type
+		};
+
+		return lResponse;
+	},
+	
+	//:m:*:lbSampleService
+	//:d:en:Create a new sample service endpoint.
+	//:a:en::aClusterAlias:String:The cluster alias value.
+	//:a:en::aPassword:String:The cluster password.
+	//:a:en::aOptions:Object:Optional arguments for the raw client sendToken method.
+	//:a:en::aOptions.connectionURL:String:Optional argument to override the default service connection URL.
+	//:a:en::aOptions.connectionUsername:String:Optional argument that indicates the server connection username. Default: root
+	//:a:en::aOptions.connectionPassword:String:Optional argument that indicates the server connection password. Default: root
+	//:r:*:::jWebSocketJSONClient:The sample service endpoint instance
+	lbSampleService: function(aClusterAlias, aPassword, aOptions) {
+		var lWSC = new jws.jWebSocketJSONClient();
+		var lURL = aOptions.connectionURL ||
+		"ws://localhost:8787/jWebSocket/jWebSocket?sessionCookieName=sSessionId" + new Date().getTime();
+		
+		lWSC.open(lURL, {
+			OnWelcome: function() {
+				if(lWSC.isLoggedIn() !== "root"){
+					lWSC.login(aOptions.connectionUsername || "root", aOptions.connectionPassword || "root"); 
+				}
+					
+				lWSC.lbRegisterServiceEndPoint(aClusterAlias, aPassword, aOptions);
+				lWSC.addPlugIn({
+					processToken: function(aToken) {
+						if (aToken.ns === aOptions.nameSpace) {
+							if ('test' === aToken.type) {
+								var lResponse = lWSC.lbCreateResponse(aToken);
+								lWSC.sendToken(lResponse);
+							}
+						}
+
+						if (aToken.ns === jws.LoadBalancerPlugIn.NS) {
+							if ('event' === aToken.type 
+									&& 'shutdownServiceEndPoint' === aToken.name) {
+								lWSC.close();
+							}
+						}
+					}
+				});
+			},
+			
+			OnMessage: function(aMessage) {
+				if ('function' === typeof log){
+					log('Message "' + aMessage.data + '" received on endpoint: ' 
+						+ (lWSC.getId() === null 
+							? aMessage.data.split('"')[11] 
+							: lWSC.getId()));
+				}
+			}
+		});
+		
+		return lWSC;
+	}
+};
+
+// add the JWebSocket Load Balancer PlugIn into the TokenClient class
+jws.oop.addPlugIn(jws.jWebSocketTokenClient, jws.LoadBalancerPlugIn);
+
+
 //	---------------------------------------------------------------------------
 //	jWebSocket External Processes Plug-in (Community Edition, CE)
 //	---------------------------------------------------------------------------
@@ -10171,6 +10146,14 @@ jws.JMSPlugIn = {
 					if (this.OnBrokerTransportResumed) {
 						this.OnBrokerTransportResumed(aToken);
 					}
+				} else if ("endPointDisconnected" === aToken.name) {
+					if (this.OnEndPointDisconnected) {
+						this.OnEndPointDisconnected(aToken);
+					}
+				} else if ("endPointConnected" === aToken.name) {
+					if (this.OnEndPointConnected) {
+						this.OnEndPointConnected(aToken);
+					}
 				} else if ("handleJmsText" === aToken.name) {
 					if (this.OnHandleJmsText) {
 						this.OnHandleJmsText(aToken);
@@ -10372,7 +10355,6 @@ jws.JMSPlugIn = {
 		if (aListeners.OnHandleJmsMapMessage !== undefined) {
 			this.OnHandleJmsMapMessage = aListeners.OnHandleJmsMapMessage;
 		}
-
 		if (aListeners.OnPing !== undefined) {
 			this.OnPing = aListeners.OnPing;
 		}
@@ -10387,6 +10369,12 @@ jws.JMSPlugIn = {
 		}
 		if (aListeners.OnBrokerTransportException !== undefined) {
 			this.OnBrokerTransportException = aListeners.OnBrokerTransportException;
+		}
+		if (aListeners.OnEndPointConnected !== undefined) {
+			this.OnEndPointConnected = aListeners.OnEndPointConnected;
+		}
+		if (aListeners.OnEndPointDisconnected !== undefined) {
+			this.OnEndPointDisconnected = aListeners.OnEndPointDisconnected;
 		}
 	}
 
@@ -10412,39 +10400,105 @@ jws.oop.addPlugIn(jws.jWebSocketTokenClient, jws.JMSPlugIn);
 //	limitations under the License.
 //	---------------------------------------------------------------------------
 
+jws = jws || {};
+
 //:package:*:jws
 //:class:*:jws.LoggingPlugIn
 //:ancestor:*:-
 //:d:en:Implementation of the [tt]jws.LoggingPlugIn[/tt] class.
 jws.LoggingPlugIn = {
-
 	//:const:*:NS:String:org.jwebsocket.plugins.Logging (jws.NS_BASE + ".plugins.logging")
 	//:d:en:Namespace for the [tt]LoggingPlugIn[/tt] class.
 	// if namespace is changed update server plug-in accordingly!
 	NS: jws.NS_BASE + ".plugins.logging",
-
 	DEBUG: "debug",
 	INFO: "info",
 	WARN: "warn",
 	ERROR: "error",
 	FATAL: "fatal",
-
-	processToken: function( aToken ) {
+	logToConsole: true,
+	logToServer: false,
+	//
+	consoleWrapper: {
+		debug: function (aMsg, aInfo) {
+			if (jws.LoggingPlugIn.logToConsole) {
+				jws.console.debug(aMsg);
+			}
+			if (jws.LoggingPlugIn.logToServer) {
+				this.loggingDebug(aMsg, aInfo);
+			}
+		},
+		info: function (aMsg, aInfo) {
+			if (jws.LoggingPlugIn.logToConsole) {
+				jws.console.info(aMsg);
+			}
+			if (jws.LoggingPlugIn.logToServer) {
+				this.loggingInfo(aMsg, aInfo);
+			}
+		},
+		warn: function (aMsg, aInfo) {
+			if (jws.LoggingPlugIn.logToConsole) {
+				jws.console.warn(aMsg);
+			}
+			if (jws.LoggingPlugIn.logToServer) {
+				this.loggingWarn(aMsg, aInfo);
+			}
+		},
+		error: function (aMsg, aInfo) {
+			if (jws.LoggingPlugIn.logToConsole) {
+				jws.console.error(aMsg);
+			}
+			if (jws.LoggingPlugIn.logToServer) {
+				this.loggingError(aMsg, aInfo);
+			}
+		},
+		fatal: function (aMsg, aInfo) {
+			if (jws.LoggingPlugIn.logToConsole) {
+				jws.console.fatal(aMsg);
+			}
+			if (jws.LoggingPlugIn.logToServer) {
+				this.loggingFatal(aMsg, aInfo);
+			}
+		}
+	},
+	//
+	setLogLevel: function (aLogLevel) {
+		jws.console.setLevel(aLogLevel);
+	},
+	//
+	setLogToConsole: function (aLog) {
+		jws.console.setActive(aLog);
+		jws.LoggingPlugIn.logToConsole = aLog;
+	},
+	//
+	setLogToServer: function (aLog) {
+		jws.LoggingPlugIn.logToServer = aLog;
+	},
+	//
+	getLogToConsole: function () {
+		return jws.LoggingPlugIn.logToConsole;
+	},
+	//
+	getLogToServer: function () {
+		return jws.LoggingPlugIn.logToServer;
+	},
+	//
+	processToken: function (aToken) {
 		// check if namespace matches
-		if( aToken.ns == jws.LoggingPlugIn.NS ) {
+		if (jws.LoggingPlugIn.NS === aToken.ns) {
 			// here you can handle incoming tokens from the server
 			// directy in the plug-in if desired.
-			if( "log" == aToken.reqType ) {
-				if( this.OnLogged ) {
-					this.OnLogged( aToken );
+			if ("log" === aToken.reqType) {
+				if (this.OnLogged) {
+					this.OnLogged(aToken);
 				}
 			}
 		}
 	},
-
-	loggingLog: function( aLevel, aInfo, aMessage, aOptions ) {
+	//
+	loggingLog: function (aLevel, aMessage, aInfo, aOptions) {
 		var lRes = this.checkConnected();
-		if( 0 == lRes.code ) {
+		if (0 === lRes.code) {
 			var lToken = {
 				ns: jws.LoggingPlugIn.NS,
 				type: "log",
@@ -10452,31 +10506,56 @@ jws.LoggingPlugIn = {
 				info: aInfo,
 				message: aMessage
 			};
-			this.sendToken( lToken,	aOptions );
+			try {
+				this.sendToken(lToken, aOptions);
+			} catch (lEx) {
+				jws.console.error("jWebSocket Logging plug-in client exception: "
+						+ lEx);
+			}
 		}
 		return lRes;
 	},
-
-	loggingEvent: function( aTable, aData, aOptions ) {
+	//
+	loggingDebug: function (aMessage, aInfo, aOptions) {
+		return this.loggingLog(jws.LoggingPlugIn.DEBUG, aMessage, aInfo, aOptions);
+	},
+	//
+	loggingInfo: function (aMessage, aInfo, aOptions) {
+		return this.loggingLog(jws.LoggingPlugIn.INFO, aMessage, aInfo, aOptions);
+	},
+	//
+	loggingWarn: function (aMessage, aInfo, aOptions) {
+		return this.loggingLog(jws.LoggingPlugIn.WARN, aMessage, aInfo, aOptions);
+	},
+	//
+	loggingError: function (aMessage, aInfo, aOptions) {
+		return this.loggingLog(jws.LoggingPlugIn.ERROR, aMessage, aInfo, aOptions);
+	},
+	//
+	loggingFatal: function (aMessage, aInfo, aOptions) {
+		return this.loggingLog(jws.LoggingPlugIn.FATAL, aMessage, aInfo, aOptions);
+	},
+	//
+	loggingEvent: function (aTable, aData, aOptions) {
 		var lRes = this.checkConnected();
-		if( 0 == lRes.code ) {
+		if (0 === lRes.code) {
 			var lSequence = null;
 			var lPrimaryKey = null;
-			if( aOptions ) {
-				if( aOptions.primaryKey ) {
+			if (aOptions) {
+				if (aOptions.primaryKey) {
 					lPrimaryKey = aOptions.primaryKey;
 				}
-				if( aOptions.sequence ) {
+				if (aOptions.sequence) {
 					lSequence = aOptions.sequence;
-				}	
+				}
 			}
 			var lFields = [];
 			var lValues = [];
-			for( var lField in aData ) {
-				lFields.push( lField );
+			for (var lField in aData) {
+				lFields.push(lField);
 				// do not use "jws.tools.escapeSQL()" here, 
 				// the SQL string will be escaped by the server!
-				lValues.push( aData[ lField ] );
+				lValues.push(aData[ lField ]);
 			}
 			var lToken = {
 				ns: jws.LoggingPlugIn.NS,
@@ -10485,29 +10564,29 @@ jws.LoggingPlugIn = {
 				fields: lFields,
 				values: lValues
 			};
-			if( lPrimaryKey && lSequence ) {
+			if (lPrimaryKey && lSequence) {
 				lToken.primaryKey = lPrimaryKey;
 				lToken.sequence = lSequence;
 			}
-			this.sendToken( lToken,	aOptions );
+			this.sendToken(lToken, aOptions);
 		}
 		return lRes;
 	},
-
-	loggingGetEvents: function( aTable, aOptions ) {
+	//
+	loggingGetEvents: function (aTable, aOptions) {
 		var lRes = this.checkConnected();
-		if( 0 == lRes.code ) {
+		if (0 === lRes.code) {
 			var lPrimaryKey = null;
 			var lFromKey = null;
 			var lToKey = null;
-			if( aOptions ) {
-				if( aOptions.primaryKey ) {
+			if (aOptions) {
+				if (aOptions.primaryKey) {
 					lPrimaryKey = aOptions.primaryKey;
 				}
-				if( aOptions.fromKey ) {
+				if (aOptions.fromKey) {
 					lFromKey = aOptions.fromKey;
 				}
-				if( aOptions.toKey ) {
+				if (aOptions.toKey) {
 					lToKey = aOptions.toKey;
 				}
 			}
@@ -10519,32 +10598,41 @@ jws.LoggingPlugIn = {
 				fromKey: lFromKey,
 				toKey: lToKey
 			};
-			this.sendToken( lToken,	aOptions );
+			this.sendToken(lToken, aOptions);
 		}
 		return lRes;
 	},
+	//
+	loggingSubscribe: function (aTable, aOptions) {
 
-	loggingSubscribe: function( aTable, aOptions ) {
-		
 	},
+	//
+	loggingUnsubscribe: function (aTable, aOptions) {
 
-	loggingUnsubscribe: function( aTable, aOptions ) {
-		
 	},
-
-	setLoggingCallbacks: function( aListeners ) {
-		if( !aListeners ) {
+	//
+	setLoggingCallbacks: function (aListeners) {
+		if (!aListeners) {
 			aListeners = {};
 		}
-		if( aListeners.OnLogged !== undefined ) {
+		if (aListeners.OnLogged !== undefined) {
 			this.OnLogged = aListeners.OnLogged;
 		}
+	},
+	//
+	addLogger: function () {
+		this.setLogLevel = jws.LoggingPlugIn.setLogLevel;
+		this.debug = jws.LoggingPlugIn.consoleWrapper.debug;
+		this.info = jws.LoggingPlugIn.consoleWrapper.info;
+		this.warn = jws.LoggingPlugIn.consoleWrapper.warn;
+		this.error = jws.LoggingPlugIn.consoleWrapper.error;
+		this.fatal = jws.LoggingPlugIn.consoleWrapper.fatal;
 	}
 
-}
+};
 
 // add the JWebSocket Logging PlugIn into the TokenClient class
-jws.oop.addPlugIn( jws.jWebSocketTokenClient, jws.LoggingPlugIn );
+jws.oop.addPlugIn(jws.jWebSocketTokenClient, jws.LoggingPlugIn);
 //	---------------------------------------------------------------------------
 //	jWebSocket Mail Plug-in (Community Edition, CE)
 //	---------------------------------------------------------------------------
@@ -10767,6 +10855,468 @@ jws.MailPlugIn = {
 
 // add the jWebSocket Mail PlugIn into the TokenClient class
 jws.oop.addPlugIn( jws.jWebSocketTokenClient, jws.MailPlugIn );
+//	---------------------------------------------------------------------------
+//	jWebSocket Quota Plug-in  (Community Edition, CE)
+//	---------------------------------------------------------------------------
+//	Copyright 2010-2015 Innotrade GmbH (jWebSocket.org)
+//	Alexander Schulze, Germany (NRW)
+//
+//	Licensed under the Apache License, Version 2.0 (the "License");
+//	you may not use this file except in compliance with the License.
+//	You may obtain a copy of the License at
+//
+//	http://www.apache.org/licenses/LICENSE-2.0
+//
+//	Unless required by applicable law or agreed to in writing, software
+//	distributed under the License is distributed on an "AS IS" BASIS,
+//	WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//	See the License for the specific language governing permissions and
+//	limitations under the License.
+//	---------------------------------------------------------------------------
+//
+//:package:*:jws
+//:class:*:jws.QuotaPlugIn
+//:ancestor:*:-
+//:d:en:Implementation of the [tt]jws.QuotaPlugIn[/tt] class. This _
+//:d:en:This client-side plug-in provides the API to access the features of the _
+//:d:en:QuotaPlugIn on the server side.
+jws.QuotaPlugIn = {
+    // namespace for quota plugin
+    // if namespace is changed update server plug-in accordingly!
+    NS: jws.NS_BASE + ".plugins.quota",
+    // if the followings tokens type are changed update server side _
+    // accordingly!
+    TT_CREATE_QUOTA: "createQuota",
+    TT_GET_QUOTA: "getQuota",
+    TT_UNREGISTER_QUOTA: "unregisterQuota",
+    TT_REGISTER_QUOTA: "registerQuota",
+    TT_REDUCE_QUOTA: "reduceQuota",
+    TT_INCREASE_QUOTA: "increaseQuota",
+    TT_SET_QUOTA: "setQuota",
+    TT_QUERY_QUOTA: "query",
+    processToken: function(aToken) {
+
+        // check if namespace matches
+        if (aToken.ns === jws.QuotaPlugIn.NS) {
+            // here you can handle incomimng tokens from the server
+            // in the plug-in if desired.
+
+            if (this.TT_CREATE_QUOTA === aToken.reqType) {
+                if (0 === aToken.code) {
+                    if (this.OnCreateQuotad) {
+                        this.OnCreateQuotad(aToken);
+                    }
+                } else {
+                    if (this.OnErrorQuota) {
+                        this.OnErrorQuota(aToken);
+                    }
+                }
+            } else if (this.TT_GET_QUOTA === aToken.reqType) {
+                if (0 === aToken.code) {
+                    if (this.OnGetQuota) {
+                        this.OnGetQuota(aToken);
+                    }
+                } else {
+                    if (this.OnErrorQuota) {
+                        this.OnErrorQuota(aToken);
+                    }
+                }
+            } else if (this.TT_UNREGISTER_QUOTA === aToken.reqType) {
+                if (0 === aToken.code) {
+                    if (this.OnUnregisterQuota) {
+                        this.OnUnregisterQuota(aToken);
+                    }
+                } else {
+                    if (this.OnErrorQuota) {
+                        this.OnErrorQuota(aToken);
+                    }
+                }
+            } else if (this.TT_REGISTER_QUOTA === aToken.reqType) {
+                if (0 === aToken.code) {
+                    if (this.OnRegisterQuota) {
+                        this.OnRegisterQuota(aToken);
+                    }
+                } else {
+                    if (this.OnErrorQuota) {
+                        this.OnErrorQuota(aToken);
+                    }
+                }
+            } else if (this.TT_REDUCE_QUOTA === aToken.reqType) {
+                if (0 === aToken.code) {
+                    if (this.OnReduceQuota) {
+                        this.OnReduceQuota(aToken);
+                    }
+                } else {
+                    if (this.OnErrorQuota) {
+                        this.OnErrorQuota(aToken);
+                    }
+                }
+            } else if (this.TT_SET_QUOTA === aToken.reqType) {
+                if (0 === aToken.code) {
+                    if (this.OnSetQuota) {
+                        this.OnSetQuota(aToken);
+                    }
+                } else {
+                    if (this.OnErrorQuota) {
+                        this.OnErrorQuota(aToken);
+                    }
+                }
+            } else if (this.TT_INCREASE_QUOTA === aToken.reqType) {
+                if (0 === aToken.code) {
+                    if (this.OnIncreaseQuota) {
+                        this.OnIncreaseQuota(aToken);
+                    }
+                } else {
+                    if (this.OnErrorQuota) {
+                        this.OnErrorQuota(aToken);
+                    }
+                }
+            } else if (this.TT_QUERY_QUOTA === aToken.reqType) {
+                if (0 === aToken.code) {
+                    if (this.OnQueryQuota) {
+                        this.OnQueryQuota(aToken);
+                    }
+                } else {
+                    if (this.OnErrorQuota) {
+                        this.OnErrorQuota(aToken);
+                    }
+                }
+            }
+        }
+    },
+    //:m:*:createQuota
+    //:d:en::Create a quota with the given values
+    //:a:en::aIdentifier:String:The identifier of the quota<tt>Examples: CountDown, Diskspace, Interval</tt>
+    //:a:en::aNamespace:String:The namespace of the feature that is restricted by this quota<tt>Example: org.jwebsocket.plugins.sample</tt>
+    //:a:en::aInstance:String:The instance that this quota will be apply to, could be an user or a group<tt>Example of user: guest</tt><tt>Example of group: DefaultGruop</tt>.
+    //:a:en::aInstanceType:String:Define if the instance is an user or a Group, mandatory values are<tt>User or Group</tt>
+    //:a:en::aActions:String:Action restricted by this quota<tt>Example: create, remove or *</tt>.
+    //:a:en::aValues:Int:The value for this quota<tt>Example: 10</tt>.
+    //:a:en::aOptions:Object:Optional arguments for the raw client sendToken method.
+    //:r:*:::void:none       
+    createQuota: function (aIdentifier, aNamespace, aInstance, aInstanceType,
+            aActions, aValue, aOptions) {
+        var lRes = this.checkConnected(),
+                lToken = {
+                    ns: jws.QuotaPlugIn.NS,
+                    type: jws.QuotaPlugIn.TT_CREATE_QUOTA,
+                    namespace: aNamespace,
+                    instance: aInstance,
+                    instance_type: aInstanceType,
+                    identifier: aIdentifier,
+                    actions: aActions,
+                    value: aValue
+                };
+        if (aOptions && aOptions.uuid) {
+            lToken.uuid = aOptions.uuid;
+        }
+        if (0 === lRes.code) {
+            this.sendToken(lToken, aOptions);
+        }
+        return lRes;
+    },
+    //:m:*:getQuota
+    //:d:en::Get a complete JSON object with all quota data
+    //:a:en::aIdentifier:String:The identifier of the quota<tt>Examples: CountDown, Diskspace, Interval</tt>
+    //:a:en::aNamespace:String:The namespace of the quota<tt>Example: org.jwebsocket.plugins.sample</tt>
+    //:a:en::aInstance:String:The instance that this quota apply to, could be an user or a group<tt>Example of user: guest</tt><tt>Example of group: DefaultGruop</tt>.
+    //:a:en::aInstanceType:String: Define if the instance above is an user or a Group, mandatory values are<tt>User or Group</tt>
+    //:a:en::aActions:String:Action restricted by this quota<tt>Example: create, remove or *</tt>.
+    //:a:en::aOptions:Object:Optional arguments for the raw client sendToken method.
+    //:r:*:::void:none
+    getQuota: function(aIdentifier, aNamespace, aInstance, aInstanceType,
+            aActions, aOptions) {
+        var lRes = this.checkConnected();
+
+        if (0 === lRes.code) {
+            this.sendToken({
+                ns: jws.QuotaPlugIn.NS,
+                type: jws.QuotaPlugIn.TT_GET_QUOTA,
+                namespace: aNamespace,
+                instance: aInstance,
+                instance_type: aInstanceType,
+                identifier: aIdentifier,
+                actions: aActions
+            }, aOptions);
+        }
+        return lRes;
+    },
+    //:m:*:unregisterQuota
+    //:d:en::Unregister a quota
+    //:a:en::aIdentifier:String:The identifier of the quota<tt>Examples: CountDown, Diskspace, Interval</tt>
+    //:a:en::aInstance:String:The instance to be unregister<tt>Example of user: guest</tt><tt>Example of group: DefaultGruop</tt>.
+    //:a:en::aUuid:String: The uuid of the quota<tt>Example: 52a009111753a6e839227295076a2fc4 </tt>
+    //:a:en::aOptions:Object:Optional arguments for the raw client sendToken method.
+    //:r:*:::void:none
+    unregisterQuota: function(aIdentifier, aInstance, aUuid, aOptions) {
+        var lRes = this.checkConnected();
+
+        if (0 === lRes.code) {
+            this.sendToken({
+                ns: jws.QuotaPlugIn.NS,
+                type: jws.QuotaPlugIn.TT_UNREGISTER_QUOTA,
+                instance: aInstance,
+                identifier: aIdentifier,
+                uuid: aUuid
+            }, aOptions);
+        }
+        return lRes;
+    },
+    //:m:*:registerQuota
+    //:d:en::Register an instance to an existent quota
+    //:a:en::aIdentifier:String:The identifier of the quota<tt>Examples: CountDown, Diskspace, Interval</tt>
+    //:a:en::aInstance:String:The instance to be register<tt>Example: guest</tt>
+    //:a:en::aUuid:String: The uuid of the quota<tt>Example: 22a009111753a6e859227295076a2fdd </tt>
+    //:a:en::aOptions:Object:Optional arguments for the raw client sendToken method.
+    //:r:*:::void:none
+    registerQuota: function(aIdentifier, aInstance, aUuid, aOptions) {
+        var lRes = this.checkConnected();
+
+        if (0 === lRes.code) {
+            this.sendToken({
+                ns: jws.QuotaPlugIn.NS,
+                type: jws.QuotaPlugIn.TT_REGISTER_QUOTA,
+                instance: aInstance,
+                identifier: aIdentifier,
+                //Only user instances can be registered to a quota
+                instance_type: "User",
+                uuid: aUuid
+            }, aOptions);
+        }
+        return lRes;
+
+    },
+    //:m:*:reduceQuota
+    //:d:en::reduceQuota a quota value
+    //:a:en::aIdentifier:String:The identifier of the quota<tt>Examples: CountDown, Diskspace, Interval</tt>
+    //:a:en::aNamespace:String:The namespace of the quota<tt>Example: org.jwebsocket.plugins.sample</tt>
+    //:a:en::aInstance:String:The instance that this quota apply to, could be an user or a group<tt>Example of user: guest</tt><tt>Example of group: DefaultGruop</tt>.
+    //:a:en::aInstanceType:String: Define if the instance above is an user or a Group, mandatory values are<tt>User or Group</tt>
+    //:a:en::aActions:String:Action restricted by this quota<tt>Example: create, remove or *</tt>.
+    //:a:en::aOptions:Object:Optional arguments for the raw client sendToken method.
+    //:a:en::aValues:Int:The value to reduce the current quota value<tt>Example: 10</tt>.
+    //:r:*:::void:none
+    reduceQuota: function(aIdentifier, aNamespace, aInstance, aInstanceType,
+            aActions, aValue, aOptions) {
+                
+        var lRes = this.checkConnected();
+        if (0 === lRes.code) {
+            this.sendToken({
+                ns: jws.QuotaPlugIn.NS,
+                type: jws.QuotaPlugIn.TT_REDUCE_QUOTA,
+                namespace: aNamespace,
+                instance: aInstance,
+                instance_type: aInstanceType,
+                identifier: aIdentifier,
+                actions: aActions,
+                value: aValue
+            }, aOptions);
+        }
+        return lRes;
+    },
+    //:m:*:reduceQuotaByUuid
+    //:d:en::reduceQuota a quota value
+    //:a:en::aIdentifier:String:The identifier of the quota<tt>Examples: CountDown, Diskspace, Interval</tt>
+    //:a:en::aInstance:String:The instance that this quota apply to, could be an user or a group<tt>Example of user: guest</tt><tt>Example of group: DefaultGruop</tt>.
+    //:a:en::aUuid:String: The uuid of the quota<tt>Example: 22a009111753a6e859227295076a2fdd </tt>
+    //:a:en::aValues:Int:The value to reduce the current quota value<tt>Example: 10</tt>.
+    //:a:en::aOptions:Object:Optional arguments for the raw client sendToken method.
+    //:r:*:::void:none
+    reduceQuotaByUuid: function(aIdentifier, aInstance, aUuid, aValue, aOptions) {
+                
+        var lRes = this.checkConnected();
+        if (0 === lRes.code) {
+            this.sendToken({
+                ns: jws.QuotaPlugIn.NS,
+                type: jws.QuotaPlugIn.TT_REDUCE_QUOTA,
+                instance: aInstance,
+                identifier: aIdentifier,
+                uuid: aUuid,
+                value: aValue
+            }, aOptions);
+        }
+        return lRes;
+    },
+    //:m:*:setQuota
+    //:d:en::set quota value
+    //:a:en::aIdentifier:String:The identifier of the quota<tt>Examples: CountDown, Diskspace, Interval</tt>
+    //:a:en::aNamespace:String:The namespace of the quota<tt>Example: org.jwebsocket.plugins.sample</tt>
+    //:a:en::aInstance:String:The instance that this quota apply to, could be an user or a group<tt>Example of user: guest</tt><tt>Example of group: DefaultGruop</tt>.
+    //:a:en::aInstanceType:String: Define if the instance above is an user or a Group, mandatory values are<tt>User or Group</tt>
+    //:a:en::aActions:String:Action restricted by this quota<tt>Example: create, remove or *</tt>.
+    //:a:en::aOptions:Object:Optional arguments for the raw client sendToken method.
+    //:a:en::aValues:Int:The new value for this quota<tt>Example: 10</tt>.
+    //:r:*:::void:none
+    setQuota: function(aIdentifier, aNamespace, aInstance, aInstanceType,
+            aActions, aValue, aOptions) {
+        
+        var lRes = this.checkConnected();
+        if (0 === lRes.code) {
+            this.sendToken({
+                ns: jws.QuotaPlugIn.NS,
+                type: jws.QuotaPlugIn.TT_SET_QUOTA,
+                namespace: aNamespace,
+                instance: aInstance,
+                instance_type: aInstanceType,
+                identifier: aIdentifier,
+                actions: aActions,
+                value: aValue
+            }, aOptions);
+        }
+        return lRes;
+    },
+    //:m:*:setQuotaByUuid
+    //:d:en::set quota value
+    //:a:en::aIdentifier:String:The identifier of the quota<tt>Examples: CountDown, Diskspace, Interval</tt>
+    //:a:en::aInstance:String:The instance that this quota apply to, could be an user or a group<tt>Example of user: guest</tt><tt>Example of group: DefaultGruop</tt>.
+    //:a:en::aUuid:String: The uuid of the quota<tt>Example: 22a009111753a6e859227295076a2fdd </tt>
+    //:a:en::aValues:Int:The value new value for this quota<tt>Example: 10</tt>.
+    //:a:en::aOptions:Object:Optional arguments for the raw client sendToken method.
+    //:r:*:::void:none
+    setQuotaByUuid: function(aIdentifier, aInstance, aUuid, aValue, aOptions) {
+                
+        var lRes = this.checkConnected();
+        if (0 === lRes.code) {
+            this.sendToken({
+                ns: jws.QuotaPlugIn.NS,
+                type: jws.QuotaPlugIn.TT_SET_QUOTA,
+                instance: aInstance,
+                identifier: aIdentifier,
+                uuid: aUuid,
+                value: aValue
+            }, aOptions);
+        }
+        return lRes;
+    },
+    //:m:*:increaseQuota
+    //:d:en::increase the current quota value
+    //:a:en::aIdentifier:String:The identifier of the quota<tt>Examples: CountDown, Diskspace, Interval</tt>
+    //:a:en::aNamespace:String:The namespace of the quota<tt>Example: org.jwebsocket.plugins.sample</tt>
+    //:a:en::aInstance:String:The instance that this quota apply to, could be an user or a group<tt>Example of user: guest</tt><tt>Example of group: DefaultGruop</tt>.
+    //:a:en::aInstanceType:String: Define if the instance above is an user or a Group, mandatory values are<tt>User or Group</tt>
+    //:a:en::aActions:String:Action restricted by this quota<tt>Example: create, remove or *</tt>.
+    //:a:en::aOptions:Object:Optional arguments for the raw client sendToken method.
+    //:a:en::aValues:Int:The value to increase the current quota value<tt>Example: 10</tt>.
+    //:r:*:::void:none
+    increaseQuota: function(aIdentifier, aNamespace, aInstance, aInstanceType,
+            aActions, aValue, aOptions) {
+        
+        var lRes = this.checkConnected();
+        if (0 === lRes.code) {
+            this.sendToken({
+                ns: jws.QuotaPlugIn.NS,
+                type: jws.QuotaPlugIn.TT_INCREASE_QUOTA,
+                namespace: aNamespace,
+                instance: aInstance,
+                instance_type: aInstanceType,
+                identifier: aIdentifier,
+                actions: aActions,
+                value: aValue
+            }, aOptions);
+        }
+        return lRes;
+    },
+    //:m:*:increaseQuotaByUuid
+    //:d:en::increase the current quota value
+    //:a:en::aIdentifier:String:The identifier of the quota<tt>Examples: CountDown, Diskspace, Interval</tt>
+    //:a:en::aInstance:String:The instance that this quota apply to, could be an user or a group<tt>Example of user: guest</tt><tt>Example of group: DefaultGruop</tt>.
+    //:a:en::aUuid:String: The uuid of the quota<tt>Example: 22a009111753a6e859227295076a2fdd </tt>
+    //:a:en::aValues:Int:The value to increase the current quota value<tt>Example: 10</tt>.
+    //:a:en::aOptions:Object:Optional arguments for the raw client sendToken method.
+    //:r:*:::void:none
+    increaseQuotaByUuid: function(aIdentifier, aInstance, aUuid, aValue, aOptions) {
+                
+        var lRes = this.checkConnected();
+        if (0 === lRes.code) {
+            this.sendToken({
+                ns: jws.QuotaPlugIn.NS,
+                type: jws.QuotaPlugIn.TT_INCREASE_QUOTA,
+                instance: aInstance,
+                identifier: aIdentifier,
+                uuid: aUuid,
+                value: aValue
+            }, aOptions);
+        }
+        return lRes;
+    },
+    //:m:*:queryQuota
+    //:d:en::Get a quota array filtering by severals options, this method is used for get all quota that match with
+    //:d:en::the given criteria Object
+    //:a:en::aCriteria:Object:Object that contains the criteria for build the query
+    //:a:en::aCriteria.aIdentifier:String:The identifier of the quota<tt>Examples: CountDown, Diskspace, Interval</tt>
+    //:a:en::aCriteria.aNamespace:String:The namespace of the quota<tt>Example: org.jwebsocket.plugins.sample</tt>
+    //:a:en::aCriteria.aInstance:String:The instance that this quota apply to, could be an user or a group<tt>Example of user: guest</tt><tt>Example of group: DefaultGruop</tt>.
+    //:a:en::aCriteria.aQuotaType:String: The real quota type not the identifier, can be severals quota from a quotaType for example<tt>CountDown and CoundDownBy5</tt>
+    //:a:en::aOptions:Object:Optional arguments for the raw client sendToken method.
+    //:r:*:::void:none
+    queryQuota: function( aCriteria, aIdentifier, aNamespace, aInstance,
+            aQuotaType, aOptions) {
+        var lRes = this.checkConnected();
+
+        if (0 === lRes.code) {
+            this.sendToken({
+                ns: jws.QuotaPlugIn.NS,
+                type: jws.QuotaPlugIn.TT_QUERY_QUOTA,
+                namespace: aNamespace,
+                instance: aInstance,
+                identifier: aIdentifier,
+                quotaType: aQuotaType
+            }, aOptions);
+        }
+        return lRes;
+    },
+    //:m:*:setQuotaCallbacks
+    //:d:en:Sets the quota plug-in lifecycle callbacks
+    //:a:en::aListeners:Object:JSONObject containing the quota lifecycle callbacks
+    //:a:en::aListeners.OnCreateQuotad:Function:Called when a quota has been created
+    //:a:en::aListeners.OnGetQuota:Function:Called when a get quota action is performed
+    //:a:en::aListeners.OnUnregisterQuota:Function:Called when a quota is unregister
+    //:a:en::aListeners.OnRegisterQuota:Function:Called when a quota has been registered
+    //:a:en::aListeners.OnReduceQuota:Function:Called when the quota reduce action is performed
+    //:a:en::aListeners.OnSetQuota:Function:Called when the quota set action is performed
+    //:a:en::aListeners.OnIncreaseQuota:Function:Called when the quota increase action is performed
+    //:a:en::aListeners.OnQueryQuota:Function:Called when the quota query action is performed
+    //:a:en::aListeners.OnErrorQuota:Function:Called when an error occur during a local file load
+    //:r:*:::void:none		
+    setQuotaCallbacks: function(aListeners) {
+
+        if (!aListeners) {
+            aListeners = {};
+        }
+        if (aListeners.OnCreateQuotad !== undefined) {
+            this.OnCreateQuotad = aListeners.OnCreateQuotad;
+        }
+        if (aListeners.OnGetQuota !== undefined) {
+            this.OnGetQuota = aListeners.OnGetQuota;
+        }
+        if (aListeners.OnUnregisterQuota !== undefined) {
+            this.OnUnregisterQuota = aListeners.OnUnregisterQuota;
+        }
+        if (aListeners.OnRegisterQuota !== undefined) {
+            this.OnRegisterQuota = aListeners.OnRegisterQuota;
+        }
+        if (aListeners.OnReduceQuota !== undefined) {
+            this.OnReduceQuota = aListeners.OnReduceQuota;
+        }
+        if (aListeners.OnSetQuota !== undefined) {
+            this.OnSetQuota = aListeners.OnSetQuota;
+        }
+        if (aListeners.OnIncreaseQuota !== undefined) {
+            this.OnIncreaseQuota = aListeners.OnIncreaseQuota;
+        }
+        if (aListeners.OnQueryQuota !== undefined) {
+            this.OnQueryQuota = aListeners.OnQueryQuota;
+        }
+        if (aListeners.OnErrorQuota !== undefined) {
+            this.OnErrorQuota = aListeners.OnErrorQuota;
+        }
+
+
+    }
+
+};
+// add the QuotaPlugIn PlugIn into the jWebSocketTokenClient class
+jws.oop.addPlugIn(jws.jWebSocketTokenClient, jws.QuotaPlugIn);
 //	---------------------------------------------------------------------------
 //	jWebSocket Reporting Client Plug-in (Community Edition, CE)
 //	---------------------------------------------------------------------------
