@@ -16,6 +16,9 @@
 //	See the License for the specific language governing permissions and
 //	limitations under the License.
 //	---------------------------------------------------------------------------
+if (typeof jws.tests === "undefined") {
+	jws.tests = {};
+}
 
 jws.tests.AutomatedAPI = {
 	title: "Automated API plug-in",
@@ -23,11 +26,11 @@ jws.tests.AutomatedAPI = {
 	category: "System",
 	enabled: false,
 	mSpecs: [],
-	testGetAPIDefaults: function() {
+	testGetAPIDefaults: function () {
 
 		var lSpec = "running default API spec";
 
-		it(lSpec, function() {
+		it(lSpec, function () {
 
 			var lDone = false;
 
@@ -39,20 +42,20 @@ jws.tests.AutomatedAPI = {
 
 			// open a separate control connection
 			lConn.open(jws.getDefaultServerURL(), {
-				OnWelcome: function() {
+				OnWelcome: function () {
 					var lAPIPlugIn = new jws.APIPlugIn();
 					lConn.addPlugIn(lAPIPlugIn);
 					// request the API of the benchmark plug-in
 					lAPIPlugIn.getPlugInAPI(
 							"jws.benchmark", {
 								// if API received successfully run the tests...
-								OnResponse: function(aServerPlugIn) {
+								OnResponse: function (aServerPlugIn) {
 									jws.tests.AutomatedAPI.mSpecs =
 											lAPIPlugIn.createSpecFromAPI(lConn, aServerPlugIn);
 									lConn.close();
 									lDone = true;
 								},
-								OnTimeout: function() {
+								OnTimeout: function () {
 									lConn.close();
 									lDone = true;
 								}
@@ -61,14 +64,14 @@ jws.tests.AutomatedAPI = {
 			});
 
 			waitsFor(
-					function() {
+					function () {
 						return lDone == true;
 					},
 					"Running against API...",
 					3000
 					);
 
-			runs(function() {
+			runs(function () {
 				expect(lDone).toEqual(true);
 
 				// stop watch for this spec
@@ -76,8 +79,8 @@ jws.tests.AutomatedAPI = {
 			});
 		});
 	},
-	testRunAPIDefaults: function() {
-		it("running default tests", function() {
+	testRunAPIDefaults: function () {
+		it("running default tests", function () {
 			eval(
 					"  for( var i = 0; i < jws.tests.AutomatedAPI.mSpecs.length; i++ ) { "
 					+ "  jws.tests.AutomatedAPI.mSpecs[ i ]();"
@@ -85,7 +88,7 @@ jws.tests.AutomatedAPI = {
 					);
 		});
 	},
-	runSpecs: function() {
+	runSpecs: function () {
 		// get the default specs from the API
 		this.testGetAPIDefaults();
 		// run all the obtained default specs
@@ -109,7 +112,9 @@ jws.tests.AutomatedAPI = {
 //	See the License for the specific language governing permissions and
 //	limitations under the License.
 //	---------------------------------------------------------------------------
-
+if (typeof jws.tests === "undefined") {
+	jws.tests = {};
+}
 jws.tests.Backbone = {
 	title: "Backbone integration UserAdmin and Quota plug-in",
 	description: "jWebSocket Backbone automated functional tests",
@@ -366,7 +371,9 @@ jws.tests.Backbone = {
 //	See the License for the specific language governing permissions and
 //	limitations under the License.
 //	---------------------------------------------------------------------------
-
+if (typeof jws.tests === "undefined") {
+	jws.tests = {};
+}
 jws.tests.Benchmarks = {
 	/*  TODO: Finish this TestCase
 	 *	this.NS: jws.NS_BASE  + ".plugins.benchmark",
@@ -587,7 +594,9 @@ jws.tests.Benchmarks = {
 //	See the License for the specific language governing permissions and
 //	limitations under the License.
 //	---------------------------------------------------------------------------
-
+if (typeof jws.tests === "undefined") {
+	jws.tests = {};
+}
 jws.tests.Channels = {
 	title: "Channel plug-in",
 	description: "jWebSocket channel plug-in. Designed for server centric communications channels.",
@@ -1266,7 +1275,9 @@ jws.tests.Channels = {
 //	See the License for the specific language governing permissions and
 //	limitations under the License.
 //	---------------------------------------------------------------------------
-
+if (typeof jws.tests === "undefined") {
+	jws.tests = {};
+}
 jws.tests.Events = {
 	title: "Events plug-in",
 	description: "jWebSocket events plug-in basic tests.",
@@ -1432,7 +1443,9 @@ jws.tests.Events = {
 //	See the License for the specific language governing permissions and
 //	limitations under the License.
 //	---------------------------------------------------------------------------
-
+if (typeof jws.tests === "undefined") {
+	jws.tests = {};
+}
 jws.tests.FileSystemEE = {
 
 	title: "FileSystem EE plug-in",
@@ -2031,7 +2044,9 @@ jws.tests.FileSystemEE = {
 //	limitations under the License.
 //	---------------------------------------------------------------------------
 
-
+if (typeof jws.tests === "undefined") {
+	jws.tests = {};
+}
 jws.tests.FileSystem = {
 	title: "FileSystem plug-in",
 	description: "jWebSocket filesystem plug-in. Designed for files management on the server.",
@@ -2379,6 +2394,9 @@ jws.tests.FileSystem = {
 /**
  * Author: Rolando Santamaria Maso <kyberneees@gmail.com>
  */
+if (typeof jws.tests === "undefined") {
+	jws.tests = {};
+}
 var classes = {};
 jws.tests.ioc = {
 	title: "JavaScript IOC library",
@@ -2680,7 +2698,9 @@ jws.tests.ioc = {
 //	See the License for the specific language governing permissions and
 //	limitations under the License.
 //	---------------------------------------------------------------------------
-
+if (typeof jws.tests === "undefined") {
+	jws.tests = {};
+}
 jws.tests.ItemStorageEE = {
 	title: "ItemStorage EE plug-in",
 	description: "jWebSocket itemstorage (enterprise edition) plug-in. Designed for generic data storage.",
@@ -4503,7 +4523,9 @@ jws.tests.ItemStorage = {
 //	limitations under the License.
 //	---------------------------------------------------------------------------
 
-
+if (typeof jws.tests === "undefined") {
+	jws.tests = {};
+}
 jws.tests.JDBC = {
 	title: "JDBC plug-in",
 	description: "jWebSocket JDBC plug-in",
@@ -4962,7 +4984,9 @@ jws.tests.JDBC = {
 //	See the License for the specific language governing permissions and
 //	limitations under the License.
 //	---------------------------------------------------------------------------
-
+if (typeof jws.tests === "undefined") {
+	jws.tests = {};
+}
 jws.tests.JMS = {
 	title: "JMS plug-in",
 	description: "jWebSocket JMS plug-in",
@@ -5055,7 +5079,9 @@ jws.tests.JMS = {
 //	limitations under the License.
 //	---------------------------------------------------------------------------
 
-
+if (typeof jws.tests === "undefined") {
+	jws.tests = {};
+}
 // requires web/res/js/jwsLoadBalancerPlugIn.js previously loaded
 jws.tests.LoadBalancer = {
 	title: "Load balancer plug-in",
@@ -5741,7 +5767,9 @@ jws.tests.LoadBalancer = {
 //	See the License for the specific language governing permissions and
 //	limitations under the License.
 //	---------------------------------------------------------------------------
-
+if (typeof jws.tests === "undefined") {
+	jws.tests = {};
+}
 jws.tests.Load = {
 	title: "Load tests",
 	description: "jWebSocket server performance tests.",
@@ -5888,7 +5916,9 @@ jws.tests.Load = {
 //	See the License for the specific language governing permissions and
 //	limitations under the License.
 //	---------------------------------------------------------------------------
-
+if (typeof jws.tests === "undefined") {
+	jws.tests = {};
+}
 jws.tests.Logging = {
 	title: "Logging plug-in",
 	description: "jWebSocket logging plug-in",
@@ -6045,7 +6075,9 @@ jws.tests.Logging = {
 //	See the License for the specific language governing permissions and
 //	limitations under the License.
 //	---------------------------------------------------------------------------
-
+if (typeof jws.tests === "undefined") {
+	jws.tests = {};
+}
 jws.tests.OntologyEE = {
 	title: "Ontology PlugIn EE",
 	description: "The jWebSocket Enterprise Ontology PlugIn is  web facade for the OWLAPI library.",
@@ -6535,7 +6567,9 @@ jws.tests.OntologyEE = {
 //	See the License for the specific language governing permissions and
 //	limitations under the License.
 //	---------------------------------------------------------------------------
-
+if (typeof jws.tests === "undefined") {
+	jws.tests = {};
+}
 jws.tests.Quota = {
 	title: "Quota plug-in",
 	description: "jWebSocket Quota plug-in automated functional tests",
@@ -6966,7 +7000,9 @@ jws.tests.Quota = {
 //	See the License for the specific language governing permissions and
 //	limitations under the License.
 //	---------------------------------------------------------------------------
-
+if (typeof jws.tests === "undefined") {
+	jws.tests = {};
+}
 // requires web/res/js/jwsReportingPlugIn.js previously loaded
 jws.tests.Reporting = {
 	title: "Reporting plug-in",
@@ -7171,7 +7207,9 @@ jws.tests.Reporting = {
 //	See the License for the specific language governing permissions and
 //	limitations under the License.
 //	---------------------------------------------------------------------------
-
+if (typeof jws.tests === "undefined") {
+	jws.tests = {};
+}
 jws.tests.REST = {
 	title: "REST support (http://localhost:8787/jWebSocket/http)",
 	description: "jWebSocket REST support for remote interaction with the jWebSocket server infrastructure",
@@ -7348,7 +7386,9 @@ jws.tests.REST = {
 //	See the License for the specific language governing permissions and
 //	limitations under the License.
 //	---------------------------------------------------------------------------
-
+if (typeof jws.tests === "undefined") {
+	jws.tests = {};
+}
 jws.tests.RPC = {
 	title: "RPC plug-in",
 	description: "jWebSocket RPC plug-in",
@@ -7427,7 +7467,9 @@ jws.tests.RPC = {
 //	See the License for the specific language governing permissions and
 //	limitations under the License.
 //	---------------------------------------------------------------------------
-
+if (typeof jws.tests === "undefined") {
+	jws.tests = {};
+}
 jws.tests.Scripting = {
 	title: "Scripting plug-in",
 	description: "jWebSocket Scripting plug-in for server side script apps.",
@@ -7615,8 +7657,9 @@ jws.tests.Scripting = {
 //	limitations under the License.
 //	---------------------------------------------------------------------------
 
-// namespace
-jws.tests = {};
+if (typeof jws.tests === "undefined") {
+	jws.tests = {};
+}
 
 // main test class
 jws.Tests = {
@@ -8065,7 +8108,9 @@ jws.Tests = {
 //	See the License for the specific language governing permissions and
 //	limitations under the License.
 //	---------------------------------------------------------------------------
-
+if (typeof jws.tests === "undefined") {
+	jws.tests = {};
+}
 jws.tests.Streaming = {
 	title: "Streaming plug-in",
 	description: "jWebSocket streaming plug-in",
@@ -8155,7 +8200,9 @@ jws.tests.Streaming = {
 //	See the License for the specific language governing permissions and
 //	limitations under the License.
 //	---------------------------------------------------------------------------
-
+if (typeof jws.tests === "undefined") {
+	jws.tests = {};
+}
 jws.tests.System = {
 	title: "System plug-in",
 	description: "jWebSocket server system plug-in. " +
