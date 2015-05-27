@@ -524,7 +524,7 @@ textarea{
 
 p{
     font-family: Verdana, Geneva, sans-serif;
-    font-size: 12px;
+    font-size: 8pt;
     font-style: normal;
     margin-top: 17px;
     margin-bottom: 17px;
@@ -614,7 +614,7 @@ input[type="checkbox"]{
 
 /* ----------------------- JQUERY UI DIALOG PERSONALIZATION -------------------------- */
 .ui-widget{
-	font-size: 12px !important;
+	font-size: 8pt !important;
 }
 .ui-dialog-buttonpane{
 	padding: 5px 5px 0 0 !important;
