@@ -16,7 +16,9 @@
 //	See the License for the specific language governing permissions and
 //	limitations under the License.
 //	---------------------------------------------------------------------------
-
+if (typeof jws.tests === "undefined") {
+	jws.tests = {};
+}
 // requires web/res/js/jwsReportingPlugIn.js previously loaded
 jws.tests.Reporting = {
 	title: "Reporting plug-in",

@@ -17,7 +17,9 @@
 //	limitations under the License.
 //	---------------------------------------------------------------------------
 
-
+if (typeof jws.tests === "undefined") {
+	jws.tests = {};
+}
 // requires web/res/js/jwsLoadBalancerPlugIn.js previously loaded
 jws.tests.LoadBalancer = {
 	title: "Load balancer plug-in",
