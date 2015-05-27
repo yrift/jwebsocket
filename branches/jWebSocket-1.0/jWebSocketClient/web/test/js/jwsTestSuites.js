@@ -92,11 +92,11 @@ function initTestsIndex() {
 		lTest.id = lTest.id || lTestName;
 
 		// setting default values for convenience
-		if (undefined == lTest['category'])
+		if (typeof lTest['category'] === "undefined")
 			lTest['category'] = DEFAULT_CATEGORY;
-		if (undefined == lTest['priority'])
+		if (typeof lTest['priority'] === "undefined")
 			lTest['priority'] = DEFAULT_PRIORITY;
-		if (undefined == lTest['enabled'])
+		if (typeof lTest['enabled'] === "undefined")
 			lTest['enabled'] = DEFAULT_ENABLED;
 
 		// getting categories set
