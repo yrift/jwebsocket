@@ -16,7 +16,9 @@
 //	See the License for the specific language governing permissions and
 //	limitations under the License.
 //	---------------------------------------------------------------------------
-
+if (typeof jws.tests === "undefined") {
+	jws.tests = {};
+}
 jws.tests.System = {
 	title: "System plug-in",
 	description: "jWebSocket server system plug-in. " +

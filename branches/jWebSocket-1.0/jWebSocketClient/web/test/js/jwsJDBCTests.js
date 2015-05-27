@@ -17,7 +17,9 @@
 //	limitations under the License.
 //	---------------------------------------------------------------------------
 
-
+if (typeof jws.tests === "undefined") {
+	jws.tests = {};
+}
 jws.tests.JDBC = {
 	title: "JDBC plug-in",
 	description: "jWebSocket JDBC plug-in",

@@ -20,6 +20,9 @@
 /**
  * Author: Rolando Santamaria Maso <kyberneees@gmail.com>
  */
+if (typeof jws.tests === "undefined") {
+	jws.tests = {};
+}
 var classes = {};
 jws.tests.ioc = {
 	title: "JavaScript IOC library",

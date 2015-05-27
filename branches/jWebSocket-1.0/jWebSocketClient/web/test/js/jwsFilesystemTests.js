@@ -17,7 +17,9 @@
 //	limitations under the License.
 //	---------------------------------------------------------------------------
 
-
+if (typeof jws.tests === "undefined") {
+	jws.tests = {};
+}
 jws.tests.FileSystem = {
 	title: "FileSystem plug-in",
 	description: "jWebSocket filesystem plug-in. Designed for files management on the server.",

@@ -17,7 +17,7 @@
 //	limitations under the License.
 //	---------------------------------------------------------------------------
 
-if (undefined == jws.tests) {
+if (typeof jws.tests === "undefined") {
 	jws.tests = {};
 }
 jws.tests.ItemStorage = {

@@ -16,7 +16,9 @@
 //	See the License for the specific language governing permissions and
 //	limitations under the License.
 //	---------------------------------------------------------------------------
-
+if (typeof jws.tests === "undefined") {
+	jws.tests = {};
+}
 jws.tests.Quota = {
 	title: "Quota plug-in",
 	description: "jWebSocket Quota plug-in automated functional tests",

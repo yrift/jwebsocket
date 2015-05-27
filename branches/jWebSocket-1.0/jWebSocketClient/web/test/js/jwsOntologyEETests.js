@@ -16,7 +16,9 @@
 //	See the License for the specific language governing permissions and
 //	limitations under the License.
 //	---------------------------------------------------------------------------
-
+if (typeof jws.tests === "undefined") {
+	jws.tests = {};
+}
 jws.tests.OntologyEE = {
 	title: "Ontology PlugIn EE",
 	description: "The jWebSocket Enterprise Ontology PlugIn is  web facade for the OWLAPI library.",

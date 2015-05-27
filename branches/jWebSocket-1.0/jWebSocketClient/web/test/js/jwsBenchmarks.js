@@ -16,7 +16,9 @@
 //	See the License for the specific language governing permissions and
 //	limitations under the License.
 //	---------------------------------------------------------------------------
-
+if (typeof jws.tests === "undefined") {
+	jws.tests = {};
+}
 jws.tests.Benchmarks = {
 	/*  TODO: Finish this TestCase
 	 *	this.NS: jws.NS_BASE  + ".plugins.benchmark",

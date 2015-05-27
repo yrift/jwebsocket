@@ -17,8 +17,9 @@
 //	limitations under the License.
 //	---------------------------------------------------------------------------
 
-// namespace
-jws.tests = {};
+if (typeof jws.tests === "undefined") {
+	jws.tests = {};
+}
 
 // main test class
 jws.Tests = {
