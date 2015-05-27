@@ -32,8 +32,8 @@ $.widget( "jws.channels", {
 		this.mSelectedRow = null;
 
 		// Messages to show in the demo
-		this.MSG_NOCHANNELS = "There are not channels to show.";
-		this.MSG_NOSUBSCRIPTIONS = "There are not subscriptions to show.";
+		this.MSG_NOCHANNELS = "There are no channels to show.";
+		this.MSG_NOSUBSCRIPTIONS = "There are no subscriptions to show.";
 		this.MSG_NOSUBSCRIBERS = "There are no subscribers for this channel yet.";
 		this.MSG_ACCESSKEY = "access";
 		this.MSG_SECRETKEY = "secret";

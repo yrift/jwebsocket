@@ -94,7 +94,7 @@
 }
 
 #amount_of_players{
-	font-family: Verdana;
+	font-family: Verdana, Geneva, sans-serif;
 	font-weight: bold;
 	font-size: 10px;
 	border: 1px solid #C8C8C8;

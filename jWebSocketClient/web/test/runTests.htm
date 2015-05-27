@@ -24,101 +24,27 @@
 		<link rel="stylesheet" type="text/css" href="../res/css/demos.css">
 		<link rel="stylesheet" type="text/css" href="css/tests.css">
 
-		<!-- use bundle to check if all plug-ins are embedded in the bundle -->
-		<!--  <script type="text/javascript" src="../res/js/jWebSocket_Bundle.js"></script> -->
-
-		<!-- also use minified version to check/validate obfuscator -->
-		<!-- <script type="text/javascript" src="../res/js/jWebSocket_Bundle_min.js"></script> -->
-
 		<!-- use separate files if you are updating individual files -->
-		<script type="text/javascript" src="../res/js/jWebSocket.js"></script>
 		<script type="text/javascript" src="../lib/cujojs-aop/aop-0.5.2.js"></script>
 		<script type="text/javascript" src="../lib/JSZip/jszip_min.js"></script>
 		<script type="text/javascript" src="../lib/JSZip/jszip-deflate_min.js"></script>
 		<script type="text/javascript" src="../lib/JSZip/jszip-inflate_min.js"></script>
 		<script type="text/javascript" src="../lib/JSZip/jszip-load_min.js"></script>
-		<script type="text/javascript" src="../res/js/jwsIOC.js"></script>
-		<script type="text/javascript" src="../res/js/jwsCache.js"></script>
-		<script type="text/javascript" src="../res/js/jwsAPIPlugIn.js"></script>
-		<script type="text/javascript" src="../res/js/jwsChannelPlugIn.js"></script>
-		<script type="text/javascript" src="../res/js/jwsCanvasPlugIn.js"></script>
-		<script type="text/javascript" src="../res/js/jwsChatPlugIn.js"></script>
-		<script type="text/javascript" src="../res/js/jwsClientGamingPlugIn.js"></script>
-		<script type="text/javascript" src="../res/js/jwsEventsPlugIn.js"></script>
-		<script type="text/javascript" src="../res/js/jwsLoadBalancerPlugIn.js"></script>
-		<script type="text/javascript" src="../res/js/jwsFilesystemPlugIn.js"></script>
-		<script type="text/javascript" src="../res/js/jwsItemStoragePlugIn.js"></script>
-		<script type="text/javascript" src="../res/js/jwsJDBCPlugIn.js"></script>
-        <script type="text/javascript" src="../res/js/jwsScriptingPlugIn.js"></script>
-		<script type="text/javascript" src="../res/js/jwsJMSPlugIn.js"></script>
-		<script type="text/javascript" src="../res/js/jwsLoggingPlugIn.js"></script>
-		<script type="text/javascript" src="../res/js/jwsMailPlugIn.js"></script>
-        <script type="text/javascript" src="../res/js/jwsQuotaPlugIn.js"></script>
-		<script type="text/javascript" src="../res/js/jwsRPCPlugIn.js"></script>
-		<script type="text/javascript" src="../res/js/jwsSamplesPlugIn.js"></script>
-		<script type="text/javascript" src="../res/js/jwsSharedObjectsPlugIn.js"></script>
-		<script type="text/javascript" src="../res/js/jwsStreamingPlugIn.js"></script>
-		<script type="text/javascript" src="../res/js/jwsTestPlugIn.js"></script>
-		<script type="text/javascript" src="../res/js/jwsReportingPlugIn.js"></script>
-		<script type="text/javascript" src="../res/js/jwsTwitterPlugIn.js"></script>
-		<script type="text/javascript" src="../res/js/jwsXMPPPlugIn.js"></script>
-		<script type="text/javascript" src="../res/js/jwsWorker.js"></script>
-		<!-- Including Enterprise jWebSocket plug-ins-->
-		<script type="text/javascript" src="../res/js/jwsFilesystemPlugInEE_min.js"></script>
-		<script type="text/javascript" src="../res/js/jwsItemStoragePlugInEE_min.js"></script>
-		<script type="text/javascript" src="../res/js/jwsOntologyPlugInEE_min.js"></script>
+
+		<!-- use bundle to check if all plug-ins are embedded in the bundle -->
+		<script type="text/javascript" src="../res/js/jWebSocket_Bundle.js"></script> 
+
+		<!-- also use minified version to check/validate obfuscator -->
+		<!-- <script type="text/javascript" src="../res/js/jWebSocket_Bundle_min.js"></script> -->
 
 		<!-- 
 			#####################################
 			#  INCLUDE YOUR TEST FILES HERE		#
 			#####################################
 		-->
+
 		<!-- shared test specs for opening and closing connections -->
-		<script type="text/javascript" src="js/jwsSharedTests.js"></script>
-		<!-- test specs for the system plug-in, system plug-in is integrated in jWebSocket.js -->
-		<script type="text/javascript" src="js/jwsSystemTests.js"></script>
-		<!-- tests for the filesystem plug-in -->
-		<script type="text/javascript" src="js/jwsFilesystemTests.js"></script>
-		<!-- tests for the enterprise filesystem plug-in -->
-		<script type="text/javascript" src="js/jwsFilesystemEETests.js"></script>
-		<!-- tests for the itemstorage plug-in -->
-		<script type="text/javascript" src="js/jwsItemStorageTests.js"></script>
-		<!-- tests for the enterprise itemstorage plug-in -->
-		<script type="text/javascript" src="js/jwsItemStorageEETests.js"></script>
-		<!-- tests for the enterprise ontology plug-in -->
-		<script type="text/javascript" src="js/jwsOntologyEETests.js"></script>
-		<!-- tests for the logging plug-in -->
-		<script type="text/javascript" src="js/jwsLoggingTests.js"></script>
-		<!-- tests for the RPC plug-in -->
-		<script type="text/javascript" src="js/jwsRPCTests.js"></script>
-		<!-- tests for the JDBC plug-in -->
-		<script type="text/javascript" src="js/jwsJDBCTests.js"></script>
-		<!-- tests for the JMS plug-in -->
-		<script type="text/javascript" src="js/jwsJMSTests.js"></script>
-		<!-- tests for the Channel plug-in -->
-		<script type="text/javascript" src="js/jwsChannelTests.js"></script>
-		<!-- tests for the Streaming plug-in -->
-		<script type="text/javascript" src="js/jwsStreamingTests.js"></script>
-		<!-- tests for the Load tests -->
-		<script type="text/javascript" src="js/jwsLoadTests.js"></script>
-		<!-- tests for the Reporting plug-in -->
-		<script type="text/javascript" src="js/jwsReportingTests.js"></script>
-		<!-- tests for the Load Balancer plug-in -->
-		<script type="text/javascript" src="js/jwsLoadBalancerTests.js"></script>
-		<!-- tests for the Quota plug-in -->
-		<script type="text/javascript" src="js/jwsQuotaTests.js"></script>
-		<!-- tests for the AutomatedAPI plug-in -->
-		<script type="text/javascript" src="js/jwsAutomatedAPITests.js"></script>
-		<!-- tests for the Dependency Injection Container -->
-		<script type="text/javascript" src="js/jwsIOC.js"></script>
-		<!-- tests for Benchmark suite -->
-		<script type="text/javascript" src="js/jwsBenchmarks.js"></script>
-		<!-- tests for REST support -->
-		<script type="text/javascript" src="js/jwsREST.js"></script>
-		<!-- tests for scripting plug-in -->
-        <script type="text/javascript" src="js/jwsScriptingPlugInTest.js"></script>
-        <!-- tests for backbone scrip plug-in -->
-        <script type="text/javascript" src="js/jwsBackboneTest.js"></script>
+        <script type="text/javascript" src="js/jWebSocket_Test_Bundle.js"></script>
 		<!-- the central test suite code contains the various test suites -->
 		<script type="text/javascript" src="js/jwsTestSuites.js"></script>
 
@@ -153,15 +79,15 @@
 						</select>
 						<div class="toolbar">
 							<div class="button onmouseup" 
-							 onmouseover="this.className = 'button onmouseover'" 
-							 onmousedown="this.className = 'button onmousedown'" 
-							 onmouseup="this.className = 'button onmouseup'" 
-							 onmouseout="this.className = 'button onmouseout'" 
-							 onclick="this.className = 'button onmouseover';"
-							 title="Select all tests">
-							<div class="btn_left"></div>
-							<div class="btn_center"><label><input id="select-all-cb" type="checkbox"><span class="select-all-text">Select all</span></label></div>
-							<div class="btn_right"></div>
+								 onmouseover="this.className = 'button onmouseover'" 
+								 onmousedown="this.className = 'button onmousedown'" 
+								 onmouseup="this.className = 'button onmouseup'" 
+								 onmouseout="this.className = 'button onmouseout'" 
+								 onclick="this.className = 'button onmouseover';"
+								 title="Select all tests">
+								<div class="btn_left"></div>
+								<div class="btn_center"><label><input id="select-all-cb" type="checkbox"><span class="select-all-text">Select all</span></label></div>
+								<div class="btn_right"></div>
 							</div>
 						</div>
 						<p>
