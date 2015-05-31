@@ -25,8 +25,9 @@ import org.jwebsocket.api.ServerConfiguration;
 import org.jwebsocket.api.WebSocketConnector;
 import org.jwebsocket.api.WebSocketEngine;
 import org.jwebsocket.api.WebSocketPacket;
+import org.jwebsocket.eventbus.BaseEventBus;
+import org.jwebsocket.eventbus.JMSDistributedEventBus;
 import org.jwebsocket.jms.api.IClusterSynchronizer;
-import org.jwebsocket.jms.api.IConnectorsManager;
 import org.jwebsocket.kit.BroadcastOptions;
 import org.jwebsocket.kit.FilterResponse;
 import org.jwebsocket.logging.Logging;
@@ -45,7 +46,7 @@ public class JMSServer extends TokenServer {
 	private final static Logger mLog = Logging.getLogger(JMSServer.class);
 	private JMSManager mJMSManager = null;
 	private IClusterSynchronizer mSynchronizer = null;
-	private IConnectorsManager mConnectorsManager = null;
+	private JMSEngine mEngine;
 
 	/**
 	 *
@@ -55,23 +56,33 @@ public class JMSServer extends TokenServer {
 		super(aServerConfig);
 	}
 
+	public JMSEngine getClusterEngine() {
+		return mEngine;
+	}
+
 	@Override
 	public void engineStarted(WebSocketEngine aEngine) {
 		if (aEngine instanceof JMSEngine) {
-			JMSEngine lEngine = (JMSEngine) aEngine;
+			mEngine = (JMSEngine) aEngine;
 
 			// instantiating the JMSManager
-			mJMSManager = new JMSManager(false, lEngine.getConnection(), "topic://"
-					+ lEngine.getDestination() + "_messagehub");
-			mSynchronizer = lEngine.getNodesManager().getSynchronizer();
-			mConnectorsManager = lEngine.getConnectorsManager();
+			mJMSManager = new JMSManager(false, mEngine.getConnection(), "topic://"
+					+ mEngine.getDestination() + "_messagehub");
+			mSynchronizer = mEngine.getNodesManager().getSynchronizer();
 
 			// instantiating the EventBus
-			mEventBus = new JMSSynchronizedEventBus(lEngine.getConnection(),
-					lEngine.getDestination() + "_eventbus", mSynchronizer);
+			mEventBus = new JMSDistributedEventBus(mEngine.getConnection(),
+					mEngine.getDestination() + "_eventbus");
+			mEventBus.setExceptionHandler(new IEventBus.IExceptionHandler() {
+
+				@Override
+				public void handle(Exception lEx) {
+					mLog.error(Logging.getSimpleExceptionMessage(lEx, "uncaught exception inside event bus"));
+				}
+			});
 
 			try {
-				((JMSSynchronizedEventBus) mEventBus).initialize();
+				((BaseEventBus) mEventBus).initialize();
 			} catch (Exception lEx) {
 				mLog.error(Logging.getSimpleExceptionMessage(lEx, "initializing cluster event bus"));
 			}
@@ -133,7 +144,7 @@ public class JMSServer extends TokenServer {
 		// shutdown message hub
 		mJMSManager.shutdown();
 		// shutdown event bus
-		((JMSSynchronizedEventBus) mEventBus).shutdown();
+		((BaseEventBus) mEventBus).shutdown();
 	}
 
 	@Override
