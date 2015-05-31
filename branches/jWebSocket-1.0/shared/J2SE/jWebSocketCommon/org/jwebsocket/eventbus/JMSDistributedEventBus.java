@@ -1,5 +1,5 @@
 //	---------------------------------------------------------------------------
-//	jWebSocket JMSEventBus (Community Edition, CE)
+//	jWebSocket JMSDistributedEventBus (Community Edition, CE)
 //	---------------------------------------------------------------------------
 //	Copyright 2010-2015 Innotrade GmbH (jWebSocket.org)
 //	Alexander Schulze, Germany (NRW)
@@ -18,11 +18,13 @@
 //	---------------------------------------------------------------------------
 package org.jwebsocket.eventbus;
 
+import java.util.List;
 import java.util.Timer;
 import java.util.UUID;
 import org.jwebsocket.api.IEventBus;
 import javax.jms.Connection;
 import javax.jms.Destination;
+import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.MessageConsumer;
 import javax.jms.MessageListener;
@@ -32,6 +34,8 @@ import javax.jms.Session;
 import javax.jms.TemporaryQueue;
 import javax.jms.TextMessage;
 import javax.jms.Topic;
+import javolution.util.FastList;
+import static org.jwebsocket.eventbus.BaseEventBus.EVENT_BUS_MSG_REPLYTO;
 import org.jwebsocket.packetProcessors.JSONProcessor;
 import org.jwebsocket.token.BaseToken;
 import org.jwebsocket.token.Token;
@@ -40,16 +44,18 @@ import org.jwebsocket.util.Tools;
 import org.springframework.util.Assert;
 
 /**
- * JMS based IEventBus implementation
+ * JMS based IEventBus implementation. Intended for clusters with non mirror
+ * nodes.
  *
  * @author Rolando Santamaria Maso
  */
-public class JMSEventBus extends BaseEventBus {
+public class JMSDistributedEventBus extends BaseEventBus {
 
+	protected static final String EVENT_BUS_NAMESPACE = "ns";
 	private final Connection mConnection;
 	private Session mSession;
 	private MessageConsumer mTopicConsumer;
-	private MessageConsumer mQueueConsumer;
+	private final List<MessageConsumer> mQueueConsumers = new FastList<MessageConsumer>();
 	private MessageProducer mProducer;
 	private final String mDestinationId;
 	private final Timer mTimer = Tools.getTimer();
@@ -62,7 +68,7 @@ public class JMSEventBus extends BaseEventBus {
 		return mConnection;
 	}
 
-	public JMSEventBus(Connection aConnection, String aDestinationId) {
+	public JMSDistributedEventBus(Connection aConnection, String aDestinationId) {
 		Assert.notNull(aConnection, "The 'connection' argument cannot be null!");
 		Assert.notNull(aDestinationId, "The 'destinationId' argument cannot be null!");
 
@@ -143,6 +149,7 @@ public class JMSEventBus extends BaseEventBus {
 				mProducer.send((Destination) aToken.getMap().get(EVENT_BUS_MSG_REPLYTO), lMsg);
 			} else if (aSendOp) {
 				// sending message
+				lMsg.setStringProperty(EVENT_BUS_NAMESPACE, aToken.getNS());
 				mProducer.send(mQueue, lMsg);
 			} else {
 				// publishing message
@@ -183,37 +190,10 @@ public class JMSEventBus extends BaseEventBus {
 
 				} catch (Exception lEx) {
 					// do nothing, invalid message was sent to the JMS destination
+					getExceptionHandler().handle(lEx);
 				}
 			}
 		});
-
-		mQueueConsumer = mSession.createConsumer(mQueue);
-		mQueueConsumer.setMessageListener(new MessageListener() {
-
-			@Override
-			public void onMessage(Message aMessage) {
-				try {
-					TextMessage lTextMsg = (TextMessage) aMessage;
-					final Token lToken = JSONProcessor.JSONStringToToken(lTextMsg.getText());
-					lToken.getMap().put(EVENT_BUS_MSG_REPLYTO, aMessage.getJMSReplyTo());
-
-					Tools.getThreadPool().submit(new Runnable() {
-
-						@Override
-						public void run() {
-							// discard if token has expired
-							if (!lToken.hasExpired()) {
-								invokeHandler(lToken.getNS(), lToken);
-							}
-						}
-					});
-
-				} catch (Exception lEx) {
-					// do nothing, invalid message
-				}
-			}
-		});
-
 		mReplyConsumer = mSession.createConsumer(mReplyQueue);
 		mReplyConsumer.setMessageListener(new MessageListener() {
 
@@ -236,27 +216,103 @@ public class JMSEventBus extends BaseEventBus {
 					});
 
 				} catch (Exception lEx) {
-					// do nothing, invalid message
+					getExceptionHandler().handle(lEx);
 				}
 			}
 		});
-
 		mProducer = mSession.createProducer(null);
+	}
+
+	@Override
+	public IRegistration register(final String aNS, final IHandler aHandler) {
+		Assert.notNull(aNS, "The 'NS' argument cannot be null!");
+		Assert.notNull(aHandler, "The 'handler' argument cannot be null!");
+
+		try {
+			String lSelector = EVENT_BUS_NAMESPACE + " = '" + aNS + "'";
+			if (aNS.contains("*")) {
+				lSelector = EVENT_BUS_NAMESPACE + " LIKE '" + aNS.replace("*", "%") + "'";
+			}
+
+			final MessageConsumer lHC = mSession.createConsumer(mQueue, lSelector);
+			lHC.setMessageListener(new MessageListener() {
+
+				@Override
+				public void onMessage(Message aMessage) {
+					try {
+						TextMessage lTextMsg = (TextMessage) aMessage;
+						final Token lToken = JSONProcessor.JSONStringToToken(lTextMsg.getText());
+						lToken.getMap().put(EVENT_BUS_MSG_REPLYTO, aMessage.getJMSReplyTo());
+
+						Tools.getThreadPool().submit(new Runnable() {
+
+							@Override
+							public void run() {
+								// discard if token has expired
+								if (!lToken.hasExpired()) {
+									invokeHandler(lToken.getNS(), lToken);
+								}
+							}
+						});
+
+					} catch (Exception lEx) {
+						getExceptionHandler().handle(lEx);
+					}
+				}
+			});
+
+			// saving consumer reference
+			mQueueConsumers.add(lHC);
+			// saving handler
+			storeHandler(aNS, aHandler);
+
+			return new IRegistration() {
+
+				@Override
+				public String getNS() {
+					return aNS;
+				}
+
+				@Override
+				public void cancel() {
+					removeHandler(aNS, aHandler);
+					try {
+						mQueueConsumers.remove(lHC);
+						lHC.close();
+					} catch (JMSException lEx) {
+						throw new RuntimeException(lEx);
+					}
+				}
+
+				@Override
+				public IHandler getHandler() {
+					return aHandler;
+				}
+			};
+		} catch (Exception lEx) {
+			getExceptionHandler().handle(lEx);
+
+			return null;
+		}
 	}
 
 	@Override
 	public void shutdown() throws Exception {
 		mProducer.close();
 		mTopicConsumer.close();
-		mQueueConsumer.close();
 		mReplyConsumer.close();
+		// close handler consumers
+		for (MessageConsumer lC : mQueueConsumers) {
+			lC.close();
+		}
+
 		mSession.close();
 	}
 
 	@Override
 	public Token createResponse(Token aInToken) {
 		Token lResponse = super.createResponse(aInToken);
-		lResponse.getMap().put(JMSEventBus.EVENT_BUS_MSG_REPLYTO, aInToken.getMap().get(JMSEventBus.EVENT_BUS_MSG_REPLYTO));
+		lResponse.getMap().put(JMSDistributedEventBus.EVENT_BUS_MSG_REPLYTO, aInToken.getMap().get(JMSDistributedEventBus.EVENT_BUS_MSG_REPLYTO));
 
 		return lResponse;
 	}
