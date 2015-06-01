@@ -468,7 +468,7 @@ public class Tools {
 				lEnvVal = lEnvVal.replace("\\", "\\\\");
 				// specially supporting jWebSocket server environmental variables                               
 				if ("JWEBSOCKET_HOME".equals(lFoundVal) || "JWEBSOCKET_EE_HOME".equals(lFoundVal)) {
-					if (!(lEnvVal.endsWith("\\") || lEnvVal.endsWith("/"))) {
+					if (!lEnvVal.endsWith(File.separator)) {
 						lEnvVal += File.separator;
 					}
 				}
@@ -1253,10 +1253,10 @@ public class Tools {
 			if (lZE.isDirectory()) {
 				lNewFile.mkdir();
 			} else {
-				if(!lNewFile.getParentFile().exists()) {
+				if (!lNewFile.getParentFile().exists()) {
 					lNewFile.getParentFile().mkdirs();
 				}
-				
+
 				FileOutputStream lFOS = new FileOutputStream(lNewFile);
 				int lLength;
 				while ((lLength = lZIS.read(lBuffer)) > 0) {
