@@ -1,5 +1,5 @@
 //	---------------------------------------------------------------------------
-//	jWebSocket - Copyright (c) 2010 Innotrade GmbH - jWebSocket.org
+//	jWebSocket - Copyright (c) 2015 Innotrade GmbH - jWebSocket.org
 //	---------------------------------------------------------------------------
 //	This program is free software; you can redistribute it and/or modify it
 //	under the terms of the GNU Lesser General Public License as published by the
