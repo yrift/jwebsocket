@@ -6,7 +6,7 @@ set host_name=localhost
 set demo_user=jwsDemo
 set app_user=jwsApp
 set sys_user=jwsSys
-set fart="..\..\tools\fart.exe"
+set fart="..\..\jWebSocketDeployment\tools\fart.exe"
 
 copy /b grantDemo.sql + grantApp.sql + grantSys.sql grantAll.sql
 
