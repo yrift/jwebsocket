@@ -13,10 +13,18 @@ goto continue
 
 :error
 echo Environment variable(s) JWEBSOCKET_HOME, ANT_HOME, CATALINA_HOME and/or JWEBSOCKET_VER not set!
+if "%1"=="/y" goto exitNow
 pause
+:exitNow
 exit
 
 :continue
+
+if "%1"=="/y" goto dontAsk1
+echo This will clean and build jWebSocket v%JWEBSOCKET_VER%. Are you sure?
+pause
+
+:dontAsk1
 set CD_SAVE=%CD%
 echo.
 echo -----------------------------------------------------------------------
@@ -26,9 +34,7 @@ echo.
 echo Updating parent jWebSocket directory: %JWEBSOCKET_HOME%..\..\
 echo.
 
-pushd %JWEBSOCKET_HOME%../../
-svn update
-popd
+svn update %JWEBSOCKET_HOME%../../
 
 echo.
 echo -----------------------------------------------------------------------
@@ -36,27 +42,19 @@ echo .       Step 2: Building jWebSocket Community Edition (CE)            .
 echo -----------------------------------------------------------------------
 echo.
 
-pushd %JWEBSOCKET_HOME%..\..\branches\jWebSocket-%JWEBSOCKET_VER%
+cd %JWEBSOCKET_HOME%..\..\branches\jWebSocket-%JWEBSOCKET_VER%
 echo Cleaning up temporary work files...
 del /p /s *.?.nblh~
 
-if "%1"=="/y" goto compileJWebSocket
-set /P c=This will clean and build jWebSocket v%JWEBSOCKET_VER%. Are you sure (y/n)?
-if /I "%c%" EQU "y" goto compileJWebSocket
-goto buildStockTicker
-
-
-:compileJWebSocket
+echo This will clean and build jWebSocket v%JWEBSOCKET_VER%
 call mvn clean install
-popd
 
-:buildStockTicker
 echo.
 echo -----------------------------------------------------------------------
 echo .       Step 3: Building jWebSocketActiveMQStockTicker                .
 echo -----------------------------------------------------------------------
 echo.
-pushd %JWEBSOCKET_HOME%..\..\branches\jWebSocket-%JWEBSOCKET_VER%\jWebSocketActiveMQStockTicker
+cd %JWEBSOCKET_HOME%..\..\branches\jWebSocket-%JWEBSOCKET_VER%\jWebSocketActiveMQStockTicker
 call mvn clean install
 
 if not exist "%CATALINA_HOME%\lib\jWebSocketServer-Bundle-%JWEBSOCKET_VER%.jar" (
@@ -67,11 +65,10 @@ if not exist "%CATALINA_HOME%\lib\jWebSocketServer-Bundle-%JWEBSOCKET_VER%.jar" 
 	echo ERROR: jWebSocketServer-Bundle-%JWEBSOCKET_VER%.jar is missing from your CATALINA_HOME\lib folder. This may cause compilation errors because of missing dependencies for jWebSocketWebAppDemo.
     echo You can either run the script 1_cleanAndBuildAll.bat once again as administrator, or just copy the required file jWebSocketServer-Bundle-%JWEBSOCKET_VER%.jar to CATALINA_HOME\lib by yourself.
 )
-popd
 
 echo.
 echo -----------------------------------------------------------------------
-echo .       Step 3: Building jWebSocketWebAppDemo                          .
+echo .       Step 4: Building jWebSocketWebAppDemo                          .
 echo -----------------------------------------------------------------------
 echo.
 pushd %JWEBSOCKET_HOME%..\..\branches\jWebSocket-%JWEBSOCKET_VER%\jWebSocketWebAppDemo
@@ -81,4 +78,7 @@ popd
 cd %CD_SAVE%
 rem copy newly created libs to Tomcat's lib folder
 call libs2tomcat.bat %1
+
+if "%1"=="/y" goto dontAsk2
 pause
+:dontAsk2

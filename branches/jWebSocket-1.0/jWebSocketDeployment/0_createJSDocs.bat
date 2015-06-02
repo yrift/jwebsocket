@@ -11,7 +11,9 @@ if "%JWEBSOCKET_VER%"=="" goto error
 goto continue
 :error
 echo Environment variable(s) JWEBSOCKET_HOME and/or JWEBSOCKET_VER not set!
+if "%1"=="/y" goto exitNow
 pause
+:exitNow
 exit
 
 :continue
