@@ -44,35 +44,59 @@ echo.
 echo Are you sure?
 pause
 
-set logfile=build_log.txt
-echo Starting Nightly Build into %logfile%...
-echo Starting Nightly Build... > %logfile%
+set LOGS_FOLDER=DEPLOYMENT_LOGS
+if not exist "%LOGS_FOLDER%" (
+	mkdir "%LOGS_FOLDER%"
+)
+set logfile_0=%LOGS_FOLDER%/0_createJSDocs.log
+set logfile_1=%LOGS_FOLDER%/1_cleanAndBuildAll.log
+set logfile_2=%LOGS_FOLDER%/2_createRunTimeFiles.log
+set logfile_3=%LOGS_FOLDER%/3_createDownloadFiles.log
 
-rem goto end
+echo Starting Nightly Build into %logfile_0%, %logfile_1%, %logfile_2%, %logfile_3%...
 
 rem generate the java docs (saved to client web)
-rem call createJavaDocs.bat
+rem call createJavaDocs.bat > %logfile_0%
 
 rem create client side bundles and minified versions
+echo.
+echo -----------------------------------------------------
 echo Running 0_createJSDocs.bat...
-call 0_createJSDocs.bat /y >> %logfile%
+echo -----------------------------------------------------
+call 0_createJSDocs.bat /y > %logfile_0%
 
-rem clean and build the project
-echo Running 1_cleanAndBuildAll...
-call 1_cleanAndBuildAll.bat /y >> %logfile%
+echo.
+echo -----------------------------------------------------
+echo Running 1_cleanAndBuildAll.bat...
+echo -----------------------------------------------------
+echo Cleaning and building the project MAY TAKE SEVERAL MINUTES.
+echo Please check the compilation logs here: %logfile_1%
+call 1_cleanAndBuildAll.bat /y > %logfile_1%
 
-rem create Run-Time-Environment
+echo.
+echo -----------------------------------------------------
 echo Running 2_createRunTimeFiles...
-call 2_createRunTimeFiles.bat /y >> %logfile%
+echo -----------------------------------------------------
+rem create Run-Time-Environment
+call 2_createRunTimeFiles.bat /y > %logfile_2%
 
-rem create download from Run-Time-Environment
+echo.
+echo -----------------------------------------------------
 echo Running 3_createDownloadFiles...
-call 3_createDownloadFiles.bat /y >> %logfile%
+echo -----------------------------------------------------
+rem create download from Run-Time-Environment
+call 3_createDownloadFiles.bat /y > %logfile_3%
 
 :scan
-rem scan log file for certain error tags
-echo ----------------------------------------------------
-%FART_EXE% -i %logfile% error
+
+echo.
+echo -----------------------------------------------------
+echo Scanning log files for certain error tags...
+echo -----------------------------------------------------
+%FART_EXE% -i %logfile_0% error
+%FART_EXE% -i %logfile_1% error
+%FART_EXE% -i %logfile_2% error
+%FART_EXE% -i %logfile_3% error
 echo ----------------------------------------------------
 echo Please check above section for error messages.
 :end

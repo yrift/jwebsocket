@@ -1,17 +1,18 @@
 @echo off
 echo -------------------------------------------------------------------------
 echo jWebSocket Packager 
-echo (C) Copyright 2013-2014 Innotrade GmbH
+echo (C) Copyright 2013-2015 Innotrade GmbH
 echo -------------------------------------------------------------------------
 
 if "%JWEBSOCKET_HOME%"=="" goto error
-if "%JWEBSOCKET_EE_HOME%"=="" goto error
 if "%JWEBSOCKET_VER%"=="" goto error
 goto continue
 
 :error
-echo Environment variable(s) JWEBSOCKET_HOME, JWEBSOCKET_EE_HOME and/or JWEBSOCKET_VER not set!
+echo Environment variable(s) JWEBSOCKET_HOME and/or JWEBSOCKET_VER not set!
+if "%1"=="/y" goto exitNow
 pause
+:exitNow
 exit
 
 :continue
@@ -33,15 +34,6 @@ set logs=%rte%logs\
 set cache=%rte%cache\
 set web=%rte%web\
 set filesystem=%rte%filesystem\
-
-set rteEE=%JWEBSOCKET_EE_HOME%
-set libsEE=%rteEE%libs\
-set confEE=%rteEE%conf\
-set clientEE=%rteEE%..\..\branches\jWebSocket-1.0-Enterprise\jWebSocketClient\
-set webEE=%clientEE%web
-
-set processes=%rteEE%processes\
-set ontologies=%rteEE%ontologies\
 
 set depl=..\jWebSocketDeployment\jWebSocket\
 set down=..\..\..\downloads\jWebSocket-%ver%\
@@ -78,7 +70,7 @@ rem Source Code Modules
 7z u -mx9 -tzip "%dest%" "%sc%jWebSocketAndroid" -xr!target -xr!.svn -xr!build -xr!bin -xr!.DS_Store
 7z u -mx9 -tzip "%dest%" "%sc%jWebSocketAppSrvDemo" -xr!target -xr!.svn -xr!dist -xr!build -xr!.DS_Store
 7z u -mx9 -tzip "%dest%" "%sc%jWebSocketBlackBerry" -xr!target -xr!.svn -xr!dist -xr!build -xr!.DS_Store
-7z u -mx9 -tzip "%dest%" "%sc%jWebSocketClient" -xr!target -xr!devguide -xr!quickguide -xr!javadocs -xr!.svn -xr!dist -xr!build -xr!.DS_Store
+7z u -mx9 -tzip "%dest%" "%sc%jWebSocketClient" -xr!target -xr!devguide -xr!quickguide -xr!javadocs -xr!.svn -xr!dist -xr!build -xr!.DS_Store -xr!.settings -xr!nbproject
 7z u -mx9 -tzip "%dest%" "%sc%jWebSocketClientAPI" -xr!target -xr!.svn -xr!dist -xr!build -xr!.DS_Store
 7z u -mx9 -tzip "%dest%" "%sc%jWebSocketCommon" -xr!target -xr!.svn -xr!dist -xr!build -xr!.DS_Store
 7z u -mx9 -tzip "%dest%" "%sc%jWebSocketCSClient" -xr!.svn -xr!Client.exe -xr!ClientLibrary.dll -xr!.DS_Store
@@ -88,22 +80,28 @@ rem Source Code Modules
 7z u -mx9 -tzip "%dest%" "%sc%jWebSocketJavaMEClient" -xr!target -xr!.svn -xr!dist -xr!build -xr!.DS_Store
 7z u -mx9 -tzip "%dest%" "%sc%jWebSocketJavaSEClient" -xr!target -xr!.svn -xr!dist -xr!build -xr!.DS_Store
 7z u -mx9 -tzip "%dest%" "%sc%jWebSocketJetty" -xr!target -xr!.svn -xr!dist -xr!build -xr!.DS_Store
+7z u -mx9 -tzip "%dest%" "%sc%jWebSocketJMSGateway" -xr!target -xr!.svn -xr!dist -xr!build -xr!.DS_Store
+7z u -mx9 -tzip "%dest%" "%sc%jWebSocketLibs" -xr!target -xr!.svn -xr!dist -xr!build -xr!.DS_Store
 7z u -mx9 -tzip "%dest%" "%sc%jWebSocketPlugIns" -xr!target -xr!.svn -xr!dist -xr!build -xr!.DS_Store
 7z u -mx9 -tzip "%dest%" "%sc%jWebSocketProxy" -xr!target -xr!.svn -xr!dist -xr!build -xr!.DS_Store
 7z u -mx9 -tzip "%dest%" "%sc%jWebSocketSamples" -xr!target -xr!.svn -xr!dist -xr!build -xr!.DS_Store
 7z u -mx9 -tzip "%dest%" "%sc%jWebSocketServer" -xr!target -xr!.svn -xr!dist -xr!build -xr!.DS_Store
 7z u -mx9 -tzip "%dest%" "%sc%jWebSocketServerAPI" -xr!target -xr!.svn -xr!dist -xr!build -xr!.DS_Store
 7z u -mx9 -tzip "%dest%" "%sc%jWebSocketSwingGUI" -xr!target -xr!.svn -xr!dist -xr!build -xr!.DS_Store
+7z u -mx9 -tzip "%dest%" "%sc%jWebSocketWatchDogClient" -xr!target -xr!.svn -xr!dist -xr!build -xr!.DS_Store
 7z u -mx9 -tzip "%dest%" "%sc%jWebSocketWebAppDemo" -xr!target -xr!.svn -xr!dist -xr!build -xr!.DS_Store
+7z u -mx9 -tzip "%dest%" "%sc%jWebSocketWindowsPhone" -xr!target -xr!.svn -xr!dist -xr!build -xr!.DS_Store
 
 rem Shared, Demo, Data and Vendor Modules
 7z u -mx9 -tzip "%dest%" "%sc%arduino" -xr!.svn -xr!.DS_Store
 7z u -mx9 -tzip "%dest%" "%sc%databases" -xr!.svn -xr!.DS_Store
 7z u -mx9 -tzip "%dest%" "%sc%libs" -xr!target -xr!.svn -xr!dist -xr!build -xr!.DS_Store
 7z u -mx9 -tzip "%dest%" "%sc%shared" -xr!target -xr!.svn -xr!dist -xr!build -xr!.DS_Store
+7z u -mx9 -tzip "%dest%" "%sc%SmartCard-client-library" -xr!target -xr!.svn -xr!dist -xr!build -xr!.DS_Store
+7z u -mx9 -tzip "%dest%" "%sc%Windows Phone API" -xr!target -xr!.svn -xr!dist -xr!build -xr!.DS_Store
 
 rem Maven Control files
-7z u -mx9 -tzip "%dest%" "%sc%pom.xml
+7z u -mx9 -tzip "%dest%" "%sc%pom.xml"
 
 rem Run Time Modules
 7z u -mx9 -tzip "%dest%" "%rt%" -xr!.svn -xr!*.tmp* -xr!*.jasper* -xr!*.war -xr!cache -xr!logs -xr!mails -xr!temp -xr!database -xr!jWebSocketServer-Bundle-%ver%.jar -xr!jWebSocketReportingPlugIn-Bundle.jar
@@ -203,19 +201,9 @@ xcopy %libs%jWebSocketProxy-%ver%.jar %tempdir%libs\ /s /i /y
 xcopy %libs%jWebSocketSamples-%ver%.jar %tempdir%libs\ /s /i /y
 xcopy %libs%jWebSocketAMQStockTicker-%ver%.jar %tempdir%libs\ /s /i /y
 
-rem enterprise edition libs
-xcopy %libsEE%jWebSocketFileSystemPlugInEE-%ver%.jar %tempdir%libs\ /s /i /y
-xcopy %libsEE%jWebSocketItemStoragePlugInEE-%ver%.jar %tempdir%libs\ /s /i /y
-xcopy %libsEE%jWebSocketUserAdminPlugInEE-%ver%.jar %tempdir%libs\ /s /i /y
-xcopy %libsEE%jWebSocketJavaSEClientEE-%ver%.jar %tempdir%libs\ /s /i /y
-
-xcopy %libsEE%jWebSocketANTLRPlugInEE-%ver%.jar %tempdir%libs\ /s /i /y
-xcopy %libsEE%jWebSocketBPMNPlugInEE-%ver%.jar %tempdir%libs\ /s /i /y
-xcopy %libsEE%jWebSocketStringTemplatePlugInEE-%ver%.jar %tempdir%libs\ /s /i /y
-xcopy %libsEE%jWebSocketOntologyPlugInEE-%ver%.jar %tempdir%libs\ /s /i /y
-
 rem jWebSocket config and keystore files (from v1.0) for SSL
-xcopy %conf%jWebSocket.xml %tempdir%conf\ /s /i /y
+echo f | xcopy %conf%jWebSocket.xml %tempdir%conf\jWebSocketDevFull.xml /s /i /y
+echo f | xcopy %conf%jWebSocketDeployment.xml %tempdir%conf\jWebSocket.xml /s /i /y
 
 rem spring config files (from v1.0)
 xcopy %conf%spring-beans.dtd %tempdir%conf\ /s /i /y
@@ -240,10 +228,10 @@ xcopy %conf%AdminPlugIn\*.xml %tempdir%conf\AdminPlugIn\ /s /i /y
 xcopy %conf%APIPlugIn\*.xml %tempdir%conf\APIPlugIn\ /s /i /y
 xcopy %conf%ChannelPlugIn\*.xml %tempdir%conf\ChannelPlugIn\ /s /i /y
 xcopy %conf%CloudPlugIn\*.xml %tempdir%conf\CloudPlugIn\ /s /i /y
-xcopy %conf%FTPPlugIn\*.xml %tempdir%conf\FTPPlugIn\ /s /i /y
 xcopy %conf%EventsPlugIn\*.xml %tempdir%conf\EventsPlugIn\ /s /i /y
-xcopy %conf%FileSystemPlugIn\*.xml %tempdir%conf\FileSystemPlugIn\ /s /i /y
+xcopy %conf%FTPPlugIn\*.xml %tempdir%conf\FTPPlugIn\ /s /i /y
 xcopy %conf%ExtProcessPlugIn\*.xml %tempdir%conf\ExtProcessPlugIn\ /s /i /y
+xcopy %conf%FileSystemPlugIn\*.xml %tempdir%conf\FileSystemPlugIn\ /s /i /y
 rem Flash Cross-Domain configuration
 xcopy %conf%FlashPlugIn\*.xml %tempdir%conf\FlashPlugIn\ /s /i /y
 xcopy %conf%ItemStoragePlugIn\*.xml %tempdir%conf\ItemStoragePlugIn\ /s /i /y
@@ -272,18 +260,6 @@ xcopy %conf%TTSPlugIn\*.xml %tempdir%conf\TTSPlugIn\ /s /i /y
 xcopy %conf%TwitterPlugIn\*.xml %tempdir%conf\TwitterPlugIn\ /s /i /y
 xcopy %conf%XMPPPlugIn\*.xml %tempdir%conf\XMPPPlugIn\ /s /i /y
 
-rem enterprise edition configs
-xcopy %confEE%FileSystemPlugInEE\*.xml %tempdir%conf\FileSystemPlugInEE\ /s /i /y
-xcopy %confEE%ItemStoragePlugInEE\*.xml %tempdir%conf\ItemStoragePlugInEE\ /s /i /y
-xcopy %confEE%SystemPlugInEE\*.xml %tempdir%conf\SystemPlugInEE\ /s /i /y
-xcopy %confEE%UserAdminPlugInEE\*.xml %tempdir%conf\UserAdminPlugInEE\ /s /i /y
-xcopy %confEE%UserAdminPlugInEE\*.info %tempdir%conf\UserAdminPlugInEE\ /s /i /y
-
-xcopy %confEE%ANTLRPlugInEE\*.xml %tempdir%conf\ANTLRPlugInEE\ /s /i /y
-xcopy %confEE%OntologyPlugInEE\*.xml %tempdir%conf\OntologyPlugInEE\ /s /i /y
-xcopy %confEE%BPMNPlugInEE\*.xml %tempdir%conf\BPMNPlugInEE\ /s /i /y
-xcopy %confEE%StringTemplatePlugInEE\*.xml %tempdir%conf\StringTemplatePlugInEE\ /s /i /y
-
 rem copy special conf settings for Tomcat engine (from v1.0)
 xcopy %conf%TomcatEngine\*.xml %tempdir%conf\TomcatEngine\ /s /i /y
 
@@ -300,13 +276,6 @@ xcopy %database%readme.txt %tempdir%database\ /s /i /y
 rem copy jWebSocket filesystem (from v1.0)
 xcopy %filesystem%public\ReadMe.txt %tempdir%filesystem\public\ /s /i /y
 xcopy %filesystem%private\ReadMe.txt %tempdir%filesystem\private\ /s /i /y
-
-rem copy jWebSocket EE ontologies (from RC3 b040908)
-xcopy %ontologies%*.owl %tempdir%ontologies\ /s /i /y
-xcopy %ontologies%catalog*.xml %tempdir%ontologies\ /s /i /y
-
-rem copy jWebSocket EE processes (from RC3 b040908)
-xcopy %processes%*.bpmn %tempdir%processes\ /s /i /y
 
 rem web folder
 xcopy %web%index.htm %tempdir%web\ /s /i /y
@@ -401,9 +370,6 @@ set dest=%down%jWebSocketClient-%ver%.zip
 if exist "%dest%" del "%dest%"
 7z u -mx9 -r -tzip "%dest%" "%src%*.*" -xr!.svn -xr!quickguide -xr!devguide -xr!javadocs -xr!target -xr!jsdoc
 
-7z u -mx9 -r -tzip "%dest%" "%clientEE%\useradmin\*.*" -xr!.svn -xr!quickguide -xr!devguide -xr!javadocs -xr!target -xr!jsdoc
-7z u -mx9 -r -tzip "%dest%" "%clientEE%\res\*.*" -xr!.svn -xr!quickguide -xr!devguide -xr!javadocs -xr!target -xr!jsdoc
-
 pushd ..\jWebSocketClient
 move jWebSocketClient-%ver% web
 popd
@@ -459,16 +425,15 @@ rem goto end
 
 :android_demo
 
-echo -------------------------------------------------------------------------
-echo Packaging Android Demo...
-echo -------------------------------------------------------------------------
-set android_base=..\jWebSocketAndroid\
-set android_demo=%android_base%jWebSocketAndroidDemo\
-set dest=%down%jWebSocketAndroidDemo-%ver%.zip
-if exist "%dest%" del "%dest%"
-rem 7z u -mx9 -r -tzip "%dest%" "%android_demo%dist\jWebSocketAndroidDemo.apk"
-7z u -mx9 -r -tzip "%dest%" "%android_demo%bin\jWebSocketAndroidDemo.apk"
-7z u -mx9 -r -tzip "%dest%" "%depl%ReadMe_Android.txt"
+rem echo -------------------------------------------------------------------------
+rem echo Packaging Android Demo...
+rem echo -------------------------------------------------------------------------
+rem set android_base=..\jWebSocketAndroid\
+rem set android_demo=%android_base%jWebSocketAndroidDemo\
+rem set dest=%down%jWebSocketAndroidDemo-%ver%.zip
+rem if exist "%dest%" del "%dest%"
+rem 7z u -mx9 -r -tzip "%dest%" "%android_demo%bin\jWebSocketAndroidDemo.apk"
+rem 7z u -mx9 -r -tzip "%dest%" "%depl%ReadMe_Android.txt"
 
 rem goto end
 
@@ -480,7 +445,7 @@ echo Packaging complete package...
 echo -------------------------------------------------------------------------
 set dest=%down%jWebSocket-%ver%.zip
 if exist "%dest%" del "%dest%"
-7z u -mx9 -r -tzip "%dest%" "%down%jWebSocketAndroidDemo-%JWEBSOCKET_VER%.zip"
+rem 7z u -mx9 -r -tzip "%dest%" "%down%jWebSocketAndroidDemo-%JWEBSOCKET_VER%.zip"
 7z u -mx9 -r -tzip "%dest%" "%down%jWebSocketWebAppDemo-%JWEBSOCKET_VER%.zip"
 7z u -mx9 -r -tzip "%dest%" "%down%jWebSocketAppSrvDemo-%JWEBSOCKET_VER%.zip"
 7z u -mx9 -r -tzip "%dest%" "%down%jWebSocketClient-%JWEBSOCKET_VER%.zip"

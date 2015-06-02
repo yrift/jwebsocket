@@ -1,15 +1,14 @@
 @echo off
 echo -------------------------------------------------------------------------
 echo jWebSocket Run Time File Generator
-echo (C) Copyright 2013-2014 Innotrade GmbH
+echo (C) Copyright 2013-2015 Innotrade GmbH
 echo -------------------------------------------------------------------------
 
 if "%JWEBSOCKET_HOME%"=="" goto error
-if "%JWEBSOCKET_EE_HOME%"=="" goto error
 if "%JWEBSOCKET_VER%"=="" goto error
 goto continue
 :error
-echo Environment variable(s) JWEBSOCKET_HOME, JWEBSOCKET_EE_HOME and/or JWEBSOCKET_VER not set!
+echo Environment variable(s) JWEBSOCKET_HOME and/or JWEBSOCKET_VER not set!
 pause
 exit
 :continue
