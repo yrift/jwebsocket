@@ -83,7 +83,7 @@
 			<list>
 				<!-- Select here the appenders to be used -->
 				<ref local="demoAppender"/>
-				<ref local="jdbcAppender"/>
+				<!--<ref local="jdbcAppender"/>-->
 			</list>
 		</property>
 	</bean>
