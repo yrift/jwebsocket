@@ -468,7 +468,7 @@ public class Tools {
 				lEnvVal = lEnvVal.replace("\\", "\\\\");
 				// specially supporting jWebSocket server environmental variables                               
 				if ("JWEBSOCKET_HOME".equals(lFoundVal) || "JWEBSOCKET_EE_HOME".equals(lFoundVal)) {
-					if (!lEnvVal.endsWith(File.separator)) {
+					if (!(lEnvVal.endsWith("\\") || lEnvVal.endsWith("/") || lEnvVal.endsWith(File.separator))) {
 						lEnvVal += File.separator;
 					}
 				}
