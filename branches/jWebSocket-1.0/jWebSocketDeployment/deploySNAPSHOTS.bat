@@ -1,7 +1,7 @@
 @echo off
 echo -------------------------------------------------------------------------
 echo SONATYPE Maven Deployment Script
-echo (C) Copyright 2013-2014 Innotrade GmbH
+echo (C) Copyright 2013-2015 Innotrade GmbH
 echo -------------------------------------------------------------------------
 
 echo ----------------------------------------------------

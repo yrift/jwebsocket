@@ -1,7 +1,7 @@
 @echo off
 echo -------------------------------------------------------------------------
 echo jWebSocket Clean and Build Automation
-echo (C) Copyright 2013-2014 Innotrade GmbH
+echo (C) Copyright 2013-2015 Innotrade GmbH
 echo -------------------------------------------------------------------------
 
 if "%JWEBSOCKET_HOME%"=="" goto error

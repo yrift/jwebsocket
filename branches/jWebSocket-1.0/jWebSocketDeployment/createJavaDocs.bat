@@ -2,7 +2,7 @@
 @echo off
 echo -------------------------------------------------------------------------
 echo jWebSocket JavaDocs and JavaSources Generator
-echo (C) Copyright 2011-2014 Innotrade GmbH
+echo (C) Copyright 2011-2015 Innotrade GmbH
 echo -------------------------------------------------------------------------
 
 set MAVEN_HOME=C:\Program Files\NetBeans 8.0 Beta\java\maven
