@@ -38,8 +38,11 @@ echo Auto Generation of jWebSocket v%JWEBSOCKET_VER% JavaScript Docs, are you su
 pause
 :dontAsk1
 
-rem set log=..\jWebSocketDeployment\createJSDocs.log
-set log=con
+
+set LOG_FOLDER=%base%jWebSocketDeployment
+IF NOT "%2"=="" (
+	set LOG_FOLDER=%2
+)
 
 rem save current deployment folder
 cd
@@ -66,10 +69,10 @@ popd
 set cd=%cd%
 
 rem call obfuscator CE
-start /wait "" "%JASOB_HOME%\jasob.exe" /src:"jWebSocket\jWebSocket.jsbp" /log:%cd%\jasobCE.log
+start /wait "" "%JASOB_HOME%\jasob.exe" /src:"jWebSocket\jWebSocket.jsbp" /log:%LOG_FOLDER%\jasobCE.log
 
 rem call obfuscator jWS 3rd party libs
-start /wait "" "%JASOB_HOME%\jasob.exe" /src:"jWebSocket\jWebSocket3rdPartyLibs.jsbp" /log:%cd%\jasob3rdP.log
+start /wait "" "%JASOB_HOME%\jasob.exe" /src:"jWebSocket\jWebSocket3rdPartyLibs.jsbp" /log:%LOG_FOLDER%\jasob3rdP.log
 
 echo finished! Please check if JavaScript Docs have been created.
 if "%1"=="/y" goto dontAsk2

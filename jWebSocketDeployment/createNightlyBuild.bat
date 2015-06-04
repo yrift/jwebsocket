@@ -48,7 +48,8 @@ set LOGS_FOLDER=NIGHTLY_BUILD_LOGS
 if not exist "%LOGS_FOLDER%" (
 	mkdir "%LOGS_FOLDER%"
 )
-set logfile_java_docs=%LOGS_FOLDER%/createJavaDocs.log
+set logfile_java_docs=%CD%/%LOGS_FOLDER%/createJavaDocs.log
+set logfile_jasob=%CD%/%LOGS_FOLDER%/
 set logfile_0=%LOGS_FOLDER%/0_createJSDocs.log
 set logfile_1=%LOGS_FOLDER%/1_cleanAndBuildAll.log
 set logfile_2=%LOGS_FOLDER%/2_createRunTimeFiles.log
@@ -57,15 +58,20 @@ set logfile_deployment=DEPLOYMENT_LOGS
 
 echo Starting Nightly Build into %logfile_0%, %logfile_1%, %logfile_2%, %logfile_3%...
 
-rem generate the java docs (saved to client web)
-rem call createJavaDocs.bat > %logfile_java_docs%
+echo.
+echo -----------------------------------------------------
+echo Running createJavaDocs.bat...
+echo -----------------------------------------------------
+rem generate the java docs (saved to client web) Passing as parameter the log file location
+call createJavaDocs.bat /y %logfile_java_docs%
 
 rem create client side bundles and minified versions
 echo.
 echo -----------------------------------------------------
 echo Running 0_createJSDocs.bat...
 echo -----------------------------------------------------
-rem call 0_createJSDocs.bat /y > %logfile_0%
+rem First parameter skips prompts, second is the logs folder for jasob output
+call 0_createJSDocs.bat /y %logfile_jasob% > %logfile_0%
 
 echo.
 echo -----------------------------------------------------
@@ -73,19 +79,19 @@ echo Running 1_cleanAndBuildAll.bat...
 echo -----------------------------------------------------
 echo Cleaning and building the project MAY TAKE SEVERAL MINUTES.
 echo Please check the compilation logs here: %logfile_1%
-rem call 1_cleanAndBuildAll.bat /y > %logfile_1%
+call 1_cleanAndBuildAll.bat /y > %logfile_1%
 
 echo.
 echo -----------------------------------------------------
 echo Running 2_createRunTimeFiles...
 echo -----------------------------------------------------
-rem call 2_createRunTimeFiles.bat /y > %logfile_2%
+call 2_createRunTimeFiles.bat /y > %logfile_2%
 
 echo.
 echo -----------------------------------------------------
 echo Running 3_createDownloadFiles...
 echo -----------------------------------------------------
-rem call 3_createDownloadFiles.bat /y > %logfile_3%
+call 3_createDownloadFiles.bat /y > %logfile_3%
 
 echo.
 echo -----------------------------------------------------
