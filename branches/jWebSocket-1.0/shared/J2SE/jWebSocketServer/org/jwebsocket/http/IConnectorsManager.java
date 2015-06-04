@@ -28,7 +28,7 @@ import org.jwebsocket.api.WebSocketEngine;
 
 /**
  *
- * @author kyberneees
+ * @author Rolando Santamaria Maso
  */
 public interface IConnectorsManager extends IInitializable {
 
