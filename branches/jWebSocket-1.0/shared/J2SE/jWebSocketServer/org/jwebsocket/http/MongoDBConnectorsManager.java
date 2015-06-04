@@ -1,5 +1,5 @@
 // ---------------------------------------------------------------------------
-// jWebSocket - RESTConnectorsManager (Community Edition, CE)
+// jWebSocket - MongoDBConnectorsManager (Community Edition, CE)
 //	---------------------------------------------------------------------------
 //	Copyright 2010-2015 Innotrade GmbH (jWebSocket.org)
 //	Alexander Schulze, Germany (NRW)
