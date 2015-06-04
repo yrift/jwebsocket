@@ -1,7 +1,7 @@
 @echo off
 echo -------------------------------------------------------------------------
 echo JWEBSOCKET REPO Deployment Script over FTP
-echo (C) Copyright 2013-2014 Innotrade GmbH
+echo (C) Copyright 2013-2015 Innotrade GmbH
 echo -------------------------------------------------------------------------
 echo           SECTION 1, PREPARING ENVIRONMENT
 echo -------------------------------------------------------------------------
@@ -10,7 +10,7 @@ set MAVEN_PATH=C:\maven
 set REPO_ID=mvn-jwebsocket-org
 set REPO_URL=ftp://mvn.jwebsocket.org/
 rem set DEPLOYMENT_VERSION=-RC3-41010
-set DEPLOYMENT_VERSION=-RC3
+set DEPLOYMENT_VERSION=
 
 IF NOT EXIST %MAVEN_PATH% GOTO NO_MAVEN_PATH
 
@@ -48,14 +48,14 @@ setlocal EnableDelayedExpansion
 
 echo -------------------------------------------------------------
 echo	RUNNING A FIRST COMPILATION, SO OUR PROJECT DEPENDENCIES 
-echo    ARE FULLY DOWNLOADED, PLEASE CHECK THE FILE %SCRIPT_DIR%\deployment_logs\full_compilation.log
+echo    ARE FULLY DOWNLOADED, PLEASE CHECK THE FILE %SCRIPT_DIR%\DEPLOYMENT_LOGS\full_compilation.log
 echo    TO VIEW THE COMPILATION RESULTS.
 echo -------------------------------------------------------------
 echo PLEASE WAIT...
 
 set SCRIPT_DIR=%CD%\
 cd %SCRIPT_DIR%\..\
-call mvn clean install >%SCRIPT_DIR%\deployment_logs\full_compilation.log
+call mvn clean install >%SCRIPT_DIR%\DEPLOYMENT_LOGS\full_compilation.log
 cd %SCRIPT_DIR%
 
 set MODULES[1]=jWebSocketLibs\jWebSocketActiveMQPlugIn
@@ -355,8 +355,8 @@ echo               STARTING DEPLOYMENT PROCESS
 echo -------------------------------------------------------------------------
 
 for /L %%i in (1,1,%LENGTH%) do (
-	if not exist "%CD%\deployment_logs\!MODULES[%%i]!" (
-		mkdir %CD%\deployment_logs\!MODULES[%%i]!
+	if not exist "%CD%\DEPLOYMENT_LOGS\!MODULES[%%i]!" (
+		mkdir %CD%\DEPLOYMENT_LOGS\!MODULES[%%i]!
 	)
 	echo -------------------------------------------------------------------------
 	echo PROCESSING MODULE: !MODULES[%%i]!
@@ -364,15 +364,15 @@ for /L %%i in (1,1,%LENGTH%) do (
 	echo VERSION: %JWEBSOCKET_VER%!JWS_DEPLOY_VER[%%i]!
 	echo REPOSITORY ID - URL: %REPO_ID% - %REPO_URL%
 	echo Please wait until the process finishes the execution...
-	call runFTPDeployment.bat !MODULES[%%i]! !JWS_DEPLOY_VER[%%i]! !ARTIFACT_ID[%%i]! > %CD%\deployment_logs\!MODULES[%%i]!\output.log
+	call runFTPDeployment.bat !MODULES[%%i]! !JWS_DEPLOY_VER[%%i]! !ARTIFACT_ID[%%i]! > %CD%\DEPLOYMENT_LOGS\!MODULES[%%i]!\output.log
 	echo REVERTING VERSION TO THE ORIGINAL %JWEBSOCKET_VER%
 	pushd ..\!MODULES[%%i]!
-	call mvn versions:set -DnewVersion=%JWEBSOCKET_VER% > %CD%\deployment_logs\!MODULES[%%i]!\version_reverted.log
+	call mvn versions:set -DnewVersion=%JWEBSOCKET_VER% > %CD%\DEPLOYMENT_LOGS\!MODULES[%%i]!\version_reverted.log
 	del pom.xml.versionsBackup
 	popd
 	echo VERSION REVERTED!
 	echo DEPLOYMENT PROCESS FINISHED FOR !MODULES[%%i]!
-	echo PLEASE CHECK LOGS FOLDER %CD%\deployment_logs\!MODULES[%%i]!\output.log
+	echo PLEASE CHECK LOGS FOLDER %CD%\DEPLOYMENT_LOGS\!MODULES[%%i]!\output.log
 	echo ----------------------------------------------------
 )
 :END

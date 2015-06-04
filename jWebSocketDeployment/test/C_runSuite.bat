@@ -2,7 +2,7 @@
 echo.
 echo -------------------------------------------------------------------------
 echo jWebSocket JavaScript Test Suite for %1...
-echo (C) Copyright 2013-2014 Innotrade GmbH
+echo (C) Copyright 2013-2015 Innotrade GmbH
 echo Browser: %2
 echo URL: %3 
 echo -------------------------------------------------------------------------

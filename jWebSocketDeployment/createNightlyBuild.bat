@@ -1,7 +1,7 @@
 @echo off
 echo -------------------------------------------------------------------------
 echo jWebSocket Nightly Build Generator
-echo (C) Copyright 2013-2014 Innotrade GmbH
+echo (C) Copyright 2013-2015 Innotrade GmbH
 echo -------------------------------------------------------------------------
 
 IF NOT EXIST %JAVA_HOME% GOTO NO_JAVA_HOME
@@ -44,7 +44,7 @@ echo.
 echo Are you sure?
 pause
 
-set LOGS_FOLDER=DEPLOYMENT_LOGS
+set LOGS_FOLDER=NIGHTLY_BUILD_LOGS
 if not exist "%LOGS_FOLDER%" (
 	mkdir "%LOGS_FOLDER%"
 )

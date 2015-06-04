@@ -1,7 +1,7 @@
 @echo off
 echo -------------------------------------------------------------------------
 echo jWebSocket Maven Repo Deployment
-echo (C) Copyright 2013-2014 Innotrade GmbH
+echo (C) Copyright 2013-2015 Innotrade GmbH
 echo -------------------------------------------------------------------------
 
 rem select specific maven version
