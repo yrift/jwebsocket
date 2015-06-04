@@ -1,59 +1,45 @@
 @echo off
-@echo off
 echo -------------------------------------------------------------------------
 echo jWebSocket JavaDocs and JavaSources Generator
 echo (C) Copyright 2011-2015 Innotrade GmbH
 echo -------------------------------------------------------------------------
 
-set MAVEN_HOME=C:\Program Files\NetBeans 8.0 Beta\java\maven
-set JAVA_HOME=C:\Program Files\Java\jdk1.7.0_51
-rem set JAVA_HOME=C:\Program Files\Java\jdk1.8.0_20
+if "%JWEBSOCKET_HOME%"=="" goto ERROR
+if "%JWEBSOCKET_VER%"=="" goto ERROR
+if "%M2_HOME%"=="" goto ERROR
 
-rem select specific maven version
-set path=%MAVEN_HOME%\bin;%PATH%
-rem select specific Java version
-set path=%JAVA_HOME%\bin;%PATH%
-rem set path=C:\Program Files\Java\jdk1.8.0_20\bin;%PATH%
+goto START
 
-set M2_HOME=%MAVEN_HOME%
-set M3_HOME=%MAVEN_HOME%
+:ERROR
+	echo Environment variable(s) M2_HOME, JWEBSOCKET_HOME and/or JWEBSOCKET_VER not set!
+	if "%1"=="/y" goto skipPause1
+	pause
+	:skipPause1
+	exit
 
-if "%JWEBSOCKET_HOME%"=="" goto error
-if "%JWEBSOCKET_EE_HOME%"=="" goto error
-if "%JWEBSOCKET_VER%"=="" goto error
-goto continue
-:error
-echo Environment variable(s) JWEBSOCKET_HOME and/or JWEBSOCKET_VER not set!
-pause
-exit
-:continue
-
+:START
 cd ..
 set base=%CD%\
-set baseEE=%JWEBSOCKET_EE_HOME%..\..\branches\jWebSocket-1.0-Enterprise\
-pushd %baseEE%
-set baseEE=%CD%\
-popd
-
 set plugins=%base%jWebSocketPlugIns\
-set pluginsEE=%baseEE%jWebSocketPlugIns\
 set engines=%base%jWebSocketEngines\
 set jmsgw=%base%jWebSocketJMSGateway\
 set libs=%base%jWebSocketLibs\
-
 set javadocs=%base%..\..\javadocs\
 
 set log=%base%jWebSocketDeployment\createJavaDocs.log
-del %log%
-rem set log=con
+
+IF NOT "%2"=="" (
+	set log=%2
+)
+if exist %log% (
+	del %log%
+)
 
 if "%1"=="/y" goto dontAsk1
 echo This generates the jWebSocket v%JWEBSOCKET_VER% JavaDocs and JavaSource jars, are you sure?
 echo -------------------------------------------------------------------------
 echo Basefolder (CE):
 echo %base%
-echo Basefolder (EE):
-echo %baseEE%
 echo -------------------------------------------------------------------------
 echo Logging to:
 echo %log%
@@ -70,76 +56,6 @@ pause
 
 rem @echo on
 rem goto jWebSocketProxyPlugIn
-
-:jWebSocketItemStorageEE
-echo ------------------------------------------------------------------------
-echo Plug-ins/jWebSocketItemStorage
-echo ------------------------------------------------------------------------
-cd %pluginsEE%jWebSocketItemStoragePlugInEE
-if exist %javadocs%jWebSocketItemStoragePlugInEE rd %javadocs%jWebSocketItemStoragePlugInEE /s/q
-call mvn generate-sources javadoc:javadoc >> %log%
-call mvn generate-sources javadoc:jar >> %log%
-call mvn source:jar >> %log%
-
-:jWebSocketOntologyPlugInEE
-echo ------------------------------------------------------------------------
-echo PlugInsEE/jWebSocketOntologyPlugInEE
-echo ------------------------------------------------------------------------
-cd %pluginsEE%jWebSocketOntologyPlugInEE
-if exist %javadocs%jWebSocketOntologyPlugInEE rd %javadocs%jWebSocketOntologyPlugInEE /s/q
-call mvn generate-sources javadoc:javadoc >> %log%
-call mvn generate-sources javadoc:jar >> %log%
-call mvn source:jar >> %log%
-
-:jWebSocketANTLRPlugInEE
-echo ------------------------------------------------------------------------
-echo PlugInsEE/jWebSocketANTLRPlugInEE
-echo ------------------------------------------------------------------------
-cd %pluginsEE%jWebSocketANTLRPlugInEE
-if exist %javadocs%jWebSocketANTLRPlugInEE rd %javadocs%jWebSocketANTLRPlugInEE /s/q
-call mvn generate-sources javadoc:javadoc >> %log%
-call mvn generate-sources javadoc:jar >> %log%
-call mvn source:jar >> %log%
-
-:jWebSocketStringTemplatePlugInEE
-echo ------------------------------------------------------------------------
-echo PlugInsEE/jWebSocketStringTemplatePlugInEE
-echo ------------------------------------------------------------------------
-cd %pluginsEE%jWebSocketStringTemplatePlugInEE
-if exist %javadocs%jWebSocketStringTemplatePlugInEE rd %javadocs%jWebSocketStringTemplatePlugInEE /s/q
-call mvn generate-sources javadoc:javadoc >> %log%
-call mvn generate-sources javadoc:jar >> %log%
-call mvn source:jar >> %log%
-
-:jWebSocketMASPlugInEE
-echo ------------------------------------------------------------------------
-echo PlugInsEE/jWebSocketMASPlugInEE
-echo ------------------------------------------------------------------------
-cd %pluginsEE%jWebSocketMASPlugInEE
-if exist %javadocs%jWebSocketMASPlugInEE rd %javadocs%jWebSocketMASPlugInEE /s/q
-call mvn generate-sources javadoc:javadoc >> %log%
-call mvn generate-sources javadoc:jar >> %log%
-call mvn source:jar >> %log%
-
-:jWebSocketEnapsoPlugInEE
-echo ------------------------------------------------------------------------
-echo PlugInsEE/jWebSocketEnapsoPlugInEE
-echo ------------------------------------------------------------------------
-cd %pluginsEE%jWebSocketEnapsoPlugInEE
-if exist %javadocs%jWebSocketEnapsoPlugInEE rd %javadocs%jWebSocketEnapsoPlugInEE /s/q
-call mvn generate-sources javadoc:javadoc >> %log%
-call mvn generate-sources javadoc:jar >> %log%
-call mvn source:jar >> %log%
-
-:jWebSocketBPMNPlugInEE
-echo ------------------------------------------------------------------------
-echo PlugInsEE/jWebSocketBPMNPlugInEE
-echo ------------------------------------------------------------------------
-cd %pluginsEE%jWebSocketBPMNPlugInEE
-if exist %javadocs%jWebSocketBPMNPlugInEE rd %javadocs%jWebSocketBPMNPlugInEE /s/q
-call mvn generate-sources javadoc:javadoc >> %log%
-call mvn generate-sources javadoc:jar >> %log%
-call mvn source:jar >> %log%
 
 :jWebSocketDynamicSQL
 echo ------------------------------------------------------------------------

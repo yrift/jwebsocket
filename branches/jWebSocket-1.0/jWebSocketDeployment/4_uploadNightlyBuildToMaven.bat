@@ -6,39 +6,26 @@ echo -------------------------------------------------------------------------
 echo           SECTION 1, PREPARING ENVIRONMENT
 echo -------------------------------------------------------------------------
 
-set MAVEN_PATH=C:\maven
 set REPO_ID=mvn-jwebsocket-org
 set REPO_URL=ftp://mvn.jwebsocket.org/
 rem set DEPLOYMENT_VERSION=-RC3-41010
 set DEPLOYMENT_VERSION=
 
-IF NOT EXIST %MAVEN_PATH% GOTO NO_MAVEN_PATH
-
-rem select specific maven version
-set path=%MAVEN_PATH%\bin;%PATH%
-
-set M2_HOME=%MAVEN_PATH%
-set M3_HOME=%MAVEN_PATH%
-
 if "%JWEBSOCKET_HOME%"=="" goto ERROR
 if "%JWEBSOCKET_VER%"=="" goto ERROR
+if "%M2_HOME%"=="" goto ERROR
+
 goto START
 
-:NO_MAVEN_PATH
-	echo The path %MAVEN_PATH% does not exist in the filesystem, please download MAVEN and add the path in the script!
+:ERROR
+	echo Environment variable(s) M2_HOME, JWEBSOCKET_HOME and/or JWEBSOCKET_VER not set!
 	if "%1"=="/y" goto skipPause1
 	pause
 	:skipPause1
 	exit
 
-:ERROR
-	echo Environment variable(s) JWEBSOCKET_HOME and/or JWEBSOCKET_VER not set!
-	if "%1"=="/y" goto skipPause2
-	pause
-	:skipPause2
-	exit
-
 :START
+	set M3_HOME=%M2_HOME%
 	echo Maven Version:
 	call mvn -version
 	echo.
@@ -47,7 +34,7 @@ goto START
 	if "%1"=="/y" goto PROCEED_DEPLOYMENT
 	
 	echo.
-	echo In order to have a success deployment we recommend you to read the following section (servers and profiles) from %MAVEN_PATH%\conf\settings.xml.
+	echo In order to have a success deployment we recommend you to read the following section (servers and profiles) from %M2_HOME%\conf\settings.xml.
 	echo.
 	echo It is explained in our Maven Deployment Tutorial: https://jwebsocket.atlassian.net/wiki/display/JWSDEVSTD/Deployment#Deployment-2.3.1.POMandsettingsconfig
 	echo.
