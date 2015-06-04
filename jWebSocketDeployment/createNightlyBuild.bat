@@ -48,22 +48,24 @@ set LOGS_FOLDER=NIGHTLY_BUILD_LOGS
 if not exist "%LOGS_FOLDER%" (
 	mkdir "%LOGS_FOLDER%"
 )
+set logfile_java_docs=%LOGS_FOLDER%/createJavaDocs.log
 set logfile_0=%LOGS_FOLDER%/0_createJSDocs.log
 set logfile_1=%LOGS_FOLDER%/1_cleanAndBuildAll.log
 set logfile_2=%LOGS_FOLDER%/2_createRunTimeFiles.log
 set logfile_3=%LOGS_FOLDER%/3_createDownloadFiles.log
+set logfile_deployment=DEPLOYMENT_LOGS
 
 echo Starting Nightly Build into %logfile_0%, %logfile_1%, %logfile_2%, %logfile_3%...
 
 rem generate the java docs (saved to client web)
-rem call createJavaDocs.bat > %logfile_0%
+rem call createJavaDocs.bat > %logfile_java_docs%
 
 rem create client side bundles and minified versions
 echo.
 echo -----------------------------------------------------
 echo Running 0_createJSDocs.bat...
 echo -----------------------------------------------------
-call 0_createJSDocs.bat /y > %logfile_0%
+rem call 0_createJSDocs.bat /y > %logfile_0%
 
 echo.
 echo -----------------------------------------------------
@@ -71,21 +73,37 @@ echo Running 1_cleanAndBuildAll.bat...
 echo -----------------------------------------------------
 echo Cleaning and building the project MAY TAKE SEVERAL MINUTES.
 echo Please check the compilation logs here: %logfile_1%
-call 1_cleanAndBuildAll.bat /y > %logfile_1%
+rem call 1_cleanAndBuildAll.bat /y > %logfile_1%
 
 echo.
 echo -----------------------------------------------------
 echo Running 2_createRunTimeFiles...
 echo -----------------------------------------------------
-rem create Run-Time-Environment
-call 2_createRunTimeFiles.bat /y > %logfile_2%
+rem call 2_createRunTimeFiles.bat /y > %logfile_2%
 
 echo.
 echo -----------------------------------------------------
 echo Running 3_createDownloadFiles...
 echo -----------------------------------------------------
-rem create download from Run-Time-Environment
-call 3_createDownloadFiles.bat /y > %logfile_3%
+rem call 3_createDownloadFiles.bat /y > %logfile_3%
+
+echo.
+echo -----------------------------------------------------
+echo         NIGHTLY BUILD SUCCESSFULLY CREATED!
+echo -----------------------------------------------------
+
+set /p option=Do you want to deploy the created Nightly Build to our Maven Repository now (y/n)?
+if "%option%"=="y" goto proceedDeployment
+goto scan
+
+:proceedDeployment
+echo.
+echo -----------------------------------------------------
+echo Running 4_uploadNightlyBuildToMaven.bat to upload all the 
+echo generated nightly build packages to our Maven Repository
+echo -----------------------------------------------------
+rem Upload nightly build to the repository, parameters %1: "skip prompts", %2: "skip compilation"
+call 4_uploadNightlyBuildToMaven.bat /y /y
 
 :scan
 
@@ -93,10 +111,12 @@ echo.
 echo -----------------------------------------------------
 echo Scanning log files for certain error tags...
 echo -----------------------------------------------------
+rem %FART_EXE% -i %logfile_java_docs% error
 %FART_EXE% -i %logfile_0% error
 %FART_EXE% -i %logfile_1% error
 %FART_EXE% -i %logfile_2% error
 %FART_EXE% -i %logfile_3% error
+%FART_EXE% -i -r %logfile_deployment%\*.log error
 echo ----------------------------------------------------
 echo Please check above section for error messages.
 :end
