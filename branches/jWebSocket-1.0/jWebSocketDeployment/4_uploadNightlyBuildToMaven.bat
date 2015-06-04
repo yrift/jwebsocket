@@ -22,40 +22,82 @@ set M3_HOME=%MAVEN_PATH%
 
 if "%JWEBSOCKET_HOME%"=="" goto ERROR
 if "%JWEBSOCKET_VER%"=="" goto ERROR
-goto CONTINUE
+goto START
 
 :NO_MAVEN_PATH
 	echo The path %MAVEN_PATH% does not exist in the filesystem, please download MAVEN and add the path in the script!
+	if "%1"=="/y" goto skipPause1
 	pause
+	:skipPause1
 	exit
 
 :ERROR
 	echo Environment variable(s) JWEBSOCKET_HOME and/or JWEBSOCKET_VER not set!
+	if "%1"=="/y" goto skipPause2
 	pause
+	:skipPause2
 	exit
 
-:CONTINUE
+:START
 	echo Maven Version:
 	call mvn -version
+	echo.
 	echo -------------------------------------------------------------------------
 	set orig=%CD%
-	set /p option=Are you sure that you correctly configured the sections (servers and profiles) from %MAVEN_PATH%\conf\settings.xml. \n It is explained in our Maven Deployment Tutorial: https://jwebsocket.atlassian.net/wiki/display/JWSDEVSTD/Deployment#Deployment-2.3.1.POMandsettingsconfig (y/n)?
+	if "%1"=="/y" goto PROCEED_DEPLOYMENT
+	
+	echo.
+	echo In order to have a success deployment we recommend you to read the following section (servers and profiles) from %MAVEN_PATH%\conf\settings.xml.
+	echo.
+	echo It is explained in our Maven Deployment Tutorial: https://jwebsocket.atlassian.net/wiki/display/JWSDEVSTD/Deployment#Deployment-2.3.1.POMandsettingsconfig
+	echo.
+	set /p /i option=Are you sure that you want to continue with the Maven Deployment (y/n)? 
+	echo.
+	
 	if "%option%"=="y" goto PROCEED_DEPLOYMENT
 	goto END
 
 :PROCEED_DEPLOYMENT
 setlocal EnableDelayedExpansion
 
-echo -------------------------------------------------------------
-echo	RUNNING A FIRST COMPILATION, SO OUR PROJECT DEPENDENCIES 
-echo    ARE FULLY DOWNLOADED, PLEASE CHECK THE FILE %SCRIPT_DIR%\DEPLOYMENT_LOGS\full_compilation.log
-echo    TO VIEW THE COMPILATION RESULTS.
-echo -------------------------------------------------------------
-echo PLEASE WAIT...
-
-set SCRIPT_DIR=%CD%\
+set SCRIPT_DIR=%JWEBSOCKET_HOME%..\..\branches\jWebSocket-%JWEBSOCKET_VER%\jWebSocketDeployment
+if not exist "%SCRIPT_DIR%\DEPLOYMENT_LOGS" (
+	mkdir "%SCRIPT_DIR%\DEPLOYMENT_LOGS"
+)
 cd %SCRIPT_DIR%\..\
-call mvn clean install >%SCRIPT_DIR%\DEPLOYMENT_LOGS\full_compilation.log
+
+rem Do not compile if skipped
+set SECOND_ARG=%2
+:COMPILE_NOW
+IF NOT "%SECOND_ARG%"=="/y" (
+	echo -------------------------------------------------------------
+	echo	RUNNING A FIRST COMPILATION, SO OUR PROJECT DEPENDENCIES 
+	echo    ARE FULLY DOWNLOADED, PLEASE CHECK THE FILE %SCRIPT_DIR%\DEPLOYMENT_LOGS\full_compilation.log
+	echo    TO VIEW THE COMPILATION RESULTS.
+	echo -------------------------------------------------------------
+	echo PLEASE WAIT...
+	call mvn clean install >%SCRIPT_DIR%\DEPLOYMENT_LOGS\full_compilation.log
+) ELSE (
+	goto ASK_AGAIN
+)
+
+goto CONTINUE_DEPLOYMENT
+
+:ASK_AGAIN
+IF NOT "%JWEBSOCKET_VER%%DEPLOYMENT_VERSION%"=="%JWEBSOCKET_VER%" (
+	echo WARNING: jWebSocket Parent Compilation Skipped. As the current version does not match with the version we want to deploy on Maven Repository some version changes must be done in the Parent pom.xml. This is why we REQUIRE TO RECOMPILE THIS PROJECT. 
+	goto CHOOSE_AGAIN
+)
+goto CONTINUE_DEPLOYMENT
+
+:CHOOSE_AGAIN
+set /p choice=Do you want to fix this by compiling the project now (y/n)?
+IF "%choice%"=="y" (
+	set SECOND_ARG="/y"
+	goto COMPILE_NOW
+)
+
+:CONTINUE_DEPLOYMENT
 cd %SCRIPT_DIR%
 
 set MODULES[1]=jWebSocketLibs\jWebSocketActiveMQPlugIn
@@ -348,7 +390,7 @@ set MODULES[61]=jWebSocketPlugIns\jWebSocketTTSPlugIn
 set ARTIFACT_ID[61]=jWebSocketTTSPlugIn
 set JWS_DEPLOY_VER[61]=%DEPLOYMENT_VERSION%
 
-set LENGTH=61
+set LENGTH=1
 
 echo -------------------------------------------------------------------------
 echo               STARTING DEPLOYMENT PROCESS
@@ -364,7 +406,7 @@ for /L %%i in (1,1,%LENGTH%) do (
 	echo VERSION: %JWEBSOCKET_VER%!JWS_DEPLOY_VER[%%i]!
 	echo REPOSITORY ID - URL: %REPO_ID% - %REPO_URL%
 	echo Please wait until the process finishes the execution...
-	call runFTPDeployment.bat !MODULES[%%i]! !JWS_DEPLOY_VER[%%i]! !ARTIFACT_ID[%%i]! > %CD%\DEPLOYMENT_LOGS\!MODULES[%%i]!\output.log
+	call doMavenUploadModule.bat !MODULES[%%i]! !JWS_DEPLOY_VER[%%i]! !ARTIFACT_ID[%%i]! > %CD%\DEPLOYMENT_LOGS\!MODULES[%%i]!\output.log
 	echo REVERTING VERSION TO THE ORIGINAL %JWEBSOCKET_VER%
 	pushd ..\!MODULES[%%i]!
 	call mvn versions:set -DnewVersion=%JWEBSOCKET_VER% > %CD%\DEPLOYMENT_LOGS\!MODULES[%%i]!\version_reverted.log
@@ -376,4 +418,6 @@ for /L %%i in (1,1,%LENGTH%) do (
 	echo ----------------------------------------------------
 )
 :END
+if "%1"=="/y" goto skipPause3
 pause
+:skipPause3
