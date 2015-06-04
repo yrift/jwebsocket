@@ -48,10 +48,15 @@ goto START
 setlocal EnableDelayedExpansion
 
 set SCRIPT_DIR=%JWEBSOCKET_HOME%..\..\branches\jWebSocket-%JWEBSOCKET_VER%\jWebSocketDeployment
-if not exist "%SCRIPT_DIR%\DEPLOYMENT_LOGS" (
-	mkdir "%SCRIPT_DIR%\DEPLOYMENT_LOGS"
-)
 cd %SCRIPT_DIR%\..\
+
+set log=%SCRIPT_DIR%\DEPLOYMENT_LOGS\
+IF NOT "%3"=="" (
+	set log="%3"
+)
+IF NOT EXIST "%log%" (
+	mkdir "%log%"
+)
 
 rem Do not compile if skipped
 set SECOND_ARG=%2
@@ -59,11 +64,11 @@ set SECOND_ARG=%2
 IF NOT "%SECOND_ARG%"=="/y" (
 	echo -------------------------------------------------------------
 	echo	RUNNING A FIRST COMPILATION, SO OUR PROJECT DEPENDENCIES 
-	echo    ARE FULLY DOWNLOADED, PLEASE CHECK THE FILE %SCRIPT_DIR%\DEPLOYMENT_LOGS\full_compilation.log
+	echo    ARE FULLY DOWNLOADED, PLEASE CHECK THE FILE %log%\full_compilation.log
 	echo    TO VIEW THE COMPILATION RESULTS.
 	echo -------------------------------------------------------------
 	echo PLEASE WAIT...
-	call mvn clean install >%SCRIPT_DIR%\DEPLOYMENT_LOGS\full_compilation.log
+	call mvn clean install >%log%\full_compilation.log
 ) ELSE (
 	goto ASK_AGAIN
 )
@@ -377,15 +382,15 @@ set MODULES[61]=jWebSocketPlugIns\jWebSocketTTSPlugIn
 set ARTIFACT_ID[61]=jWebSocketTTSPlugIn
 set JWS_DEPLOY_VER[61]=%DEPLOYMENT_VERSION%
 
-set LENGTH=1
+set LENGTH=61
 
 echo -------------------------------------------------------------------------
 echo               STARTING DEPLOYMENT PROCESS
 echo -------------------------------------------------------------------------
 
 for /L %%i in (1,1,%LENGTH%) do (
-	if not exist "%CD%\DEPLOYMENT_LOGS\!MODULES[%%i]!" (
-		mkdir %CD%\DEPLOYMENT_LOGS\!MODULES[%%i]!
+	if not exist "%log%\!MODULES[%%i]!" (
+		mkdir %log%\!MODULES[%%i]!
 	)
 	echo -------------------------------------------------------------------------
 	echo PROCESSING MODULE: !MODULES[%%i]!
@@ -393,15 +398,15 @@ for /L %%i in (1,1,%LENGTH%) do (
 	echo VERSION: %JWEBSOCKET_VER%!JWS_DEPLOY_VER[%%i]!
 	echo REPOSITORY ID - URL: %REPO_ID% - %REPO_URL%
 	echo Please wait until the process finishes the execution...
-	call doMavenUploadModule.bat !MODULES[%%i]! !JWS_DEPLOY_VER[%%i]! !ARTIFACT_ID[%%i]! > %CD%\DEPLOYMENT_LOGS\!MODULES[%%i]!\output.log
+	call doMavenUploadModule.bat !MODULES[%%i]! !JWS_DEPLOY_VER[%%i]! !ARTIFACT_ID[%%i]! > %log%\!MODULES[%%i]!\output.log
 	echo REVERTING VERSION TO THE ORIGINAL %JWEBSOCKET_VER%
 	pushd ..\!MODULES[%%i]!
-	call mvn versions:set -DnewVersion=%JWEBSOCKET_VER% > %CD%\DEPLOYMENT_LOGS\!MODULES[%%i]!\version_reverted.log
+	call mvn versions:set -DnewVersion=%JWEBSOCKET_VER% > %log%\!MODULES[%%i]!\version_reverted.log
 	del pom.xml.versionsBackup
 	popd
 	echo VERSION REVERTED!
 	echo DEPLOYMENT PROCESS FINISHED FOR !MODULES[%%i]!
-	echo PLEASE CHECK LOGS FOLDER %CD%\DEPLOYMENT_LOGS\!MODULES[%%i]!\output.log
+	echo PLEASE CHECK LOGS FOLDER %log%\!MODULES[%%i]!\output.log
 	echo ----------------------------------------------------
 )
 :END

@@ -108,9 +108,6 @@ rem Run Time Modules
 7z u -mx9 -tzip "%dest%" "%rt%"database/readme.txt
 popd
 
-rem goto end
-
-
 :server
 
 echo -------------------------------------------------------------------------
@@ -204,12 +201,16 @@ xcopy %libs%jWebSocketAMQStockTicker-%ver%.jar %tempdir%libs\ /s /i /y
 rem jWebSocket config and keystore files (from v1.0) for SSL
 echo f | xcopy %conf%jWebSocket.xml %tempdir%conf\jWebSocketDevFull.xml /s /i /y
 echo f | xcopy %conf%jWebSocketDeployment.xml %tempdir%conf\jWebSocket.xml /s /i /y
+xcopy xcopy %conf%jWebSocketScripting.xml %tempdir%libs\ /s /i /y
 
 rem spring config files (from v1.0)
 xcopy %conf%spring-beans.dtd %tempdir%conf\ /s /i /y
 
 rem jWebSocket development config file
-xcopy %conf%jWebSocketDevTemplate.xml %tempdir%conf\ /s /i /y
+xcopy %conf%jWebSocketDevMinimum.xml %tempdir%conf\ /s /i /y
+xcopy %conf%jWebSocketJMSClusterNode01.xml %tempdir%conf\ /s /i /y
+xcopy %conf%jWebSocketJMSClusterNode02.xml %tempdir%conf\ /s /i /y
+xcopy %conf%jWebSocketJMSClusterNode03.xml %tempdir%conf\ /s /i /y
 
 rem jWebSocket SSL keystore
 xcopy %conf%jWebSocket.ks %tempdir%conf\ /s /i /y

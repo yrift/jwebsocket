@@ -18,8 +18,9 @@ goto START
 	exit
 
 :START
-cd ..
-set base=%CD%\
+set base=%JWEBSOCKET_HOME%..\..\branches\jWebSocket-%JWEBSOCKET_VER%\
+
+cd %base%
 set plugins=%base%jWebSocketPlugIns\
 set engines=%base%jWebSocketEngines\
 set jmsgw=%base%jWebSocketJMSGateway\
@@ -29,10 +30,10 @@ set javadocs=%base%..\..\javadocs\
 set log=%base%jWebSocketDeployment\createJavaDocs.log
 
 IF NOT "%2"=="" (
-	set log=%2
+	set log="%2"
 )
-if exist %log% (
-	del %log%
+IF EXIST %log% (
+	del %log% /F /S /Q /A
 )
 
 if "%1"=="/y" goto dontAsk1
