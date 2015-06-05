@@ -199,8 +199,8 @@ xcopy %libs%jWebSocketSamples-%ver%.jar %tempdir%libs\ /s /i /y
 xcopy %libs%jWebSocketAMQStockTicker-%ver%.jar %tempdir%libs\ /s /i /y
 
 rem jWebSocket config and keystore files (from v1.0) for SSL
-echo f | xcopy %conf%jWebSocket.xml %tempdir%conf\jWebSocketDevFull.xml /s /i /y
-echo f | xcopy %conf%jWebSocketDeployment.xml %tempdir%conf\jWebSocket.xml /s /i /y
+echo.>%tempdir%conf\jWebSocketDevFull.xml|xcopy %conf%jWebSocket.xml %tempdir%conf\jWebSocketDevFull.xml /Y
+echo.>%tempdir%conf\jWebSocket.xml|xcopy %conf%jWebSocketDeployment.xml %tempdir%conf\jWebSocket.xml /Y
 xcopy xcopy %conf%jWebSocketScripting.xml %tempdir%libs\ /s /i /y
 
 rem spring config files (from v1.0)
