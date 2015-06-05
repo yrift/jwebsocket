@@ -1,4 +1,5 @@
 @echo off
+setlocal EnableDelayedExpansion
 echo -------------------------------------------------------------------------
 echo JWEBSOCKET REPO Deployment Script over FTP
 echo (C) Copyright 2013-2015 Innotrade GmbH
@@ -45,7 +46,6 @@ goto START
 	goto END
 
 :PROCEED_DEPLOYMENT
-setlocal EnableDelayedExpansion
 
 set SCRIPT_DIR=%JWEBSOCKET_HOME%..\..\branches\jWebSocket-%JWEBSOCKET_VER%\jWebSocketDeployment
 cd %SCRIPT_DIR%\..\
@@ -398,7 +398,7 @@ for /L %%i in (1,1,%LENGTH%) do (
 	echo VERSION: %JWEBSOCKET_VER%!JWS_DEPLOY_VER[%%i]!
 	echo REPOSITORY ID - URL: %REPO_ID% - %REPO_URL%
 	echo Please wait until the process finishes the execution...
-	call doMavenUploadModule.bat !MODULES[%%i]! !JWS_DEPLOY_VER[%%i]! !ARTIFACT_ID[%%i]! > %log%\!MODULES[%%i]!\output.log
+	call doMavenUploadModule.bat !MODULES[%%i]! !ARTIFACT_ID[%%i]! !JWS_DEPLOY_VER[%%i]! > %log%\!MODULES[%%i]!\output.log
 	echo REVERTING VERSION TO THE ORIGINAL %JWEBSOCKET_VER%
 	pushd ..\!MODULES[%%i]!
 	call mvn versions:set -DnewVersion=%JWEBSOCKET_VER% > %log%\!MODULES[%%i]!\version_reverted.log
