@@ -3,16 +3,18 @@
 if "%1"=="" goto ERROR
 if "%2"=="" goto ERROR
 
+set MODULE=%1
+set ARTIFACT_ID=%2
+set JWS_DEPLOY_VER=%3
 echo ----------------------------------------------------
-echo PROCESSING MODULE: %1
-echo VERSION TO BE DEPLOYED: %JWEBSOCKET_VER%%2
+echo PROCESSING MODULE: %MODULE%
+echo VERSION TO BE DEPLOYED: %JWEBSOCKET_VER%%JWS_DEPLOY_VER%
 echo MAVEN LOCATION: %MAVEN_PATH%
 echo REPOSITORY ID - URL: %REPO_ID% - %REPO_URL%
 echo ----------------------------------------------------
 
 set REPO_ID=mvn-jwebsocket-org
 set REPO_URL=ftp://mvn.jwebsocket.org/
-set JWS_DEPLOY_VER=%2
 
 goto READY_TO_GO
 
@@ -25,6 +27,7 @@ goto READY_TO_GO
 	set SCRIPT_DIR=%CD%\
 	set LIBS_FOLDER=%CD%\..\..\..\rte\jWebSocket-%JWEBSOCKET_VER%%JWS_DEPLOY_VER%\libs
 	set repo=..\..\..\repo\
+	echo LIBS_FOLDER: %LIBS_FOLDER%
 	rem Save current directory and change to target directory
 	pushd %repo%
 	rem Save value of CD variable (current directory)
@@ -32,7 +35,7 @@ goto READY_TO_GO
 	rem Restore original directory
 	popd
 	
-	set base=%CD%\..\..\..\branches\jWebSocket-%JWEBSOCKET_VER%\%1
+	set base=%CD%\..\..\..\branches\jWebSocket-%JWEBSOCKET_VER%\%MODULE%
 	rem Save current directory and change to target directory
 	rem pushd %base%
 	rem Save value of CD variable (current directory)
@@ -81,7 +84,7 @@ goto READY_TO_GO
 	
 	echo DEPLOYING JWEBSOCKET LIBRARIES TO %REPO_URL%
 	rem call mvn deploy -DaltDeploymentRepository=%REPO_ID%::default::%REPO_URL%
-	call mvn deploy:deploy-file -DgroupId=org.jwebsocket -DartifactId=%3 -Dversion=%JWEBSOCKET_VER%%JWS_DEPLOY_VER% -Dpackaging=jar -Dfile=%LIBS_FOLDER%\%%3-%JWEBSOCKET_VER%%JWS_DEPLOY_VER%.jar -DpomFile=%CD%\pom.xml -DrepositoryId=%REPO_ID% -Durl=%REPO_URL%
+	call mvn deploy:deploy-file -DgroupId=org.jwebsocket -DartifactId=%ARTIFACT_ID% -Dversion=%JWEBSOCKET_VER%%JWS_DEPLOY_VER% -Dpackaging=jar -Dfile=%LIBS_FOLDER%\%ARTIFACT_ID%-%JWEBSOCKET_VER%%JWS_DEPLOY_VER%.jar -DpomFile=%CD%\pom.xml -DrepositoryId=%REPO_ID% -Durl=%REPO_URL%
 	echo ------------------------------------------------------------------------
 	echo RESTORING CHANGED POMS
 	echo ------------------------------------------------------------------------
