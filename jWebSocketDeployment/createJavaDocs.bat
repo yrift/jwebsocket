@@ -642,7 +642,7 @@ echo AppServer/jWebSocketWebAppDemo
 echo ------------------------------------------------------------------------
 rem ### THE WEBAPP DEMO IS ANT BASED! ###
 cd %base%jWebSocketWebAppDemo
-call ant javadoc >> %log%
+call ant javadoc -Dj2ee.server.home="%CATALINA_HOME%" -Dlibs.CopyLibs.classpath=%ANT_HOME%/lib/org-netbeans-modules-java-j2seproject-copylibstask.jar >> %log%
 if exist %javadocs%jWebSocketWebAppDemo rd %javadocs%jWebSocketWebAppDemo /s/q
 md %javadocs%jWebSocketWebAppDemo\apidocs
 xcopy %base%jWebSocketWebAppDemo\dist\javadoc\*.* %javadocs%jWebSocketWebAppDemo\apidocs\ /s /i /y >> %log%
