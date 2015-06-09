@@ -1,7 +1,6 @@
 Ext.define('IS.view.item.History', {
 	extend: 'IS.view.base.Window',
 	alias: 'widget.i_history',
-
 	title: 'History viewer',
 	autoShow: false,
 	width: 550,
@@ -9,13 +8,12 @@ Ext.define('IS.view.item.History', {
 	resizable: false,
 	iconCls: 'history',
 	modal: false,
-	
-	loadHistory: function( aCollection, aItemPK ){
-		this.setTitle( 'History viewer: ' + aCollection + ' - ' + aItemPK);
-		
+	loadHistory: function (aCollection, aItemPK) {
+		this.setTitle('History viewer: ' + aCollection + ' - ' + aItemPK);
+
 		var lCollection = aCollection;
 		var lItemPK = aItemPK;
-		var lStore= Ext.create('Ext.data.Store', {
+		var lStore = Ext.create('Ext.data.Store', {
 			model: 'IS.model.ItemLog',
 			proxy: Ext.create('Ext.jws.data.Proxy', {
 				type: 'jws',
@@ -26,12 +24,12 @@ Ext.define('IS.view.item.History', {
 				reader: {
 					type: 'jws'
 				},
-				transform: function ( aRequest ){
-					if ( 'getLogs' == aRequest.type ){
+				transform: function (aRequest) {
+					if ('getLogs' == aRequest.type) {
 						aRequest.data.offset = aRequest.data.start;
 						aRequest.data.length = aRequest.data.limit;
 						aRequest.data.eType = 'item';
-				
+
 						// setting the collection name
 						aRequest.data.collectionName = lCollection;
 						aRequest.data.itemPK = lItemPK;
@@ -43,7 +41,7 @@ Ext.define('IS.view.item.History', {
 				}
 			})
 		});
-		
+
 		this.removeAll();
 		this.add({
 			xtype: 'grid',
@@ -55,39 +53,39 @@ Ext.define('IS.view.item.History', {
 			store: lStore,
 			border: 0,
 			columns: [{
-				header: 'Action',  
-				dataIndex: 'action',  
-				flex: 1
-			},{
-				header: 'User',  
-				dataIndex: 'user',  
-				flex: 1,
-				renderer: function( aUser ){
-					return (Ext.jws.getConnection().getUsername() == aUser) ? 
-					'<b>' + aUser + '</b>' : aUser;
-				}
-			},{
-				header: 'Time',  
-				dataIndex: 'time',  
-				flex: 1,
-				renderer: function ( aTime ){
-					return new Date(aTime);
-				},
-				minWidth: 250
-			},{
-				header: 'Info',  
-				dataIndex: 'info',  
-				flex: 1,
-				minWidth: 100
-			}],
+					header: 'Action',
+					dataIndex: 'action',
+					flex: 1
+				}, {
+					header: 'User',
+					dataIndex: 'user',
+					flex: 1,
+					renderer: function (aUser) {
+						return (Ext.jwsClient.getConnection().getUsername() === aUser) ?
+								'<b>' + aUser + '</b>' : aUser;
+					}
+				}, {
+					header: 'Time',
+					dataIndex: 'time',
+					flex: 1,
+					renderer: function (aTime) {
+						return new Date(aTime);
+					},
+					minWidth: 250
+				}, {
+					header: 'Info',
+					dataIndex: 'info',
+					flex: 1,
+					minWidth: 100
+				}],
 			dockedItems: [{
-				xtype: 'pagingtoolbar',
-				dock: 'bottom',
-				store: lStore
-			}]
+					xtype: 'pagingtoolbar',
+					dock: 'bottom',
+					store: lStore
+				}]
 		});
-		
-		this.down('grid').getView().on('render', function(aView) {
+
+		this.down('grid').getView().on('render', function (aView) {
 			aView.tip = Ext.create('Ext.tip.ToolTip', {
 				target: aView.el,
 				delegate: aView.itemSelector,
@@ -100,18 +98,16 @@ Ext.define('IS.view.item.History', {
 				}
 			});
 		});
-		
+
 		this.down('pagingtoolbar').moveFirst();
 		this.showAt({
 			y: 100
 		});
 	},
-	
-	initComponent: function() {
-	
+	initComponent: function () {
 		this.callParent(arguments);
 	},
-	close: function(){
+	close: function () {
 		this.hide();
 	}
 });
