@@ -20,7 +20,10 @@
  * @author Victor Antonio Barzana Crespo
  */
 $.widget("jws.auth", {
-	_init: function( ) {
+	_init: function ( ) {
+		if ("undefined" === typeof w) {
+			w = {};
+		}
 		w.auth = this;
 
 		// Stores the jWebSocketJSONClient for all the demos
@@ -50,7 +53,7 @@ $.widget("jws.auth", {
 		this.registerEvents( );
 		this.connect();
 	},
-	checkWebSocketSupport: function( ) {
+	checkWebSocketSupport: function ( ) {
 		if (jws.browserSupportsWebSockets( )) {
 			mWSC = new jws.jWebSocketJSONClient( );
 			// Setting the type of WebSocket
@@ -64,9 +67,9 @@ $.widget("jws.auth", {
 			}
 		}
 	},
-	registerEvents: function( ) {
+	registerEvents: function ( ) {
 		//adding click functions
-		w.auth.eLoginButton.click(function( ) {
+		w.auth.eLoginButton.click(function ( ) {
 			// If there is not a connect button
 //			if (!w.auth.eConnectButton.attr("id")) {
 //				// we open the connection and then login
@@ -77,7 +80,7 @@ $.widget("jws.auth", {
 //			}
 		});
 		w.auth.eLogoffButton.click(
-				function( ) {
+				function ( ) {
 					w.auth.deauth( );
 					if (w.auth.logout) {
 						w.auth.logout( );
@@ -97,7 +100,7 @@ $.widget("jws.auth", {
 		w.auth.ePassword.keypress(w.auth.ePasswordKeypress);
 	},
 	// Logs in, only if there is connection with the server, otherwise it won't work
-	login: function( ) {
+	login: function ( ) {
 		if (mWSC && mWSC.isConnected( )) {
 			if (mLog.isDebugEnabled) {
 				log("Logging in...");
@@ -134,13 +137,13 @@ $.widget("jws.auth", {
 			log("Not connected, please click 'Connect button'");
 		}
 	},
-	getCallbacks: function( ) {
+	getCallbacks: function ( ) {
 		var lCallbacks = {
 			// use JSON sub protocol
 			subProtocol: (w.auth.options.subProtocol) ? w.auth.options.subProtocol : jws.WS_SUBPROT_JSON,
 			// connection timeout in ms
 			openTimeout: (w.auth.options.timeout) ? w.auth.options.timeout : 3000,
-			OnOpen: function(aEvent, aToken) {
+			OnOpen: function (aEvent, aToken) {
 				// starting keepAlive mechanism (required)
 				mWSC.startKeepAlive();
 
@@ -150,7 +153,7 @@ $.widget("jws.auth", {
 				w.auth.setConnected(aToken);
 			},
 			// OnOpenTimeout callback
-			OnOpenTimeout: function(aEvent) {
+			OnOpenTimeout: function (aEvent) {
 				if (mLog.isDebugEnabled) {
 					log("Opening timeout exceeded!");
 				}
@@ -160,12 +163,12 @@ $.widget("jws.auth", {
 				}
 			},
 			// OnReconnecting callback
-			OnReconnecting: function(aEvent) {
+			OnReconnecting: function (aEvent) {
 				if (mLog.isDebugEnabled) {
 					log("Re-establishing jWebSocket connection...");
 				}
 			},
-			OnWelcome: function(aToken) {
+			OnWelcome: function (aToken) {
 				if (w.auth.options.OnWelcome) {
 					w.auth.options.OnWelcome(aToken);
 				}
@@ -181,19 +184,19 @@ $.widget("jws.auth", {
 					//w.auth.setLoggedOn(aToken);
 				}
 			},
-			OnLogon: function(aToken) {
+			OnLogon: function (aToken) {
 				if (w.auth.options.OnLogon) {
 					w.auth.options.OnLogon(aToken);
 				}
 				w.auth.setLoggedOn(aToken);
 			},
-			OnLogoff: function(aToken) {
+			OnLogoff: function (aToken) {
 				if (w.auth.options.OnLogoff) {
 					w.auth.options.OnLogoff(aToken);
 				}
 				w.auth.setLoggedOff(aToken);
 			},
-			OnGoodBye: function(aEvent) {
+			OnGoodBye: function (aEvent) {
 				if (w.auth.options.OnGoodBye) {
 					w.auth.options.OnGoodBye(aEvent);
 				}
@@ -202,7 +205,7 @@ $.widget("jws.auth", {
 				}
 			},
 			// OnMessage callback
-			OnMessage: function(aEvent, aToken) {
+			OnMessage: function (aEvent, aToken) {
 				if (!aToken && aEvent && aEvent.type === "message" && aEvent.data) {
 					aToken = JSON.parse(aEvent.data);
 				}
@@ -230,7 +233,7 @@ $.widget("jws.auth", {
 				}
 			},
 			// OnClose callback
-			OnClose: function(aEvent) {
+			OnClose: function (aEvent) {
 				if (w.auth.options.OnClose) {
 					w.auth.options.OnClose(aEvent);
 				}
@@ -241,7 +244,7 @@ $.widget("jws.auth", {
 	},
 	// If there is not connection with the server, opens a connection and then 
 	// tries to log the user in the system
-	logon: function(aUser, aPassword) {
+	logon: function (aUser, aPassword) {
 		var lURL = (w.auth.options.lURL) ? w.auth.options.lURL : jws.getAutoServerURL( );
 
 		var lUsername;
@@ -272,7 +275,7 @@ $.widget("jws.auth", {
 			log(mWSC.resultToString(lRes));
 		}
 	},
-	logoff: function( ) {
+	logoff: function ( ) {
 		if (mWSC) {
 			if (mWSC.isLoggedIn() !== "anonymous") {
 				if (mLog.isDebugEnabled) {
@@ -296,7 +299,7 @@ $.widget("jws.auth", {
 			}
 		}
 	},
-	connect: function( ) {
+	connect: function ( ) {
 		var lURL = (w.auth.options.lURL) ? w.auth.options.lURL : jws.getAutoServerURL( );
 		if (mLog.isDebugEnabled) {
 			log("Connecting to " + lURL + " ...");
@@ -318,7 +321,7 @@ $.widget("jws.auth", {
 			}
 		}
 	},
-	disconnect: function( ) {
+	disconnect: function ( ) {
 		if (mWSC) {
 			if (mLog.isDebugEnabled) {
 				log("Disconnecting...");
@@ -341,7 +344,7 @@ $.widget("jws.auth", {
 			}
 		}
 	},
-	auth: function(aUser, aPassword) {
+	auth: function (aUser, aPassword) {
 		if (mWSC) {
 			if (mLog.isDebugEnabled) {
 				log("Authenticating...");
@@ -382,7 +385,7 @@ $.widget("jws.auth", {
 			}
 		}
 	},
-	deauth: function( ) {
+	deauth: function ( ) {
 		if (mWSC) {
 			if (mLog.isDebugEnabled) {
 				log("Deauthenticating...");
@@ -406,7 +409,7 @@ $.widget("jws.auth", {
 			}
 		}
 	},
-	getAuth: function( ) {
+	getAuth: function ( ) {
 		if (mWSC) {
 			if (mLog.isDebugEnabled) {
 				log("Getting authorities...");
@@ -434,7 +437,7 @@ $.widget("jws.auth", {
 	 * including the authenticated username
 	 * @param {Token} aToken The token with the authenticated user
 	 */
-	setLoggedOn: function(aToken) {
+	setLoggedOn: function (aToken) {
 		if (mLog.isDebugEnabled) {
 			log("<font color='green'>Successfully authenticated as: "
 					+ aToken.username + "</font>");
@@ -447,7 +450,7 @@ $.widget("jws.auth", {
 		w.auth.mUsername = aToken.username;
 		w.auth.eClientStatus.attr("class", "authenticated").text("authenticated").attr("title", "Authenticated as " + aToken.username);
 	},
-	setLoggedOff: function(aToken) {
+	setLoggedOff: function (aToken) {
 		w.auth.eLogoffArea.hide( );
 		if (w.auth.eLogonArea) {
 			w.auth.eLogonArea.fadeIn(200);
@@ -459,7 +462,7 @@ $.widget("jws.auth", {
 		w.auth.eUserInfoName.text("");
 		w.auth.eClientStatus.attr("class", "online").text("online").attr("title", "");
 	},
-	setConnected: function(aToken) {
+	setConnected: function (aToken) {
 		if (mLog.isDebugEnabled) {
 			log("<font color='green'>jWebSocket connection established.</font>");
 		}
@@ -471,7 +474,7 @@ $.widget("jws.auth", {
 		// Setting the status connected
 		w.auth.eClientStatus.attr("class", "online").text("connected").attr("title", "");
 	},
-	setDisconnected: function(aToken) {
+	setDisconnected: function (aToken) {
 		if (mLog.isDebugEnabled) {
 			log("<font color='red'>jWebSocket connection closed.</font>");
 		}
@@ -491,17 +494,17 @@ $.widget("jws.auth", {
 		w.auth.eUsername.focus( );
 	},
 	// EVENTS FUNCTIONS
-	eUsernameKeypress: function(aEvent) {
+	eUsernameKeypress: function (aEvent) {
 		if (aEvent.keyCode === 13 || aEvent.keyChar === 13) {
 			w.auth.ePassword.focus( );
 		}
 	},
-	ePasswordKeypress: function(aEvent) {
+	ePasswordKeypress: function (aEvent) {
 		if (aEvent.keyCode === 13 || aEvent.keyChar === 13) {
 			w.auth.auth( );
 		}
 	},
-	cleanHTML: function(aMsg) {
+	cleanHTML: function (aMsg) {
 		var lResult = "", lEnd = aMsg.length, lChar = '';
 		for (var lIdx = 0; lIdx < lEnd; lIdx++) {
 			lChar = aMsg.charAt(lIdx);
