@@ -18,7 +18,7 @@
 //	---------------------------------------------------------------------------
 
 /*
- * @authors Rolando Santamaria, Victor Antonio Barzana
+ * @authors Rolando Santamaria, Victor Antonio Barzana Crespo
  */
 
 //:package:*:jws
