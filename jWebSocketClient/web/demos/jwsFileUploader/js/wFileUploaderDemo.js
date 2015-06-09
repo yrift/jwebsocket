@@ -23,7 +23,7 @@
  * @author Victor Antonio Barzana Crespo
  */
 $.widget("jws.fileUploaderDemo", {
-	_init: function( ) {
+	_init: function ( ) {
 		this.eBtnUpload = this.element.find("#start_upload");
 		this.eBtnDownload = this.element.find("#download");
 		this.eBtnGetFileList = this.element.find("#get_file_list");
@@ -40,34 +40,32 @@ $.widget("jws.fileUploaderDemo", {
 		w.fileUploader = this;
 		w.fileUploader.registerEvents( );
 	},
-	registerEvents: function( ) {
+	registerEvents: function ( ) {
 		w.fileUploader.eChunkInput.attr('disabled', true);
-		w.fileUploader.eChunkInput.change(function( ) {
+		w.fileUploader.eChunkInput.change(function ( ) {
 			mWSC.setChunkSize($(this).val( ));
 		});
-		w.fileUploader.eChecksumEnabled.change(function() {
-			w.fileUploader.eChecksumAlgorithm.attr('disabled', $(this).attr("checked")?false:true);
+		w.fileUploader.eChecksumEnabled.change(function () {
+			w.fileUploader.eChecksumAlgorithm.attr('disabled', $(this).attr("checked") ? false : true);
 		});
-		w.fileUploader.eBtnGetFileList.click(function( ) {
+		w.fileUploader.eBtnGetFileList.click(function ( ) {
 			w.fileUploader.getFileList();
 		});
-		w.fileUploader.eBtnDownload.click(function( ) {
+		w.fileUploader.eBtnDownload.click(function ( ) {
 			// TODO: implement this...
 		});
 
 		w.fileUploader.eFileMask.attr('disabled', true);
 
 		w.fileUploader.eAliasInput.attr('disabled', true);
-		w.fileUploader.eAliasInput.change(function( ) {
+		w.fileUploader.eAliasInput.change(function ( ) {
 			mWSC.setUploadAlias($(this).val( ));
 		});
 
 		w.fileUploader.eFileMask.change(w.fileUploader.getFileList);
 
-		w.fileUploader.eBtnUpload.click(function( ) {
-			mWSC.startUpload( );
-		});
-		w.fileUploader.eScopeChooser.change(function( ) {
+		w.fileUploader.eBtnUpload.click(w.fileUploader.startUpload);
+		w.fileUploader.eScopeChooser.change(function ( ) {
 			w.fileUploader.setScope($(this).val( ));
 			if ($(this).val() === "private") {
 				w.fileUploader.eAliasInput.val("privateDir");
@@ -82,20 +80,19 @@ $.widget("jws.fileUploaderDemo", {
 		// For more information, check the file ../../res/js/widget/wAuth.js
 		var lCallbacks = {
 //			lURL: "ws://localhost:8787/jWebSocket/jWebSocket",
-			OnMessage: function(aEvent, aToken) {
+			OnMessage: function (aEvent, aToken) {
 				w.fileUploader.processToken(aEvent, aToken);
 			},
-			OnOpen: function( ) {
+			OnOpen: function ( ) {
 				w.fileUploader.eChunkInput.attr('disabled', false);
 				w.fileUploader.eAliasInput.attr('disabled', false);
 				w.fileUploader.eFileMask.attr('disabled', false);
 
-				w.fileUploader.eScopeChooser.each(function(aIdx, aInput) {
+				w.fileUploader.eScopeChooser.each(function (aIdx, aInput) {
 					if (aInput.checked) {
 						w.fileUploader.setScope($(this).val( ));
 					}
 				});
-
 				// Note: This is the only thing you need to do if you want to 
 				// configure the jWebSocket File Uploader PlugIn
 				mWSC.initUploaderPlugIn({
@@ -120,15 +117,18 @@ $.widget("jws.fileUploaderDemo", {
 					OnFileDeleted: w.fileUploader.onFileDeleted
 				});
 			},
-			OnClose: function( ) {
+			OnClose: function ( ) {
 				w.fileUploader.eChunkInput.attr('disabled', true);
 				w.fileUploader.eAliasInput.attr('disabled', true);
 				w.fileUploader.eFileMask.attr('disabled', true);
+			},
+			OnLogon: function () {
+				w.fileUploader.getFileList();
 			}
 		};
 		w.fileUploader.eMainContainer.auth(lCallbacks);
 	},
-	createFile: function(aFile) {
+	createFile: function (aFile) {
 		//canRead: true
 		//canWrite: true
 		//directory: true
@@ -147,11 +147,11 @@ $.widget("jws.fileUploaderDemo", {
 		return $("<div class='" + (aFile.directory ? "folder" : "file") + "' title='" + lProperties + "'>" + lName + "</div>");
 
 	},
-	getFileList: function( ) {
+	getFileList: function ( ) {
 		mWSC.fileGetFilelist(w.fileUploader.eAliasInput.val(), [w.fileUploader.eFileMask.val() || '*.*'], {
 			recursive: true,
 			includeDirs: true,
-			OnSuccess: function(aToken) {
+			OnSuccess: function (aToken) {
 				w.fileUploader.eFileTree.html("");
 				if (aToken.files) {
 					for (var lIdx = 0; lIdx < aToken.files.length; lIdx++) {
@@ -159,16 +159,24 @@ $.widget("jws.fileUploaderDemo", {
 					}
 				}
 			},
-			OnFailure: function(aToken) {
+			OnFailure: function (aToken) {
 				console.log("failure");
 				console.log(aToken);
 			}
 		});
 	},
-	startUpload: function( ) {
+	startUpload: function ( ) {
+		var lIsEnterpriseEdition = (typeof mWSC.fileSaveByChunks === "function"),
+				lIdx, lQueue = mWSC.getQueue();
+		// Can't upload the files chunked if no Enterprise Edition FileSystem PlugIn loaded
+		if (!lIsEnterpriseEdition) {
+			for (lIdx = 0; lIdx < lQueue.length; lIdx++) {
+				lQueue[lIdx].setChunked(false);
+			}
+		}
 		mWSC.startUpload( );
 	},
-	onFileSelected: function(aEvent, aFiles) {
+	onFileSelected: function (aEvent, aFiles) {
 		for (var lIdx = 0; lIdx < aFiles.length; lIdx++) {
 			var lExists = false;
 			for (var lFileIdx = 0; lFileIdx < mWSC.queue.length; lFileIdx++) {
@@ -183,18 +191,20 @@ $.widget("jws.fileUploaderDemo", {
 //			w.fileUploader.updateProgress( aFiles[lIdx].name, 100 );
 		}
 	},
-	onFileDeleted: function(aEvent, aData) {
+	onFileDeleted: function (aEvent, aData) {
 		w.fileUploader.removeFileFromTable(aData.item.getName( ));
+		w.fileUploader.getFileList();
 	},
-	onFileUploaded: function(aEvent, aItem) {
+	onFileUploaded: function (aEvent, aItem) {
 		w.fileUploader.updateProgress(aItem.getName( ), aItem.getProgress( ));
 		w.fileUploader.updateStatus(aItem.getName( ), aItem.getStatus( ));
+		w.fileUploader.getFileList();
 	},
-	onFileUploadError: function(aEvent, aData) {
+	onFileUploadError: function (aEvent, aData) {
 		jwsDialog(aData.msg, "Error uploading file", true, 'error');
 		w.fileUploader.updateStatus(aData.getName( ), aData.getStatus( ));
 	},
-	onError: function(aEvent, aErrorData) {
+	onError: function (aEvent, aErrorData) {
 		var lItem = aErrorData.item;
 		// The errorrs must bring a type when they are fired, so we can control 
 		// them if the error does not bring a message, at least it must bring a 
@@ -205,12 +215,12 @@ $.widget("jws.fileUploaderDemo", {
 				jwsDialog(aErrorData.msg + "Do you want to remove this file from the list?",
 						"Error detected", true, 'error', null, [{
 								text: 'yes',
-								aFunction: function( ) {
+								aFunction: function ( ) {
 									w.fileUploader.removeFileFromTable(lItem.getName( ));
 								}
 							}, {
 								text: 'no',
-								aFunction: function( ) {
+								aFunction: function ( ) {
 								}
 							}]);
 			} else if (aErrorData.type === mWSC.TT_ERROR) {
@@ -220,36 +230,36 @@ $.widget("jws.fileUploaderDemo", {
 			}
 		}
 	},
-	onUploadComplete: function(aEvent, aData) {
+	onUploadComplete: function (aEvent, aData) {
 		console.log("Upload completed");
 	},
-	onUploadProgress: function(aEvent, aProgressData) {
+	onUploadProgress: function (aEvent, aProgressData) {
 		var lItem = aProgressData.item;
 		w.fileUploader.updateProgress(lItem.getName( ), lItem.getProgress( ));
 		w.fileUploader.updateStatus(lItem.getName( ), lItem.getStatus( ));
 		jws.console.log("Upload progress in file: " + lItem.getName( ) + ", with progress: " + aProgressData.progress);
 	},
-	onUploadStarted: function(aFiles) {
+	onUploadStarted: function (aFiles) {
 		jws.console.log("Upload started successfully");
 	},
-	onUploadStopped: function(aEvt) {
+	onUploadStopped: function (aEvt) {
 		jws.console.log("upload has stopped");
 	},
-	onUploadPaused: function(aEvt) {
+	onUploadPaused: function (aEvt) {
 		console.log("upload paused successfully");
 	},
-	onUploadResumed: function(aEvt) {
+	onUploadResumed: function (aEvt) {
 		console.log("upload resumed successfully");
 	},
-	cleanID: function(aFilename, aCallback) {
+	cleanID: function (aFilename, aCallback) {
 		$.when({id: aFilename.replace(/[`~!@#$%^&*_( )|+\-=?;:'" ,.<>/]/gi, '_')}).done(
-				function(aData) {
+				function (aData) {
 					if (aCallback && "function" === typeof aCallback) {
 						aCallback(aData.id);
 					}
 				});
 	},
-	setScope: function(aScope) {
+	setScope: function (aScope) {
 		switch (aScope) {
 			case "public":
 				mWSC.setUploadScope(jws.SCOPE_PUBLIC);
@@ -259,13 +269,20 @@ $.widget("jws.fileUploaderDemo", {
 				break;
 		}
 	},
-	addFileToTable: function(aFile) {
-		var lGetId = function(aId) {
+	addFileToTable: function (aFile) {
+		var lGetId = function (aId) {
 			var lTr = $("<tr id='" + aId + "'></tr>"),
 					lNameCell = $("<td>" + aFile.name + "</td>"),
 					lPercentCell = $("<td class='progress'>0%</td>"),
-					lInputCell = $('<td></td>').append($('<input type="checkbox" ' +
-					'checked></input>').change(function( ) {
+					lCheckbox, lInputCell = $('<td/>'),
+					lActions = $('<td/>').append(
+					$('<div class="pauseUpload" title="Pause upload"></div>').click(function ( ) {
+				w.fileUploader.toggleUpload($(this), aFile.name);
+			})).append(
+					$('<div class="delete_file" title="Delete file"></div>').click(function ( ) {
+				mWSC.removeFile(aFile.name);
+			}));
+			lCheckbox = $('<input type="checkbox"/>').change(function ( ) {
 				var lFile = mWSC.getFile(aFile.name);
 				if (lFile && lFile.getStatus( ) !== mWSC.STATUS_UPLOADING) {
 					lFile.setChunked($(this).prop("checked"));
@@ -273,21 +290,21 @@ $.widget("jws.fileUploaderDemo", {
 					log("This file is being uploaded, please wait until the " +
 							"upload finishes or remove this file and add it again.");
 				}
-			})),
-					lActions = $('<td/>').append(
-					$('<div class="pauseUpload" title="Pause upload"></div>').click(function( ) {
-				w.fileUploader.toggleUpload($(this), aFile.name);
-			})).append(
-					$('<div class="delete_file" title="Delete file"></div>').click(function( ) {
-				mWSC.removeFile(aFile.name);
-			}));
+			});
+			if (typeof mWSC.fileSaveByChunks !== "function") {
+				lCheckbox.attr("disabled", true);
+				lCheckbox.attr("title", "Please note that chunking is only supported in our Enterprise Edition!");
+			} else {
+				lCheckbox.attr("checked", true);
+			}
+			lInputCell.append(lCheckbox);
 			w.fileUploader.eTableContainer.append(lTr.append(lNameCell).append(lPercentCell)
 					.append(lInputCell).append(lActions));
 		};
 		w.fileUploader.cleanID(aFile.name, lGetId);
 	},
-	removeFileFromTable: function(aFilename) {
-		var lGetId = function(aId) {
+	removeFileFromTable: function (aFilename) {
+		var lGetId = function (aId) {
 			var lRow = w.fileUploader.eTableContainer.find("#" + aId);
 			if (lRow) {
 				lRow.remove( );
@@ -295,7 +312,7 @@ $.widget("jws.fileUploaderDemo", {
 		};
 		w.fileUploader.cleanID(aFilename, lGetId);
 	},
-	toggleUpload: function(aDomObj, aFilename) {
+	toggleUpload: function (aDomObj, aFilename) {
 		var lFile = mWSC.getFile(aFilename);
 		// If the upload is paused we resume it, otherwise we pause
 		if (lFile.getStatus( ) === mWSC.STATUS_PAUSED) {
@@ -306,8 +323,8 @@ $.widget("jws.fileUploaderDemo", {
 			mWSC.pauseUpload(aFilename);
 		}
 	},
-	updateProgress: function(aFilename, aProgress) {
-		var lGetId = function(aId) {
+	updateProgress: function (aFilename, aProgress) {
+		var lGetId = function (aId) {
 			var lFileRow = $('#' + aId);
 			if (lFileRow && lFileRow.context) {
 				var lProgressRow = lFileRow.find(".progress");
@@ -318,8 +335,8 @@ $.widget("jws.fileUploaderDemo", {
 		};
 		w.fileUploader.cleanID(aFilename, lGetId);
 	},
-	updateStatus: function(aFilename, aStatus) {
-		var lGetId = function(aId) {
+	updateStatus: function (aFilename, aStatus) {
+		var lGetId = function (aId) {
 			var lFileRow = $('#' + aId);
 			if (lFileRow && lFileRow.context) {
 				switch (aStatus) {
@@ -360,7 +377,7 @@ $.widget("jws.fileUploaderDemo", {
 		};
 		w.fileUploader.cleanID(aFilename, lGetId);
 	},
-	processToken: function(aToken) {
+	processToken: function (aToken) {
 
 	}
 });

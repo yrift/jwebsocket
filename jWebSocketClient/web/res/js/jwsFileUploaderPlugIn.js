@@ -70,10 +70,12 @@ jws.FileUploaderPlugIn = {
 			lBrowseButton.setAttribute('multiple', 'true');
 			lBrowseButton.style.cssText = 'visibility:hidden !important;display: none !important;';
 			var lMe = this;
-			lUserBrowseBtn.appendChild(lBrowseButton);
-			lUserBrowseBtn.onclick = function () {
-				lMe.browse();
-			};
+			if (lUserBrowseBtn) {
+				lUserBrowseBtn.appendChild(lBrowseButton);
+				lUserBrowseBtn.onclick = function () {
+					lMe.browse();
+				};
+			}
 			this.browseButton = lBrowseButton;
 
 			var lFlashFileReader = new FlashFileReader({
@@ -99,10 +101,11 @@ jws.FileUploaderPlugIn = {
 			this.defaultAlias = aConfig.defaultAlias || this.defaultAlias;
 			this.dropZone = aConfig.drop_area || '';
 
-			// TODO: remove jQuery dependency
-			lUserBrowseBtn.onchange = function (aEvt) {
-				lMe.onFileSelected(aEvt);
-			};
+			if (lUserBrowseBtn) {
+				lUserBrowseBtn.onchange = function (aEvt) {
+					lMe.onFileSelected(aEvt);
+				};
+			}
 			lMe.setFileSystemCallbacks({
 				OnFileSaved: function (aToken) {
 					lMe.onFileSaved(aToken.filename);
@@ -115,20 +118,22 @@ jws.FileUploaderPlugIn = {
 				}
 			});
 			var lDropArea = document.getElementById(this.dropZone);
-			lDropArea.ondragover = function () {
-				this.className = 'hover';
-				return false;
-			};
-			lDropArea.ondragend = function () {
-				this.className = '';
-				return false;
-			};
-			lDropArea.ondrop = function (aEvent) {
-				this.className = '';
-				aEvent.preventDefault();
-				lMe.onFileSelected(aEvent);
-				return false;
-			};
+			if (lDropArea) {
+				lDropArea.ondragover = function () {
+					this.className = 'hover';
+					return false;
+				};
+				lDropArea.ondragend = function () {
+					this.className = '';
+					return false;
+				};
+				lDropArea.ondrop = function (aEvent) {
+					this.className = '';
+					aEvent.preventDefault();
+					lMe.onFileSelected(aEvent);
+					return false;
+				};
+			}
 		}
 	},
 	onFileSaved: function (aFilename) {
@@ -447,6 +452,9 @@ jws.FileUploaderPlugIn = {
 			}
 		}
 		return null;
+	},
+	getQueue: function(){
+		return this.queue;
 	},
 	setChunkSize: function (aChunkSize) {
 		this.chunkSize = aChunkSize || this.chunkSize;
