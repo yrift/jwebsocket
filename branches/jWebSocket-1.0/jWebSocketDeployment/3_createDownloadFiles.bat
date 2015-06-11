@@ -193,6 +193,7 @@ xcopy %libs%jWebSocketXMPPPlugIn-%ver%.jar %tempdir%libs\ /s /i /y
 
 xcopy %libs%jWebSocketClientAPI-%ver%.jar %tempdir%libs\ /s /i /y
 xcopy %libs%jWebSocketJavaSEClient-%ver%.jar %tempdir%libs\ /s /i /y
+xcopy %libs%jWebSocketJavaSEClient-Bundle-%ver%.jar %tempdir%libs\ /s /i /y
 xcopy %libs%jWebSocketSwingGUI-%ver%.jar %tempdir%libs\ /s /i /y
 xcopy %libs%jWebSocketProxy-%ver%.jar %tempdir%libs\ /s /i /y
 xcopy %libs%jWebSocketSamples-%ver%.jar %tempdir%libs\ /s /i /y
