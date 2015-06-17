@@ -263,7 +263,9 @@ public class JMSPlugIn extends TokenPlugIn {
 				lServer.removeEngine(mJMSEngine);
 			}
 			mLog.error(Logging.getSimpleExceptionMessage(lEx,
-					"connecting JMS gateway, de-registered JMS engine from server environment."));
+					"connecting JMS gateway, de-registered JMS engine from server "
+					+ "environment. Please make sure that your Active MQ server "
+					+ "is properly running with the following broker URI: " + mBrokerURI));
 		}
 	}
 
