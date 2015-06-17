@@ -135,31 +135,10 @@
 		<!-- jackson -->
 		<dependency>
 			<groupId>com.fasterxml.jackson.core</groupId>
-			<artifactId>jackson-annotations</artifactId>
-			<version>2.4.3</version>
-		</dependency>
-		<dependency>
-			<groupId>com.fasterxml.jackson.core</groupId>
-			<artifactId>jackson-core</artifactId>
-			<version>2.4.3</version>
-		</dependency>
-		<dependency>
-			<groupId>com.fasterxml.jackson.core</groupId>
 			<artifactId>jackson-databind</artifactId>
 			<version>2.4.3</version>
 		</dependency>
-<!--		
-		<dependency>
-			<groupId>org.codehaus.jackson</groupId>
-			<artifactId>jackson-core-asl</artifactId>
-			<version>1.9.13</version>
-		</dependency>
-		<dependency>
-			<groupId>org.codehaus.jackson</groupId>
-			<artifactId>jackson-mapper-asl</artifactId>
-			<version>1.9.13</version>
-		</dependency>
--->		
+		
 		<!-- json.org -->
 		<dependency>
 			<groupId>org.netbeans.external</groupId>
@@ -198,12 +177,13 @@
 			<artifactId>activemq-all</artifactId> 
 			<version>5.8.0</version> 
 		</dependency>
-		<!-- Required for management of relational database systems and ItemStorage PlugIn. -->
+		
 		<dependency>
-			<groupId>org.jwebsocket</groupId>
-			<artifactId>jWebSocketDynamicSQL</artifactId>
-			<version>${project.version}</version>
+			<groupId>commons-lang</groupId>
+			<artifactId>commons-lang</artifactId>
+			<version>2.6</version>
 		</dependency>
+
 	</dependencies>
 
 	<repositories>
