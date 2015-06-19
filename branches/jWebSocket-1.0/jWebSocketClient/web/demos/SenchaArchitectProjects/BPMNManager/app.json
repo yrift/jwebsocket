@@ -12,7 +12,7 @@
    "url": null,
    "js": [
       {
-         "path": "jWebSocket.js",
+         "path": "../../../res/js/jWebSocket.js",
          "update": "delta",
          "remote": true,
          "x-bootstrap": true
