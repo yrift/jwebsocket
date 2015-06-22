@@ -32,7 +32,7 @@ import org.jwebsocket.api.WebSocketPacket;
 public class RawPacket implements WebSocketPacket {
 
 	private byte[] mData = null;
-	// private String mUTF8 = null;
+	private Boolean mIsFinalFragment = true;
 	private Date mCreationDate = null;
 	private WebSocketFrameType mFrameType = WebSocketFrameType.TEXT;
 
@@ -204,5 +204,21 @@ public class RawPacket implements WebSocketPacket {
 	@Override
 	public Integer size() {
 		return mData.length;
+	}
+
+	/**
+	 * @return the isFinalFragment flag
+	 */
+	@Override
+	public Boolean getIsFinalFragment() {
+		return mIsFinalFragment;
+	}
+
+	/**
+	 * @param aIsFinalFragment the isFinalFragment flag to set
+	 */
+	@Override
+	public void setIsFinalFragment(Boolean aIsFinalFragment) {
+		mIsFinalFragment = aIsFinalFragment;
 	}
 }

@@ -721,6 +721,7 @@ var jws = {
 		//:r:en:::void:none
 		log: function( aMsg ) {
 			if( window.console 
+				&& aMsg
 				&& jws.console.mIsActive
 				) {
 				console.log( aMsg );
@@ -735,6 +736,7 @@ var jws = {
 		//:r:en:::void:none
 		debug: function( aMsg ) {
 			if( window.console
+				&& aMsg
 				&& jws.console.mIsActive 
 				&& jws.console.mLevel <= jws.console.DEBUG
 				) {
@@ -754,6 +756,7 @@ var jws = {
 		//:r:en:::void:none
 		info: function( aMsg ) {
 			if( window.console 
+				&& aMsg
 				&& jws.console.mIsActive 
 				&& jws.console.mLevel <= jws.console.INFO
 				) {
@@ -773,6 +776,7 @@ var jws = {
 		//:r:en:::void:none
 		warn: function( aMsg ) {
 			if( window.console
+				&& aMsg
 				&& jws.console.mIsActive
 				&& jws.console.mLevel <= jws.console.WARN
 				) {
@@ -792,6 +796,7 @@ var jws = {
 		//:r:en:::void:none
 		error: function( aMsg ) {
 			if( window.console
+				&& aMsg
 				&& jws.console.mIsActive
 				&& jws.console.mLevel <= jws.console.ERROR
 				) {
@@ -811,6 +816,7 @@ var jws = {
 		//:r:en:::void:none
 		fatal: function( aMsg ) {
 			if( window.console
+				&& aMsg
 				&& jws.console.mIsActive
 				&& jws.console.mLevel <= jws.console.FATAL
 				) {
@@ -4592,7 +4598,6 @@ jws.oop.addPlugIn( jws.jWebSocketTokenClient, jws.SystemClientPlugIn );
 
 //	---------------------------------------------------------------------------
 //  jWebSocket JSON client
-//	todo: consider potential security issues with 'eval'
 //	---------------------------------------------------------------------------
 
 //:package:*:jws

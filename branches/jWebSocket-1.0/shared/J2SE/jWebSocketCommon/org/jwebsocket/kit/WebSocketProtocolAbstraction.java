@@ -289,9 +289,9 @@ public class WebSocketProtocolAbstraction {
 
 		// Determine fragmentation
 		// from Hybi Draft 04 it's the FIN flag < 04 its a more flag ;-)
-		boolean lFragmented = (aVersion >= 4
-				? (lFlags & 0x80) == 0x00
-				: (lFlags & 0x80) == 0x80);
+		boolean lIsFinalFragment = (aVersion >= 4
+				? (lFlags & 0x80) == 0x80
+				: true);
 		boolean lMasked;
 		int[] lMask = new int[4];
 
@@ -357,6 +357,7 @@ public class WebSocketProtocolAbstraction {
 		}
 
 		WebSocketPacket lRes = new RawPacket(lFrameType, aBuff.toByteArray());
+		lRes.setIsFinalFragment(lIsFinalFragment);
 		return lRes;
 	}
 
