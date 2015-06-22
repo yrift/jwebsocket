@@ -57,11 +57,15 @@ class JMSEndPointListener implements MessageListener {
 	}
 
 	public void addMessageListener(IJMSMessageListener aListener) {
-		mMessageListeners.add(aListener);
+		if (null != aListener) {
+			mMessageListeners.add(aListener);
+		}
 	}
 
 	public void removeMessageListener(IJMSMessageListener aListener) {
-		mMessageListeners.remove(aListener);
+		if (null != aListener) {
+			mMessageListeners.remove(aListener);
+		}
 	}
 
 	private void processMessage(final Message aMsg) {
