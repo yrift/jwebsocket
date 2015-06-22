@@ -50,9 +50,6 @@
 				<entry key="channel:jWebSocketVideoStreamingDemo">
 					<value>{state:"STARTED",owner:"root",name:"Video Streaming Demo" ,isPrivate:false,isSystem:true, access_key:"f7b44cfafd5c52223d5498196c8a2e7b",secret_key:"6ea9d3504a42de8008ddc959e1048faa",token_server:"ts0"}</value>
 				</entry>
-				<entry key="channel:jWebSocketSharedCanvasDemo">
-					<value>{state:"STARTED",owner:"root",name:"Shared Canvas Demo" ,isPrivate:false,isSystem:true, access_key:"9df3b01c60df20d13843841ff0d4482c",secret_key:"5ebe2294ecd0e0f08eab7690d2a6ee69",token_server:"ts0"}</value>
-				</entry>
 			</map>
 		</constructor-arg>	
 		<constructor-arg ref="storageProvider"/>
