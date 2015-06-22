@@ -149,4 +149,15 @@ public interface WebSocketPacket {
 	 * @return
 	 */
 	Integer size();
+
+	/**
+	 *
+	 * @return
+	 */
+	public Boolean getIsFinalFragment();
+
+	/**
+	 * @param aIsFinalFragment the isFinalFragment flag to set
+	 */
+	public void setIsFinalFragment(Boolean aIsFinalFragment);
 }
