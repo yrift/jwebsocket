@@ -287,7 +287,7 @@ public class WebSocketProtocolAbstraction {
 		// TODO: handle if stream gets closed within this method!
 		ByteArrayOutputStream aBuff = new ByteArrayOutputStream();
 
-		// Determine fragmentation
+		// determine fragmentation
 		// from Hybi Draft 04 it's the FIN flag < 04 its a more flag ;-)
 		boolean lIsFinalFragment = (aVersion >= 4
 				? (lFlags & 0x80) == 0x80
