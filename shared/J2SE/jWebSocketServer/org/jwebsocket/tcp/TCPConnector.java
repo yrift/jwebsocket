@@ -58,6 +58,7 @@ public class TCPConnector extends BaseConnector {
 	private OutputStream mOut = null;
 	private Socket mClientSocket = null;
 	private static final int CONNECT_TIMEOUT = 10000; // in ms
+	private ByteArrayOutputStream mFragments = new ByteArrayOutputStream();
 	/**
 	 *
 	 */
@@ -640,12 +641,12 @@ public class TCPConnector extends BaseConnector {
 							+ mClientSocket.getPort()
 							+ " due to handshake issues. "
 							+ (null != lAddr
-							? lAddr.getHostAddress() + ", " + lAddr.getHostName()
-							: "[no IP/hostname available]")
+									? lAddr.getHostAddress() + ", " + lAddr.getHostName()
+									: "[no IP/hostname available]")
 							+ ", headers: "
 							+ (null != lHeader
-							? lHeader.toString()
-							: "[no headers passed]")
+									? lHeader.toString()
+									: "[no headers passed]")
 							+ ", invalid client" + (isSSL() ? " , SSL handshake error or certificate issue" : "")
 							+ ", connection closed.");
 				}
@@ -742,6 +743,13 @@ public class TCPConnector extends BaseConnector {
 			}
 		}
 
+		private void processPacket(WebSocketPacket aPacket, String aFrom) {
+			if (mLog.isDebugEnabled()) {
+				mLog.debug("Processing '" + aPacket.getFrameType().toString().toLowerCase() + "' frame (" + mLogInfo + ") from " + aFrom + "...");
+			}
+			mConnector.processPacket(aPacket);
+		}
+
 		private void processHybi(int aVersion, WebSocketEngine aEngine) {
 
 			String lFrom = getRemoteHost() + ":" + getRemotePort() + " (" + getId() + ")";
@@ -754,15 +762,16 @@ public class TCPConnector extends BaseConnector {
 						}
 						mCloseReason = CloseReason.CLIENT;
 						setStatus(WebSocketConnectorStatus.DOWN);
-					} else if (WebSocketFrameType.TEXT.equals(lPacket.getFrameType())
-							|| WebSocketFrameType.BINARY.equals(lPacket.getFrameType())) {
-						if (lPacket.size() > getMaxFrameSize()) {
-							mLog.error(BaseEngine.getUnsupportedIncomingPacketSizeMsg(mConnector, lPacket.size()));
-						} else {
-							if (mLog.isDebugEnabled()) {
-								mLog.debug("Processing '" + lPacket.getFrameType().toString().toLowerCase() + "' frame (" + mLogInfo + ") from " + lFrom + "...");
+					} else if (WebSocketFrameType.TEXT.equals(lPacket.getFrameType()) || WebSocketFrameType.BINARY.equals(lPacket.getFrameType())) {
+						if (lPacket.isFinalFragment()) {
+							if (lPacket.size() > getMaxFrameSize()) {
+								mLog.error(BaseEngine.getUnsupportedIncomingPacketSizeMsg(mConnector, lPacket.size()));
+							} else {
+								processPacket(lPacket, lFrom);
 							}
-							mConnector.processPacket(lPacket);
+						} else {
+							// enqueue fragment in buffer
+							mFragments.write(lPacket.getByteArray());
 						}
 						// reading pending packets in the buffer (for high concurrency scenarios)
 						// if (mIn.available() > 0) {
@@ -792,8 +801,17 @@ public class TCPConnector extends BaseConnector {
 						sendPacket(lClose);
 						// the streams are closed in the run method
 					} else if (WebSocketFrameType.FRAGMENT.equals(lPacket.getFrameType())) {
-						// TODO: support fragments!
-						mLog.warn("Frame type '" + lPacket.getFrameType() + "' not yet supported (" + mLogInfo + "), ignoring frame.");
+						// TODO: Future multiplexing extensions should require changes 
+						// in following implementation. Meanwhile fragments are sent sequencially.
+						mFragments.write(lPacket.getByteArray());
+						if (lPacket.isFinalFragment()) {
+							RawPacket lNewPacket = new RawPacket(mFragments.toByteArray());
+							lNewPacket.setFrameType(WebSocketFrameType.TEXT);
+							// reset buffer
+							mFragments = new ByteArrayOutputStream();
+							// invoke process packet
+							processPacket(lNewPacket, lFrom);
+						}
 					} else if (WebSocketFrameType.PONG.equals(lPacket.getFrameType())) {
 						// TODO: shouldn't we enclose this in a synchronize(this)??
 						if (mKeepAlive) {
