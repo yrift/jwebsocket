@@ -26,10 +26,10 @@ Ext.define('Ext.jws.data.Reader', {
 	extend: 'Ext.data.reader.Json',
 	alternateClassName: 'Ext.jws.data.Reader',
 	alias: 'reader.jws',
-	rootProperty: 'data',
+	root: 'data',
 	readRecords: function (aData) {
-		if (typeof this.transformData === "function") {
-			this.transformData(aData);
+		if (typeof this.transform === "function") {
+			this.transform(aData);
 		}
 		return this.callParent([aData]);
 	}
