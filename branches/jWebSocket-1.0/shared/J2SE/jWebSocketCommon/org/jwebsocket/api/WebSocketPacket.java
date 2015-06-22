@@ -154,10 +154,10 @@ public interface WebSocketPacket {
 	 *
 	 * @return
 	 */
-	public Boolean getIsFinalFragment();
+	public boolean isFinalFragment();
 
 	/**
 	 * @param aIsFinalFragment the isFinalFragment flag to set
 	 */
-	public void setIsFinalFragment(Boolean aIsFinalFragment);
+	public void setIsFinalFragment(boolean aIsFinalFragment);
 }
