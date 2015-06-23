@@ -149,7 +149,7 @@ Ext.define('Ext.jws.Client', {
 					OnLogoff: function (aToken) {
 						self.fireEvent('OnLogoff', aToken);
 					},
-					OnMessage: function (aToken) {
+					OnMessage: function (aEvent, aToken) {
 						self.fireEvent('OnMessage', aToken);
 					}
 				});
