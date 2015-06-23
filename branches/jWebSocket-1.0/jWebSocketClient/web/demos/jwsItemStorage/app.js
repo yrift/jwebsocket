@@ -47,13 +47,20 @@ Ext.application({
 			Ext.Msg.alert("Connection Closed", "Could not establish a connection with the server application.<br>Please contact the system administrator!");
 			Ext.getBody().unmask();
 		});
-
+		
 		Ext.jwsClient.on('OnOpen', function () {
+			Ext.jwsClient.getConnection().systemGetAuthorities({
+				OnSuccess: function(aToken){
+					// Authenticated
+					Ext.jwsClient.fireEvent("OnLogon", aToken);
+				}
+			});
 			Ext.getBody().unmask();
 			Ext.jwsClient.addPlugIn({
 				// global behiavor for failure messages
 				processToken: function (aMessage) {
-					if ('response' === aMessage.type && 0 !== aMessage.code) {
+					console.log(aMessage)
+					if ('response' === aMessage.type && 0 !== aMessage.code && aMessage.reqType !== "getAuthorities") {
 						Ext.Msg.show({
 							msg: aMessage.msg,
 							buttons: Ext.Msg.OK,
