@@ -1645,7 +1645,7 @@
 				<setting key="spring_config">${JWEBSOCKET_HOME}conf/ItemStoragePlugIn/itemstorage.xml</setting>
 				<!-- Authorization method 
 				     - spring: Uses the user Spring authentication to check for granted authorities 
-					 - static: Uses the user static (jWebSocket.xml users definition) authentication
+					 - embedded: Uses the user embedded (jWebSocket.xml users definition) authentication
 					   to check for granted authorities (rights)
 					   
 					 Default value is "spring"
@@ -1973,7 +1973,7 @@
 				<setting key="spring_config">${JWEBSOCKET_HOME}conf/FileSystemPlugIn/filesystem.xml</setting>
 				<!-- Authorization method 
 				     - spring: Uses the user Spring authentication to check for granted authorities 
-					 - static: Uses the user static (jWebSocket.xml users definition) authentication
+					 - embedded: Uses the user embedded (jWebSocket.xml users definition) authentication
 					   to check for granted authorities (rights)
 					   
 					 Default value is "spring"
