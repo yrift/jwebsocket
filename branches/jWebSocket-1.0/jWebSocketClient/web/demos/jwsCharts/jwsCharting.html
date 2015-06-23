@@ -49,6 +49,68 @@
             <!--       DEMO_HEADER       -->
             <div id="demo_box_header">
                 <h1>jWebSocket Charting</h1>
+				<div id="demo_box_header_login">
+
+					<div id="login_area">
+                        <div id="login_form">
+                            <label class="first">Username</label>
+                            <label class="second">Password</label>
+                            <input type="text" id="user_text" value="root"/>
+                            <input type="password" id="user_password" value="root"/>
+                        </div>
+						<div id="login_button" class="button onmouseup" 
+							 onmouseover="this.className = 'button onmouseover'" 
+							 onmousedown="this.className = 'button onmousedown'" 
+							 onmouseup="this.className = 'button onmouseup'" 
+							 onmouseout="this.className = 'button onmouseout'" 
+							 onclick="this.className = 'button onmouseover'">
+							<div class="btn_left"></div>
+							<div class="btn_center">Login</div>
+							<div class="btn_right"></div>
+						</div>
+                    </div>
+
+					<div id="connect_area">
+						<div id="connect_button" class="button onmouseup" 
+							 onmouseover="this.className = 'button onmouseover'" 
+							 onmousedown="this.className = 'button onmousedown'" 
+							 onmouseup="this.className = 'button onmouseup'" 
+							 onmouseout="this.className = 'button onmouseout'" 
+							 onclick="this.className = 'button onmouseover'">
+							<div class="btn_left"></div>
+							<div class="btn_center">Connect</div>
+							<div class="btn_right"></div>
+						</div>
+
+						<div id="disconnect_button" 
+							 style="display: none;" 
+							 class="button onmouseup" 
+							 onmouseover="this.className = 'button onmouseover'" 
+							 onmousedown="this.className = 'button onmousedown'" 
+							 onmouseup="this.className = 'button onmouseup'" 
+							 onmouseout="this.className = 'button onmouseout'" 
+							 onclick="this.className = 'button onmouseover'">
+							<div class="btn_left"></div>
+							<div class="btn_center">Disconnect</div>
+							<div class="btn_right"></div>
+						</div>
+					</div>
+					<div id="logoff_area" style="display: none;" >
+                        <div id="user_info">
+                            <div id="user_info_name"></div> <div>&nbsp;|&nbsp;</div>
+							<div id="logoff_button" class="button onmouseup" 
+								 onmouseover="this.className = 'button onmouseover'" 
+								 onmousedown="this.className = 'button onmousedown'" 
+								 onmouseup="this.className = 'button onmouseup'" 
+								 onmouseout="this.className = 'button onmouseout'" 
+								 onclick="this.className = 'button onmouseover'">
+								<div class="btn_left"></div>
+								<div class="btn_center">Logout</div>
+								<div class="btn_right"></div>
+							</div>
+                        </div>
+                    </div>
+				</div>
             </div>
             <div id="container">
                 <!--       STATUSBAR         -->

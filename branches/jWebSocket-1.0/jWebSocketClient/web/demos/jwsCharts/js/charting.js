@@ -34,7 +34,6 @@ Ext.require([
 	'Ext.chart.*',
 	'Ext.jws.Client'
 ]);
-Ext.BLANK_IMAGE_URL = 's.gif';
 
 Ext.require([
 	'Ext.form.field.ComboBox',
@@ -45,12 +44,24 @@ Ext.require([
 jws.ChartingPlugIn = {
 	NS_MONITORING: jws.NS_BASE + ".plugins.monitoring",
 	NS_SYSTEM: jws.NS_BASE + ".plugins.system",
+	MONITORING_PLUGIN_ID: "MonitoringPlugIn",
+	ID_LOGIN_AREA: 'login_area',
+	ID_LOGIN_BTN: 'login_button',
+	ID_USERNAME: 'user_text',
+	ID_PWD: 'user_password',
+	ID_USER_INFO_NAME: 'user_info_name',
+	ID_LOGOFF_BTN: 'logoff_button',
+	ID_CONNECT_BTN: 'connect_button',
+	ID_DISCONNECT_BTN: 'disconnect_button',
+	ID_LOGOFF_AREA: 'logoff_area',
 	TT_COMPUTER_INFO: "computerInfo",
 	TT_ONLINE_USERS: "userInfo",
 	TT_SERVER_XCHG_INFO: "serverXchgInfo",
 	TT_SERVER_XCHG_INFO_X_DAYS: "serverXchgInfoXDays",
 	TT_SERVER_XCHG_INFO_X_MONTH: "serverXchgInfoXMonth",
 	TT_PLUGINS_INFO: "pluginsInfo",
+	// Used to get the loaded plugins from the server side
+	TT_GET_SERVER_PLUGINS: "getPlugInsInfo",
 	TT_WELCOME: "welcome",
 	TT_REGISTER: "register",
 	TT_UNREGISTER: "unregister",
@@ -88,27 +99,131 @@ jws.ChartingPlugIn = {
 		Ext.jwsClient.send(this.NS_MONITORING, this.TT_UNREGISTER);
 	},
 	onReady: function () {
-		var lClientStatus = Ext.get("client_status"),
-				lClientId = Ext.get("client_id"),
-				lWebSocketType = Ext.get("websocket_type");
-		var lScope = this;
+		var lMe = this;
+		lMe.registerListeners();
+		lMe.openConnection();
+		lMe.init();
+	},
+	registerListeners: function () {
+		var lMe = this;
+		// Note, this will only work with Ext4.x.x
+		Ext.get(lMe.ID_LOGOFF_AREA).setVisibilityMode(Ext.dom.AbstractElement.DISPLAY);
+		Ext.get(lMe.ID_LOGIN_AREA).setVisibilityMode(Ext.dom.AbstractElement.DISPLAY);
+		Ext.get(lMe.ID_CONNECT_BTN).setVisibilityMode(Ext.dom.AbstractElement.DISPLAY);
+		Ext.get(lMe.ID_DISCONNECT_BTN).setVisibilityMode(Ext.dom.AbstractElement.DISPLAY);
 
-		lWebSocketType.dom.innerHTML = "WebSocket: " +
-				(jws.browserSupportsNativeWebSockets ? "(native)" : "(flashbridge)");
+		Ext.get(lMe.ID_DISCONNECT_BTN).on('click', function () {
+			Ext.jwsClient.close();
+		});
+		Ext.get(lMe.ID_CONNECT_BTN).on('click', function () {
+			lMe.openConnection();
+		});
+		Ext.get(lMe.ID_LOGIN_BTN).on('click', function () {
+			lMe.authenticate();
+		});
+		Ext.get(lMe.ID_LOGOFF_BTN).on('click', function () {
+			Ext.jwsClient.getConnection().systemLogoff();
+		});
+		lMe.setDisconnected();
 
-		Ext.jwsClient.open(jws.getAutoServerURL());
-
+		Ext.jwsClient.on('OnLogon', function (aToken) {
+			lMe.setAuthenticated(aToken);
+		});
+		Ext.jwsClient.on('OnLogoff', function (aToken) {
+			lMe.setLoggedOff(aToken);
+		});
 		Ext.jwsClient.on('OnOpen', function ( ) {
-			lScope.registerTo(lScope.TT_COMPUTER_INFO);
+			Ext.jwsClient.getConnection().systemGetAuthorities({
+				OnFailure: function () {
+					lMe.authenticate();
+				}
+			})
+			lMe.setConnected();
+			lMe.registerTo(lMe.TT_COMPUTER_INFO);
 		});
 
 		Ext.jwsClient.on('OnClose', function ( ) {
-			lClientId.dom.innerHTML = "Client-ID: - ";
-			lClientStatus.dom.innerHTML = "disconnected";
-			lClientStatus.dom.className = "offline";
+			lMe.setDisconnected();
 		});
-		Ext.jwsClient.addPlugIn(this);
-		this.init();
+		Ext.jwsClient.on('OnMessage', function (aToken) {
+			lMe.processToken(aToken);
+		});
+	},
+	authenticate: function () {
+		var lMe = this;
+		if (Ext.jwsClient.isConnected()) {
+			var lUsername = Ext.get(lMe.ID_USERNAME).getValue(),
+					lPassword = Ext.get(lMe.ID_PWD).getValue();
+
+			Ext.jwsClient.getConnection().systemLogon(lUsername, lPassword, {
+				OnFailure: function (aToken) {
+					Ext.Msg.alert("Login error", aToken.msg);
+				}
+			});
+		}
+	},
+	openConnection: function () {
+		// Now we open the connection with the server
+		Ext.jwsClient.open(jws.getAutoServerURL());
+	},
+	setLoggedOff: function () {
+		Ext.get(this.ID_LOGOFF_AREA).hide();
+		Ext.get(this.ID_LOGIN_AREA).show();
+		Ext.get("client_status").dom.innerHTML = "anonymous";
+	},
+	setConnected: function () {
+		Ext.get(this.ID_CONNECT_BTN).hide();
+		Ext.get(this.ID_DISCONNECT_BTN).show();
+	},
+	setAuthenticated: function (aToken) {
+		var lMe = this, lMonitoringLoaded = false;
+		if (aToken.username !== "anonymous") {
+			Ext.get(lMe.ID_LOGOFF_AREA).show();
+			Ext.get(lMe.ID_LOGIN_AREA).hide();
+			if (aToken.username) {
+				Ext.get(lMe.ID_USER_INFO_NAME).setHTML(aToken.username);
+			}
+			Ext.jwsClient.send(lMe.NS_SYSTEM, lMe.TT_GET_SERVER_PLUGINS, {}, {
+				OnSuccess: function (aToken) {
+					for (var lIdx = 0; lIdx < aToken.data.length; lIdx++) {
+						if (lMe.MONITORING_PLUGIN_ID === aToken.data[lIdx].id) {
+							lMonitoringLoaded = true;
+							break;
+						}
+						console.log(aToken.data[lIdx]);
+					}
+					if (!lMonitoringLoaded) {
+						Ext.Msg.show({
+							title: "Monitoring PlugIn not loaded!",
+							msg: "Please make sure that you properly configured " +
+									"the Monitoring PlugIn in the server side configuration " +
+									"following the instructions from our website: " +
+									"http://jwebsocket.org/documentation/Plug-Ins/Monitoring-Plug-In/Administrator-Guide",
+							buttons: Ext.Msg.OK,
+							icon: Ext.Msg.WARNING
+						});
+					}
+				}
+			});
+		}
+		if (aToken.sourceId) {
+			Ext.get("client_id").dom.innerHTML = "Client-ID: " + aToken.sourceId;
+		}
+		Ext.get("client_status").dom.innerHTML = aToken.username || "online";
+		Ext.get("client_status").dom.className = "authenticated";
+	},
+	setDisconnected: function () {
+		var lClientStatus = Ext.get("client_status"),
+				lClientId = Ext.get("client_id"),
+				lWebSocketType = Ext.get("websocket_type");
+		this.setLoggedOff();
+		lClientId.dom.innerHTML = "Client-ID: - ";
+		lClientStatus.dom.innerHTML = "disconnected";
+		lClientStatus.dom.className = "offline";
+		lWebSocketType.dom.innerHTML = "WebSocket: " +
+				(jws.browserSupportsNativeWebSockets ? "(native)" : "(flashbridge)");
+		Ext.get(this.ID_DISCONNECT_BTN).hide();
+		Ext.get(this.ID_CONNECT_BTN).show();
 	},
 	init: function () {
 		var lScope = this;
@@ -707,7 +822,7 @@ jws.ChartingPlugIn = {
 						axes: [{
 								type: 'Numeric',
 								position: 'bottom',
-								fields: ['data'], 
+								fields: ['data'],
 								label: {
 									renderer: Ext.util.Format.numberRenderer('0,0')
 								},
@@ -717,7 +832,7 @@ jws.ChartingPlugIn = {
 							}, {
 								type: 'Category',
 								position: 'left',
-								fields: ['name'], 
+								fields: ['name'],
 								title: 'Plug-ins'
 							}], series: [{
 								type: 'bar',
@@ -1038,9 +1153,7 @@ jws.ChartingPlugIn = {
 
 		else if (aToken.ns === this.NS_SYSTEM) {
 			if (aToken.type === this.TT_WELCOME) {
-				Ext.get("client_id").dom.innerHTML = "Client-ID: " + aToken.sourceId;
-				Ext.get("client_status").dom.innerHTML = aToken.username || "online";
-				Ext.get("client_status").dom.className = "authenticated";
+				this.setAuthenticated(aToken);
 			}
 		}
 	}
