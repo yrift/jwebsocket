@@ -352,7 +352,8 @@ Ext.define('IS.controller.Collection', {
 						// deleting extra fields
 						delete lArguments.accessPassword2;
 						delete lArguments.secretPassword2;
-
+						lArguments.accessPassword = jws.tools.calcMD5(lArguments.accessPassword);
+						lArguments.secretPassword = jws.tools.calcMD5(lArguments.secretPassword);
 						Ext.jwsClient.send(jws.ItemStoragePlugIn.NS, 'createCollection', lArguments, {
 							success: function () {
 								self.getCollectionNamesStore().reload();
