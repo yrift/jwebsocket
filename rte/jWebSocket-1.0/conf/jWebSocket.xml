@@ -1689,7 +1689,6 @@
 		</plugin>
 		
 		<!-- jWebSocket Chat PlugIn -->
-		<!--
 		<plugin>
 			<name>org.jwebsocket.plugins.chat.ChatPlugIn</name>
 			<id>jws.chat</id>
@@ -1699,7 +1698,6 @@
 				<server-assignment>ts0</server-assignment>
 			</server-assignments>
 		</plugin>
-		-->
 		
 		<plugin>
 			<name>org.jwebsocket.plugins.paypal.PayPalPlugIn</name>
