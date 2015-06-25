@@ -67,6 +67,15 @@
 	cursor: pointer;
 }
 
+.remove-file{
+	position: absolute;
+}
+
+#file_tree .file.selected, #file_tree .folder.selected{
+	background-color: rgb(154, 196, 240);
+	color: white;
+}
+
 #upload_options{
 	width: 35%;
 	float: right;
@@ -79,8 +88,10 @@
 }
 
 #buttons_area .centered{
-	margin: auto;
-	width: 70%;
+	/*	margin: auto;
+		width: 70%;*/
+	display: flex;
+	justify-content: center;
 }
 
 #scope{
@@ -225,4 +236,8 @@
 	height: 20px;
 	cursor: pointer;
 	background: url(images/play.png) center center no-repeat;
+}
+
+.options_to_selected_files{
+	display: none;
 }

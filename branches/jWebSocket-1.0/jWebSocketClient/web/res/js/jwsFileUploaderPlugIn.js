@@ -370,29 +370,43 @@ jws.FileUploaderPlugIn = {
 	 * @param {type} aScope the scope in the server where the file was uploaded
 	 * @returns {void}
 	 */
-	removeFile: function (aFilename, aScope) {
+	removeFile: function (aFilename, aScope, aListeners) {
 		var lMe = this;
 		lMe.cancelUpload(aFilename);
 		// delete a file from the fs aFilename, aForce, aOptions
 		lMe.fileDelete(aFilename, true, {
 			scope: aScope || this.defaultScope,
 			OnSuccess: function (aToken) {
-				lMe.fireUploaderEvent(lMe.TT_FILE_DELETED, {
-					item: lMe.getFile(aFilename),
-					token: aToken
-				});
-				lMe.removeFileFromQueue(aFilename);
+				try {
+					lMe.fireUploaderEvent(lMe.TT_FILE_DELETED, {
+						item: lMe.getFile(aFilename),
+						token: aToken
+					});
+					lMe.removeFileFromQueue(aFilename);
+				} catch (lEx) {
+					// Nothing todo here...
+				}
+				if (aListeners && typeof aListeners.OnSuccess === "function") {
+					aListeners.OnSuccess(aFilename);
+				}
 			},
 			OnFailure: function (aToken) {
-				var lMsg = "Error found while removing the file: " + aFilename + "." +
-						" The server returned the following error: " + aToken.msg;
+				try {
+					var lMsg = "Error found while removing the file: " + aFilename + "." +
+							" The server returned the following error: " + aToken.msg;
 
-				lMe.fireUploaderEvent(lMe.TT_ERROR, {
-					type: lMe.TT_ERROR_DELETING_FILE,
-					item: lMe.getFile(aFilename),
-					msg: lMsg
-				});
-				lMe.removeFileFromQueue(aFilename);
+					lMe.fireUploaderEvent(lMe.TT_ERROR, {
+						type: lMe.TT_ERROR_DELETING_FILE,
+						item: lMe.getFile(aFilename),
+						msg: lMsg
+					});
+					lMe.removeFileFromQueue(aFilename);
+				} catch (lEx) {
+					// Nothing todo here...
+				}
+				if (aListeners && typeof aListeners.OnFailure === "function") {
+					aListeners.OnFailure(aFilename);
+				}
 			}
 		});
 	},
@@ -453,7 +467,60 @@ jws.FileUploaderPlugIn = {
 		}
 		return null;
 	},
-	getQueue: function(){
+	downloadFileFromServer: function (aFilename, aAlias, aOnCompleteFn) {
+		var lMe = this, lFile;
+		if (jws.isIExplorer() && jws.getBrowserVersion() <= 9) {
+			lMe.fireUploaderEvent(lMe.TT_ERROR, {
+				type: lMe.TT_ERROR,
+				item: null,
+				msg: "Sorry the download is not supported for the current " +
+						"browser version, please update your browser."
+			});
+			return;
+		}
+		lMe.fileLoad(aFilename, aAlias || jws.FileSystemPlugIn.ALIAS_PRIVATE, {
+			OnSuccess: function (aToken) {
+				if (jws.isIExplorer() && jws.getBrowserVersion() <= 9) {
+					window.open('data:' + (aToken.mime ? aToken.mime : lFile.mime) +
+							';' + (aToken.isBinary ? 'base64' : 'plain') + ',' + aToken.data, '_blank');
+				} else {
+					// use 1 or 0, true or false as you wish  
+					lMe.saveData(aToken.filename, aToken.data,
+							(aToken.mime ? aToken.mime : lFile.mime), (aToken.isBinary ? 'base64' : 'plain'));
+				}
+				if (typeof aOnCompleteFn === "function") {
+					aOnCompleteFn(aToken, aToken.data);
+				}
+			}
+		});
+	},
+	saveData: function (aFilename, aData, aMime, aEncoding) {
+		var aSaveLinkEl = $('#button_save').get(0) ||
+				$('<a id="button_save" download="' + aFilename +
+						'" style="display: none;">here</a>').appendTo('body').get(0),
+				lBlob, lType = aMime || 'text/plain', lUrl,
+				aSaveLink = $('#button_save');
+		try {
+			//if (aIsDataURI) {  
+			if (aEncoding === 'base64') {
+				lBlob = jws.tools.b64toBlob(aData, aMime);
+			} else {
+				lBlob = new Blob([aData]);
+				lBlob.type = lType;
+			}
+			lUrl = (window.URL || window.webkitURL).createObjectURL(lBlob);
+			aSaveLinkEl.href = lUrl;
+			aSaveLinkEl.click();
+			aSaveLink.remove();
+		} catch (aException) {
+			aSaveLink.remove();
+			if (jws.isIExplorer() && jws.getBrowserVersion() >= 10 &&
+					typeof window.navigator.msSaveOrOpenBlob === "function") {
+				window.navigator.msSaveOrOpenBlob(lBlob, aFilename);
+			}
+		}
+	},
+	getQueue: function () {
 		return this.queue;
 	},
 	setChunkSize: function (aChunkSize) {

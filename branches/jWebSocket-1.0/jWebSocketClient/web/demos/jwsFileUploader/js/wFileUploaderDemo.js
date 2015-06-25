@@ -1,3 +1,5 @@
+/* global mWSC */
+
 //	---------------------------------------------------------------------------
 //	jWebSocket FileUploader Demo ( Community Edition, CE )
 //	---------------------------------------------------------------------------
@@ -26,6 +28,7 @@ $.widget("jws.fileUploaderDemo", {
 	_init: function ( ) {
 		this.eBtnUpload = this.element.find("#start_upload");
 		this.eBtnDownload = this.element.find("#download");
+		this.eBtnDeleteSelected = this.element.find("#delete_selected");
 		this.eBtnGetFileList = this.element.find("#get_file_list");
 		this.eFileTree = this.element.find("#file_tree");
 		this.eMainContainer = $("#demo_box");
@@ -52,11 +55,51 @@ $.widget("jws.fileUploaderDemo", {
 			w.fileUploader.getFileList();
 		});
 		w.fileUploader.eBtnDownload.click(function ( ) {
-			// TODO: implement this...
+			var lSelected = $('.selected'), lFilename, lFileData,
+					lAlias = w.fileUploader.eAliasInput.val(), lRelativePath;
+			lSelected.each(function (aIdx, aItem) {
+				lFileData = JSON.parse($(aItem).attr('filedata')) || {};
+				lRelativePath = lFileData.relativePath || "";
+				lFilename = lRelativePath + (lFileData.filename || "");
+				if (!lSelected.hasClass('folder')) {
+					if (lFilename) {
+						mWSC.downloadFileFromServer(lFilename.trim(), lAlias);
+					}
+				} else {
+					jwsDialog("Sorry, but folder downloads are not supported yet!",
+							"Folder download not supported", true, 'error');
+				}
+			});
+		});
+
+		w.fileUploader.eBtnDeleteSelected.click(function ( ) {
+			var lSelected = $('.selected'), lFilename, lFileData, lScope, lRelativePath;
+			lSelected.each(function (aIdx, aItem) {
+				lFileData = JSON.parse($(aItem).attr('filedata')) || {};
+				lRelativePath = lFileData.relativePath || "";
+				lFilename = lRelativePath + (lFileData.filename || "");
+				w.fileUploader.eScopeChooser.each(function (aIdx, aInput) {
+					if (aInput.checked) {
+						lScope = $(this).val();
+					}
+				});
+				if (lScope === "private") {
+					if (lFilename) {
+						mWSC.removeFile(lFilename.trim(), lScope, {
+							OnSuccess: function () {
+								w.fileUploader.getFileList();
+							}
+						});
+					}
+				} else {
+					jwsDialog("Sorry, but you are not allowed to remove " +
+							"files from the public scope.", "Operation not allowed!",
+							true, 'error');
+				}
+			});
 		});
 
 		w.fileUploader.eFileMask.attr('disabled', true);
-
 		w.fileUploader.eAliasInput.attr('disabled', true);
 		w.fileUploader.eAliasInput.change(function ( ) {
 			mWSC.setUploadAlias($(this).val( ));
@@ -144,7 +187,9 @@ $.widget("jws.fileUploaderDemo", {
 		for (var lIdx in aFile) {
 			lProperties += lIdx + ": " + aFile[lIdx] + "\n";
 		}
-		return $("<div class='" + (aFile.directory ? "folder" : "file") + "' title='" + lProperties + "'>" + lName + "</div>");
+		return $("<div class='" + (aFile.directory ? "folder" : "file") +
+				"' filedata='" + JSON.stringify(aFile) +
+				"' title='" + lProperties + "'>" + lName + "</div>");
 
 	},
 	getFileList: function ( ) {
@@ -158,6 +203,17 @@ $.widget("jws.fileUploaderDemo", {
 						w.fileUploader.eFileTree.append(w.fileUploader.createFile(aToken.files[lIdx]));
 					}
 				}
+				var lOptionsToSelectedFile = $(".options_to_selected_files");
+				$('.file, .folder').click(function () {
+					$(this).toggleClass('selected');
+					var lSelected = $('.selected');
+					if (lSelected.get(0)) {
+						// there is something selected
+						lOptionsToSelectedFile.show();
+					} else {
+						lOptionsToSelectedFile.hide();
+					}
+				});
 			},
 			OnFailure: function (aToken) {
 				console.log("failure");
@@ -211,18 +267,23 @@ $.widget("jws.fileUploaderDemo", {
 		// default type: aErrorData.type === TT_ERROR
 		if (aErrorData.type) {
 			if (aErrorData.type === mWSC.TT_ERROR_DELETING_FILE) {
-				w.fileUploader.updateStatus(lItem.getName( ), lItem.getStatus( ));
-				jwsDialog(aErrorData.msg + "Do you want to remove this file from the list?",
-						"Error detected", true, 'error', null, [{
-								text: 'yes',
-								aFunction: function ( ) {
-									w.fileUploader.removeFileFromTable(lItem.getName( ));
-								}
-							}, {
-								text: 'no',
-								aFunction: function ( ) {
-								}
-							}]);
+				if (lItem) {
+					w.fileUploader.updateStatus(lItem.getName( ), lItem.getStatus( ));
+					jwsDialog(aErrorData.msg + "Do you want to remove this file from the list?",
+							"Error detected", true, 'error', null, [{
+									text: 'yes',
+									aFunction: function ( ) {
+										w.fileUploader.removeFileFromTable(lItem.getName( ));
+									}
+								}, {
+									text: 'no',
+									aFunction: function ( ) {
+									}
+								}]);
+				} else {
+					jwsDialog(aErrorData.msg, "Error detected", true, 'error');
+				}
+
 			} else if (aErrorData.type === mWSC.TT_ERROR) {
 				jwsDialog(aErrorData.msg, "Error detected", true, 'error', null);
 			} else if (aErrorData.type === mWSC.TT_INFO) {

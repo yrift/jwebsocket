@@ -5,7 +5,7 @@
         <!-- If Google's chrome frame installed, use it! -->
         <!-- Comment needs to be BELOW this meta tag! -->
         <!--
-		@author Victor Antonio Barzana Crespo (vbarzana@jwebsocket.org, Münster Deutschland)
+		@author Victor Antonio Barzana Crespo (vbarzana@jwebsocket.org, Latvia)
 		
 		//	****************************************************************************
 		//	jWebSocket jwsFileUploader Demo (Community Edition, CE)
@@ -45,7 +45,7 @@
 
 		<!--  [if lte IE 9]>
 		<script type="text/javascript" src='js/FileReader/swfobject/swfobject.js'></script>
-         -->
+		-->
 
         <!-- JWEBSOCKET CLIENT JAVASCRIPT LIBRARIES -->
         <script type="text/javascript" src="../../res/js/jWebSocket.js"></script>
@@ -56,6 +56,7 @@
 
 		<!-- this one imports the client side jWebSocketUploaderPlugIn -->
 		<script type="text/javascript" src="../../res/js/jwsFilesystemPlugIn.js"></script>
+		<script type="text/javascript" src="../../res/js/jwsFilesystemPlugInEE_min.js"></script>
 
 		<!-- FLASH FALLBACK FOR THE HTML5 FILE API -->
         <script type="text/javascript" src='js/FileReader/FileReader.js'></script>
@@ -156,9 +157,14 @@
 							<div id="get_file_list" class="button"
 								 title="Gets a list of files from the server">
 								Get File List</div>
-							<div id="download" class="button"
-								 title="Downloads a file from the server">
-								Download file</div>
+							<div class="options_to_selected_files">
+								<div id="download" class="button"
+									 title="Download selected file from the server">
+									Download</div>
+								<div id="delete_selected" class="button"
+									 title="Delete selected file from the server">
+									Delete</div>
+							</div>
 						</div>
 					</div>
 
