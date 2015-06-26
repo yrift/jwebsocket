@@ -190,7 +190,6 @@ jws.ChartingPlugIn = {
 							lMonitoringLoaded = true;
 							break;
 						}
-						console.log(aToken.data[lIdx]);
 					}
 					if (!lMonitoringLoaded) {
 						Ext.Msg.show({
