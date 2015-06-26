@@ -21,8 +21,8 @@ function init() {
 				lBtn.html( ) + '</div>' + '<div class="' + lRightClass + '"></div>');
 	});
 	//executing widgets
-	$("#container").RemoteShell();
 	$("#log_box").log();
+	$("#container").RemoteShell();
 
 	//Configuring tooltip as we wish
 	$("[title]").tooltip({
