@@ -28,6 +28,7 @@ $.widget("jws.monitoring", {
 		// Used to get the loaded plugins from the server side
 		this.TT_GET_SERVER_PLUGINS = "getPlugInsInfo";
 		this.TT_REGISTER = "register";
+		this.TT_UNREGISTER = "unregister";
 		this.TT_INFO = "computerInfo";
 		this.eCpuGauge = $("#cpuDiv");
 		this.eMemGauge = $("#memDiv");
@@ -47,25 +48,27 @@ $.widget("jws.monitoring", {
 		// Each widget uses the same authentication mechanism, please refer
 		// to the public widget ../../res/js/widgets/wAuth.js
 		var lCallbacks = {
-			OnOpen: function () {
-				// Sending the register token
+			OnClose: function () {
+				w.monitoring.resetGauges();
+			},
+			OnLogoff: function () {
+				w.monitoring.resetGauges();
+				mWSC.sendToken({
+					ns: lMe.NS,
+					type: lMe.TT_UNREGISTER
+				});
+			},
+			OnLogon: function () {
+				// Registering to the monitoring stream
 				mWSC.sendToken({
 					ns: lMe.NS,
 					type: lMe.TT_REGISTER,
 					interest: lMe.TT_INFO
 				});
-			},
-			OnClose: function () {
-				w.monitoring.resetGauges();
-			},
-			OnLogon: function () {
-				// Registering to the monitoring stream
-				var lGetPlugInsToken = {
-					ns: lMe.NS_SYSTEM,
-					type: lMe.TT_GET_SERVER_PLUGINS
-				};
 				// Checking if the Monitoring PlugIn has been loaded in the server side
-				mWSC.sendToken(lGetPlugInsToken, {
+				mWSC.sendToken({
+					ns: lMe.NS_SYSTEM,
+					type: lMe.TT_GET_SERVER_PLUGINS}, {
 					OnSuccess: function (aToken) {
 						var lMonitoringLoaded = false;
 						for (var lIdx = 0; lIdx < aToken.data.length; lIdx++) {
