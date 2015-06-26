@@ -1,10 +1,17 @@
 #shell_login,
 #shell_color_settings{
-    background: #E4E4E4;
-    border: 1px solid #C8C8C8;
-    float: left;
     padding-bottom: 10px;
     margin-top: 17px;
+}
+.body-el{
+	background: #E4E4E4;
+    border: 1px solid #C8C8C8;
+    float: left;
+	padding-bottom: 8px;
+	width: 100%;
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
 }
 
 #shell_login{
@@ -15,6 +22,9 @@
 #shell_color_settings{
     width: 300px;
 	float: left;
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
 }
 
 #demo_description{
@@ -22,9 +32,12 @@
     text-align: justify;
 }
 
-#shell_login_header,
-#color_setting_header{
-    margin: -1px -1px 0 -1px;
+.header{
+	float: left;
+	width: 100%;
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
     -moz-border-radius-topleft: 6px;
     -moz-border-radius-topright: 6px;
     -moz-border-radius-bottomright: 0px;
@@ -36,9 +49,8 @@
     color: white;
     font-family: Verdana, Geneva, sans-serif;
     font-size: 11px;
-    padding: 7px 3px 0 10px;
+    padding: 5px 3px 0 10px;
     font-weight: bold;
-
     background: rgb(134,173,216); /* Old browsers */
     /* IE9 SVG, needs conditional override of 'filter' to 'none' */
     background: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/Pgo8c3ZnIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgdmlld0JveD0iMCAwIDEgMSIgcHJlc2VydmVBc3BlY3RSYXRpbz0ibm9uZSI+CiAgPGxpbmVhckdyYWRpZW50IGlkPSJncmFkLXVjZ2ctZ2VuZXJhdGVkIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgeDE9IjAlIiB5MT0iMCUiIHgyPSIwJSIgeTI9IjEwMCUiPgogICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iIzg2YWRkOCIgc3RvcC1vcGFjaXR5PSIxIi8+CiAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiMyNTg1YzEiIHN0b3Atb3BhY2l0eT0iMSIvPgogIDwvbGluZWFyR3JhZGllbnQ+CiAgPHJlY3QgeD0iMCIgeT0iMCIgd2lkdGg9IjEiIGhlaWdodD0iMSIgZmlsbD0idXJsKCNncmFkLXVjZ2ctZ2VuZXJhdGVkKSIgLz4KPC9zdmc+);
@@ -57,6 +69,8 @@
     border: 1px solid #C8C8C8;
     padding: 5px;
     margin: 5px 5px 2px 5px;
+	width: 84%;
+	float: left;
 }
 
 /*---------------- DEMO_SCENARIO -------------*/
@@ -69,17 +83,12 @@
 }
 
 #shell_logout_btn{
-    margin-left: 40px;
+    margin-left: 30px;
+	width: 95px;
 }
 
 #shell_login_form{
     width: auto;
-}
-
-/*COLOR SETTINGS*/
-#shell_color_settings{
-    float: left;
-    width: 300px;
 }
 
 #backcolor_fields,
@@ -98,6 +107,7 @@
     height: 15px;
     background-repeat: no-repeat;
     border: 1px white solid;
+	cursor: pointer;
 }
 
 #backcolor_fields div:first-child,
@@ -160,5 +170,5 @@
     color: white;
     width: 98.5%;
     height: 300px;
-    margin-top: 17px;
+    margin-top: 6px;
 }
