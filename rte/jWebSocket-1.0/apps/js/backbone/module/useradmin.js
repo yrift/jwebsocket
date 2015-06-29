@@ -44,12 +44,12 @@ App.setModule('useradmin', {
                             'org.jwebsocket.plugins.sms',
                             'defaultUser', 'Group', 'sendSMS');
 
-                    if (0 === lResponse.getCode()) {
+                    if (0 >= lResponse.code) {
                         // assigning the SMS countdown quota to the new user
                         lResponse = self.registerSMSQuota(lResponse.getString('uuid'),
                                 'CountDown', lUsername, 'User');
                         
-                        if (0 !== lResponse.getCode()) {
+                        if (0 > lResponse.code) {
                             App.getLogger().error("UserAdmin - Could not register quota: " + lResponse.getString('msg'));
                         } else {
 							App.getLogger().debug("UserAdmin - Quota CountDown(SMS) successfully registered for '" + lUsername + "' user!")
@@ -68,12 +68,12 @@ App.setModule('useradmin', {
                         });
 
                         // if quota create was success then register user to the quota.
-                        if (0 === lResponse.getCode()) {
+                        if (0 >= lResponse.code) {
                             var lUuidResponse = lResponse.getString('uuid');
                             lResponse = self.registerSMSQuota(lUuidResponse,
                                     'CountDown', lUsername, 'User');
 
-                            if (0 !== lResponse.getCode()) {
+                            if (0 > lResponse.code) {
                                 App.getLogger().error("UserAdmin - Could not register quota: " + lResponse.getString('msg'));
                             }
                             self.initQuotaDefaultServerUsers(lUuidResponse);
@@ -95,7 +95,7 @@ App.setModule('useradmin', {
                 'defaultUser', 'Group', 'sendSMS');
 
         // if there is not a quota for SMSPlugin, create the quota
-        if (0 !== lResponse.getCode()) {
+        if (0 > lResponse.code) {
             lResponse = App.invokePlugIn('jws.quota', null, {
                 type: 'createQuota',
                 identifier: 'CountDown',
@@ -106,7 +106,7 @@ App.setModule('useradmin', {
                 value: '5'
             });
 
-            if (0 === lResponse.getCode()) {
+            if (0 >= lResponse.code) {
                 // registering quotas for defualt server users
                 this.initQuotaDefaultServerUsers(lResponse.getString('uuid'));
             } else {
@@ -157,9 +157,9 @@ App.setModule('useradmin', {
                 'org.jwebsocket.plugins.sms',
                 'anonymous', 'User', 'sendSMS');
 
-        if (0 !== lResponse.getCode()) {
+        if (0 > lResponse.code) {
             lResponse = this.registerSMSQuota(aUuid, 'CountDown', 'anonymous', 'User');
-            if (0 === lResponse.getCode()) {
+            if (0 >= lResponse.code) {
                 App.invokePlugIn('jws.quota', null, {
                     type: 'setQuota',
                     identifier: 'CountDown',
@@ -176,11 +176,11 @@ App.setModule('useradmin', {
         lResponse = this.getSMSQuota('CountDown',
                 'org.jwebsocket.plugins.sms', 'guest', 'User', 'sendSMS');
 
-        if (0 !== lResponse.getCode()) {
+        if (0 > lResponse.code) {
             lResponse = this.registerSMSQuota(aUuid,
                     'CountDown', 'guest', 'User');
 
-            if (0 === lResponse.getCode()) {
+            if (0 >= lResponse.code) {
                 App.invokePlugIn('jws.quota', null, {
                     type: 'setQuota',
                     identifier: 'CountDown',
@@ -198,11 +198,11 @@ App.setModule('useradmin', {
                 'org.jwebsocket.plugins.sms',
                 'root', 'User', 'sendSMS');
 
-        if (0 !== lResponse.getCode()) {
+        if (0 > lResponse.code) {
             lResponse = this.registerSMSQuota(aUuid,
                     'CountDown', 'root', 'User');
 
-            if (0 === lResponse.getCode()) {
+            if (0 >= lResponse.code) {
                 App.invokePlugIn('jws.quota', null, {
                     type: 'setQuota',
                     identifier: 'CountDown',
@@ -220,11 +220,11 @@ App.setModule('useradmin', {
                 'org.jwebsocket.plugins.sms',
                 'alexander', 'User', 'sendSMS');
 
-        if (0 !== lResponse.getCode()) {
+        if (0 > lResponse.code) {
             lResponse = this.registerSMSQuota(aUuid,
                     'CountDown', 'alexander', 'User');
 
-            if (0 === lResponse.getCode()) {
+            if (0 >= lResponse.code) {
                 App.invokePlugIn('jws.quota', null, {
                     type: 'setQuota',
                     identifier: 'CountDown',
