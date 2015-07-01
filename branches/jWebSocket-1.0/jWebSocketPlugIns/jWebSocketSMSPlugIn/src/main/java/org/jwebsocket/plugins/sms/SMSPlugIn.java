@@ -295,13 +295,31 @@ public class SMSPlugIn extends ActionPlugIn {
 		 */
 		// validating captcha
 		String lCaptcha = aToken.getString("captcha");
-		// creating jcaptcha plug-in request for invocation
-		Token lRequest = TokenFactory.createToken(JWebSocketServerConstants.NS_BASE + ".plugins.jcaptcha", "validate");
-		// setting the captcha value to validate
-		lRequest.setString("inputChars", lCaptcha);
-		// checking the result
-		Assert.isTrue(invokePlugIn("jws.jcaptcha", aConnector, lRequest).getCode() == 0,
-				"Invalid captcha!");
+		String lReCaptcha = aToken.getString("g-recaptcha-response");
+
+		Assert.isTrue(!(null == lCaptcha && (null == lReCaptcha || lReCaptcha.equals(""))),
+				"Missing Captcha validation, please provide a valid captcha response.");
+
+		if (null != lCaptcha) {
+			// creating jcaptcha plug-in request for invocation
+			Token lRequest = TokenFactory.createToken(JWebSocketServerConstants.NS_BASE + ".plugins.jcaptcha", "validate");
+			// setting the captcha value to validate
+			lRequest.setString("inputChars", lCaptcha);
+			// checking the result
+			Assert.isTrue(invokePlugIn("jws.jcaptcha", aConnector, lRequest).getCode() == 0,
+					"Invalid captcha!");
+		}
+
+		if (null != lReCaptcha) {
+			// creating jcaptcha plug-in request for invocation
+			Token lRequest = TokenFactory.createToken(JWebSocketServerConstants.NS_BASE + ".plugins.jcaptcha", "validaterecaptcha");
+			// setting the captcha value to validate
+			lRequest.setString("g-recaptcha-response", lReCaptcha);
+			// checking the result
+			Token lResponse = invokePlugIn("jws.jcaptcha", aConnector, lRequest);
+			Assert.isTrue(null != lResponse && lResponse.getCode() == 0 && lResponse.getBoolean("success"),
+					"Invalid captcha, please check!");
+		}
 
 		// calling sendSMS
 		Token lResponse = send(aConnector, aToken);
