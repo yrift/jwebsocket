@@ -95,7 +95,17 @@ p.pText {
 	width:253px;
 }
 
-#remaining_sms div{
+#remaining_sms_captcha{
+	display: none;
+	float: left;
+	font-size: 8pt;
+	margin-top: 17px;
+	float: right;
+	margin-right: 21px;
+	width: 253px;
+}
+
+#remaining_sms div, #remaining_sms_captcha div{
 	display: inline;
 }
 
@@ -240,4 +250,12 @@ label{
 .gritter-top_align.gritter-light a{
 	color: black !important;
 	font-weight: bold;
+}
+
+.g-recaptcha{
+	float: left;
+}
+
+.captcha-parent{
+	width: 93% !important;
 }
