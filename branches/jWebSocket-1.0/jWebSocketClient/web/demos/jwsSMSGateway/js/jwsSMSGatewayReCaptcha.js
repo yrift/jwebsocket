@@ -129,7 +129,6 @@ $.widget("jws.SMSGateway", {
 				log("Sending SMS...");
 				var lCallbacks = {
 					OnSuccess: function(aToken) {
-						debugger;
 						//function dialog(aTitle, aMessage, aIsModal, aCloseFunction)
 						jwsDialog(w.SMS.mMSG_SMS_SENT, "SMS sent correctly",
 								true, "alert", function() {
@@ -174,7 +173,6 @@ $.widget("jws.SMSGateway", {
 		if (aUsername === null) {
 			aUsername = mWSC.getUsername();
 		}
-		debugger;
 		//not request for a quota if the user login exist in mQuotaNoApply array
 		if (-1 !== w.SMS.mQuotaNoApply.indexOf(aUsername)) {
 			w.SMS.eRemainingSMS.hide();
