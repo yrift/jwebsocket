@@ -403,8 +403,8 @@ textarea{
     height: 2px;
 	max-height: 2px;
     padding:0px 5px 0 5px !important;
-    /*background: white;*/
 	overflow: hidden !important;
+	resize: none !important;
 }
 
 .log_box_visible{
