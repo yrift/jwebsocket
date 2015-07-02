@@ -39,9 +39,9 @@ import static org.jwebsocket.eventbus.BaseEventBus.EVENT_BUS_MSG_REPLYTO;
 import org.jwebsocket.packetProcessors.JSONProcessor;
 import org.jwebsocket.token.BaseToken;
 import org.jwebsocket.token.Token;
+import org.jwebsocket.util.Assert;
 import org.jwebsocket.util.JWSTimerTask;
 import org.jwebsocket.util.Tools;
-import org.springframework.util.Assert;
 
 /**
  * JMS based IEventBus implementation. Intended for clusters with non mirror
