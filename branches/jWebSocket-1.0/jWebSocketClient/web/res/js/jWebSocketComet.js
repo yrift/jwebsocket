@@ -36,18 +36,15 @@
         self.readyState = self.readyStateValues.CONNECTING;
         self.bufferedAmount = 0;
         self.__events = {};
-
         self.__ableToSend = true;
         self.__pendingMessages = [];
         XHRWebSocket.prototype.__already = false;
-
         XHRWebSocket.prototype.addEventListener = function (aType, aListener) {
             if (!(aType in this.__events)) {
                 this.__events[aType] = [];
             }
             this.__events[aType].push(aListener);
         };
-
         XHRWebSocket.prototype.removeEventListener = function (aType, aListener, aUseCapture) {
             if (!(aType in this.__events))
                 return;
@@ -59,7 +56,6 @@
                 }
             }
         };
-
         XHRWebSocket.prototype.dispatchEvent = function (aEvent) {
             var lEvents = this.__events[aEvent.type] || [];
             for (var lIndex = 0; lIndex < lEvents.length; ++lIndex) {
@@ -69,14 +65,12 @@
             if (lHandler)
                 lHandler(aEvent);
         };
-
         XHRWebSocket.prototype.send = function (aData) {
             this.__pendingMessages.push(aData);
             if (true === this.__ableToSend) {
                 this.__sendMessage(this.__pendingMessages.shift());
             }
         };
-
         XHRWebSocket.prototype.close = function () {
             if (this.readyState === this.readyStateValues.CLOSING)
                 throw "The websocket connection is closing";
@@ -88,15 +82,12 @@
                     readyState: 3
                 });
                 var lJSONMessage = JSON.stringify(lMessage);
-
                 this.__handleEvent({
                     type: "close"
                 });
-
                 var lXHR = this.__getXHRTransport();
                 lXHR.open("POST", this.url, true);
                 lXHR.setRequestHeader("Content-Type", "application/x-javascript;");
-
                 lXHR.onreadystatechange = function () {
 
                     if (lXHR.readyState >= 4 && lXHR.status === 200) {
@@ -110,11 +101,9 @@
                         }
                     }
                 };
-
                 lXHR.send(lJSONMessage);
             }
         };
-
         self.__handleEvent = function (aXHREvent) {
             var lEvent;
             if (aXHREvent.type === "close" || aXHREvent.type === "open" || aXHREvent.type === "error") {
@@ -125,10 +114,13 @@
                 throw "unknown event type: " + aXHREvent.type;
             }
 
-            this.dispatchEvent(lEvent);
+            try {
+                this.dispatchEvent(lEvent);
+            } catch (lEx) {
+                // REQUIRED
+                console.error(lEx);
+            }
         };
-
-
         self.__createSimpleEvent = function (lType) {
             return {
                 type: lType,
@@ -136,8 +128,6 @@
                 cancelable: false
             };
         };
-
-
         self.__createMessageEvent = function (aType, aData) {
             return {
                 type: aType,
@@ -146,7 +136,6 @@
                 cancelable: false
             };
         };
-
         this.__checkPendingMessage = function () {
             if (this.__pendingMessages.length > 0) {
                 var lData = this.__pendingMessages.shift();
@@ -154,32 +143,26 @@
             }
             ;
         };
-
         this.open = function () {
             if (this.readyState === this.readyStateValues.OPEN)
                 throw "the connection is already opened";
             else
                 this.__handleConnectionChannel();
         };
-
         this.keepConnection = function () {
             this.__handleConnectionChannel();
         };
-
         this.__handleConnectionChannel = function () {
 
             var lXHR = this.__getXHRTransport();
             this.__xhr = lXHR;
-
             lXHR.open("POST", this.url, true);
             lXHR.setRequestHeader("Content-Type", "application/x-javascript;");
-
             lXHR.onreadystatechange = function () {
                 if (lXHR.readyState >= 4) {
                     if (lXHR.status === 200) {
                         if (lXHR.responseText) {
                             var lResponse = JSON.parse(lXHR.responseText);
-
                             if (lResponse.data !== "") {
                                 setTimeout(function () {
                                     for (var lIndex = 0; lIndex < lResponse.data.length; lIndex++) {
@@ -193,7 +176,6 @@
 
                             // process response from the server
                             self.handleConnectionState(lResponse);
-
                             // IMPORTANT: wait for the XHR connection close
                             if (1 === self.readyState) {
                                 setTimeout(function () {
@@ -208,10 +190,8 @@
                 cometType: "connection"
             });
             var lJSONMessage = JSON.stringify(lMessage);
-
             lXHR.send(lJSONMessage);
         };
-
         this.__objectMessageBasePrototype = function () {
             var lMessage = {
                 subPl: "json", //jWebSocket subprotocol support
@@ -221,7 +201,6 @@
             };
             return lMessage;
         };
-
         this.__sendMessage = function (aData) {
             if (this.readyState === this.readyStateValues.CONNECTING) {
                 throw "The websocket connection has not been stablished";
@@ -230,46 +209,38 @@
             } else if (this.__ableToSend === true) {
                 // basic synchronism
                 this.__ableToSend = false;
-
                 var lMessage = this.__messageFactory({
                     cometType: "message",
                     data: aData
                 });
                 var lJSONMessage = JSON.stringify(lMessage);
                 var lXHR = this.__getXHRTransport();
-
                 lXHR.open("POST", this.url, true);
                 lXHR.setRequestHeader("Content-Type", "application/x-javascript;");
-
                 lXHR.onreadystatechange = function () {
                     // the channel is released
                     self.__ableToSend = true;
-
                     if (lXHR.readyState >= 4 && lXHR.status === 200) {
                         if (lXHR.responseText) {
                             var lResponse = JSON.parse(lXHR.responseText);
-
                             setTimeout(function () {
                                 for (var lIndex = 0; lIndex < lResponse.data.length; lIndex++) {
                                     self.__handleEvent({
                                         type: "message",
                                         data: lResponse.data[lIndex]
                                     });
-
                                 }
                             }, 0);
                         }
                         self.__checkPendingMessage();
                     }
                 };
-
                 // sending XHR message
                 lXHR.send(lJSONMessage);
             } else {
                 this.__pendingMessages.push(aData);
             }
         };
-
         this.__messageFactory = function (aArgs) {
 
             var lMessage = this.__objectMessageBasePrototype();
@@ -288,7 +259,6 @@
 
             return lMessage;
         };
-
         this.handleConnectionState = function (lResponse) {
             if (this.readyState === this.readyStateValues.CONNECTING
                     && lResponse.readyState === this.readyStateValues.OPEN) {
@@ -303,14 +273,12 @@
                 this.readyState = lResponse.readyState;
             else
                 throw "Missing 'readyState' argument from the server";
-
             if (this.readyState === 2 || this.readyState === 3) {
                 this.__handleEvent({
                     type: "close"
                 });
             }
         };
-
         this.__getXHRTransport = function () {
 
             var lXHR;
@@ -342,7 +310,6 @@
 
             return lXHR;
         };
-
         this.open();
     };
 })();
