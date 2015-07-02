@@ -50,35 +50,9 @@ $.widget( "jws.fundamentals", {
 	},
 	
 	doWebSocketConnection: function( ) {
-		// Each widget utilizes the same authentication mechanism, please refer
-		// to the public widget ../../res/js/widgets/wAuth.js
-		var lCallbacks = {
-			OnOpen: function( aEvent ) {
-			},
-			OnClose: function( aEvent ) {
-			},
-			OnMessage: function( aEvent, aToken ) {
-				var lDate;
-				if( aToken.date_val ) {
-					lDate = jws.tools.ISO2Date( aToken.date_val );
-				} else {
-					lDate = new Date( );
-				}
-				
-				if( mLog.isDebugEnabled ) {
-					log( "<div style='color:#888'>jWebSocket '" + aToken.type 
-						+ "' token received, full message: '" + aEvent.data + "' " 
-						+ lDate + "</div>" );
-				}
-			},
-			OnWelcome: function( aEvent ) {
-			},
-			OnGoodBye: function( aEvent ) {
-			}
-		};
 		// For more information check the public login widget
 		// ../../res/js/widgets/wAuth.js
-		w.fund.eDemoBox.auth( lCallbacks );
+		w.fund.eDemoBox.auth();
 	},
 	
 	registerEvents: function( ) {

@@ -5,7 +5,7 @@
 function init() {
 	w = {};
 	mLog = {};
-	mLog.isDebugEnabled = true;
+	mLog.isDebugEnabled = false;
 
 	// Setting the styles to the buttons, avoiding to fill the HTML code 
 	// with unnecessary data

@@ -122,8 +122,6 @@ $.widget( "jws.channels", {
 							// OnChannelStopped: null
 				} );
 			},
-			OnWelcome: function( aEvent ) {
-			},
 			OnLogon: function( aToken ) {
 				w.channels.getChannels( );
 				w.channels.eChannelsAreaResizable.animate( {
@@ -144,11 +142,6 @@ $.widget( "jws.channels", {
 				w.channels.destroy( );
 			},
 			OnMessage: function( aEvent, aToken ) {
-				if ( mLog.isDebugEnabled ) {
-					log( "<font style='color:#888'>jWebSocket '" + aToken.type
-							+ "' token received, full message: '" + aEvent.data + "' "
-							+ "</font>" );
-				}
 				w.channels.onMessage( aEvent, aToken );
 			}
 		};

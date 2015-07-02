@@ -81,7 +81,7 @@ function checkWebSocketSupport() {
 									terminal: aTerminal
 								},
 								OnSuccess: function(aToken) {
-									if (!lWSC.isLoggedIn() || lWSC.getUsername() == "anonymous") {
+									if (!lWSC.isLoggedIn() || lWSC.getUsername() === "anonymous") {
 										jc.login({
 											OnSuccess: function(aToken) {
 												w.auth.eUsername.val(aToken.response.username);
@@ -90,7 +90,7 @@ function checkWebSocketSupport() {
 												w.auth.logon();
 											},
 											OnFailure: function(aToken) {
-												log(JSON.stringify(aToken));
+												log(w.log.parseJSON(aToken));
 											}
 										});
 									}
@@ -125,14 +125,14 @@ function checkWebSocketSupport() {
 				}
 			},
 			OnToken: function(aToken) {
-				if (aToken.ns == "org.jwebsocket.auth") {
+				if (aToken.ns === "org.jwebsocket.auth") {
 					console.log("TYPE: " + JSON.stringify(aToken));
-					if (aToken.type == "logon") {
+					if (aToken.type === "logon") {
 						console.log("LOGIN");
 						w.auth.eUsername.val(aToken.user);
 						w.auth.ePassword.val(aToken.password);
 						w.auth.logon();
-					} else if (aToken.type == "logoff") {
+					} else if (aToken.type === "logoff") {
 						console.log("LOGOFF");
 						if (lWSC.isLoggedIn())
 							w.auth.logoff();
@@ -144,7 +144,7 @@ function checkWebSocketSupport() {
 				if (aToken.date_val) {
 					lDate = jws.tools.ISO2Date(aToken.date_val);
 				}
-				log("<font style='color:#888'>jWebSocket '" + aToken.type + "' token received, full message: '" + aEvent.data + "' " + lDate + "</font>");
+				log("<font style='color:#888'>jWebSocket '" + aToken.type + "' token received, full message: '" + w.log.parseJSON(aEvent.data) + "' " + lDate + "</font>");
 				if (lWSC.isLoggedIn() && lWSC.getUsername() != "anonymous") {
 					w.auth.eUserInfoName.text(aToken.username);
 					w.auth.eClientId.text("Client-ID: " + (lWSC.getId()));
@@ -171,7 +171,7 @@ function checkWebSocketSupport() {
 				w.auth.eClientStatus.removeClass("online").removeClass("online").addClass("offline").text("disconnected");
 				w.auth.eUsername.focus();
 			}
-		})
+		});
 	} else {
 		var lMsg = jws.MSG_WS_NOT_SUPPORTED;
 		alert(lMsg);
@@ -185,7 +185,6 @@ function resetDetails() {
 	$(".firstname").attr("value", "");
 	$(".secondname").attr("value", "");
 	$(".address").text("");
-
 }
 
 $(document).ready(function() {

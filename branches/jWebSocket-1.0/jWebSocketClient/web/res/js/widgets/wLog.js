@@ -60,11 +60,24 @@ $.widget("jws.log", {
 	},
 	clearLog: function ( ) {
 		w.log.eLog.text("");
+	},
+	parseJSON: function (aMessage) {
+		var lResult = aMessage;
+		try {
+			if ("object" === typeof aMessage) {
+				lResult = "<pre>" + JSON.stringify(aMessage, null, 3) + "</pre>";
+			} else {
+				lResult = "<pre>" + JSON.stringify(JSON.parse(aMessage), null, 3) + "</pre>";
+			}
+		} catch (aError) {
+			// Do Nothing
+		}
+		return lResult;
 	}
 });
 
 function log(aString) {
-	w.log.eLog.append(aString + "<br/>");
+	w.log.eLog.append(w.log.parseJSON(aString) + "<br/>");
 
 	var lLineHeight = 20; // This should match the line-height in the CSS
 	var lScrollHeight = w.log.eLog.get(0).scrollHeight;
