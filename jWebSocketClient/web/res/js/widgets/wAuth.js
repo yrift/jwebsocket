@@ -172,16 +172,15 @@ $.widget("jws.auth", {
 				if (w.auth.options.OnWelcome) {
 					w.auth.options.OnWelcome(aToken);
 				}
-				if (mLog.isDebugEnabled) {
-					log("<font color='green'>jWebSocket Welcome received.</font>");
-					log(w.auth.parseJSON(aToken));
-				}
+//				if (mLog.isDebugEnabled) {
+//					log("<font color='green'>jWebSocket Welcome received.</font>");
+//					log(w.log ? w.log.parseJSON(aToken) : aToken);
+//				}
 				if (aToken.sourceId) {
 					w.auth.eClientId.text("Client-ID: " + aToken.sourceId);
 				}
 				if (aToken.username && aToken.username !== "anonymous") {
 					lCallbacks.OnLogon(aToken);
-					//w.auth.setLoggedOn(aToken);
 				}
 			},
 			OnLogon: function (aToken) {
@@ -207,7 +206,17 @@ $.widget("jws.auth", {
 			// OnMessage callback
 			OnMessage: function (aEvent, aToken) {
 				if (!aToken && aEvent && aEvent.type === "message" && aEvent.data) {
-					aToken = JSON.parse(aEvent.data);
+					try {
+						aToken = JSON.parse(aEvent.data);
+					} catch (lError) {
+						// Do nothing here
+					}
+				}
+				if (mLog.isDebugEnabled) {
+					log("<font color='green'>jWebSocket '<b>" + (aToken ? aToken.type : "")
+							+ "</b>' token received" + (aToken && aToken.type === 'response' ?
+									(" for '<b>" + aToken.reqType + "</b>'") : "") + ", full message: </font>" +
+							(w.log ? w.log.parseJSON(aEvent.data) : aEvent.data));
 				}
 				if (aToken && aToken.code === -1) {
 					if (mLog.isDebugEnabled) {
@@ -219,12 +228,6 @@ $.widget("jws.auth", {
 				// Debug if the user doesn't have an OnMessage method
 				if (w.auth.options.OnMessage) {
 					w.auth.options.OnMessage(aEvent, aToken);
-				} else {
-					if (mLog.isDebugEnabled) {
-						log("<font color='green'>jWebSocket '" + aToken.type
-								+ "' token received, full message: </font>" + 
-								w.auth.parseJSON(aEvent.data));
-					}
 				}
 			},
 			// OnClose callback
@@ -236,15 +239,6 @@ $.widget("jws.auth", {
 			}
 		};
 		return lCallbacks;
-	},
-	parseJSON: function (aMessage) {
-		var lResult = aMessage;
-		try {
-			lResult = "<pre>" + JSON.stringify(JSON.parse(aMessage), null, 3) + "</pre>";
-		} catch (aError) {
-			// Do Nothing
-		}
-		return lResult;
 	},
 	// If there is not connection with the server, opens a connection and then 
 	// tries to log the user in the system

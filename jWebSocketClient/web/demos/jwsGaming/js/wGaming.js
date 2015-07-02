@@ -92,8 +92,12 @@ $.widget("jws.gaming", {
 		// Registers all callbacks for jWebSocket basic connection
 		// For more information, check the file ../../res/js/widget/wAuth.js
 		var lCallbacks = {
-			//			OnOpen: function( aEvent) { },
+			OnOpen: function( aEvent) {
+				log("<font color='green'>Connection opened</font>");
+			},
 			OnWelcome: function (aToken) {
+				log("<font color='green'>jWebSocket Welcome message received!</font>");
+				log(w.log.parseJSON(aToken));
 				w.gaming.mAuthenticatedUser = aToken.sourceId;
 				// Registering the callbacks for the channels
 				mWSC.setChannelCallbacks({
@@ -292,7 +296,7 @@ $.widget("jws.gaming", {
 	onMessage: function (aEvent, aToken) {
 
 		if (w.gaming.eDebug.get(0).checked) {
-			log("<font style='color:#888'>" + aEvent.data + "</font>");
+			log(aEvent.data);
 		}
 		if (aToken.ns === w.gaming.NS_CHANNELS) {
 			// When the channel authorizes the user to publish on it
@@ -300,12 +304,12 @@ $.widget("jws.gaming", {
 
 
 				// When information published through the channel
-			} else if (aToken.type == "data") {
+			} else if (aToken.type === "data") {
 				w.gaming.onChannelPublish(aToken);
 			}
 		}
-		else if (aToken.type == "event") {
-			if ("logout" == aToken.name || "disconnect" == aToken.name) {
+		else if (aToken.type === "event") {
+			if ("logout" === aToken.name || "disconnect" === aToken.name) {
 				w.gaming.removeClient(aToken.sourceId);
 			}
 		}

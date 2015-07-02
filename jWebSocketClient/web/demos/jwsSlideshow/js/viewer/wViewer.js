@@ -114,10 +114,6 @@ $.widget("jws.viewer", {
 	},
 	onMessage: function(aEvent, aToken) {
 		if (aToken.ns === w.viewer.NS_CHANNELS) {
-			if (mLog.isDebugEnabled) {
-				log(" <b>" + w.viewer.TITLE + " new message received: </b>" +
-						JSON.stringify(aToken));
-			}
 			// When information is published in the channel the data is sent
 			// in a map inside the token and the type of the token comes in 
 			// the key "data"
