@@ -39,15 +39,10 @@ $.widget("jws.sessionManagement", {
 	},
 	registerEvents: function( ) {
 		var lCallbacks = {
-			OnOpen: function(aEvent) {
-			},
 			OnClose: function(aEvent) {
 				w.SM.eClientId.text("-");
 				w.SM.clearList(w.SM.ePublicList, true);
 				w.SM.clearList(w.SM.ePrivateList, false);
-			},
-			OnMessage: function(aEvent, aToken) {
-				log("<font style='color:#888'>" + JSON.stringify(aToken) + "</font>");
 			},
 			OnWelcome: function(aEvent) {
 				w.SM.mAuthUser = aEvent.sourceId;
@@ -58,8 +53,6 @@ $.widget("jws.sessionManagement", {
 						w.SM.updateLists(aToken);
 					}
 				});
-			},
-			OnGoodBye: function(aEvent) {
 			}
 		};
 

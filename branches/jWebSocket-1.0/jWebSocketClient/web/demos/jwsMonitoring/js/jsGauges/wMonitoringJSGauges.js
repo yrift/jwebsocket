@@ -93,13 +93,6 @@ $.widget("jws.monitoring", {
 						w.monitoring.TT_INFO === aToken.type) {
 					w.monitoring.updateGauge(aToken);
 				}
-				var lDate = "";
-				if (aToken.date_val) {
-					lDate = jws.tools.ISO2Date(aToken.date_val);
-				}
-				log("<font style='color:#888'>jWebSocket '" + aToken.type +
-						"' token received, full message: '" + aEvent.data + "' " +
-						lDate + "</font>");
 			}
 		};
 		// this widget will be accessible from the global variable w.auth

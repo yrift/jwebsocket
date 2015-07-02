@@ -76,11 +76,6 @@ $.widget("jws.reporting", {
             OnGoodBye: function(aToken) {
             },
             OnMessage: function(aEvent, aToken) {
-                if (mLog.isDebugEnabled) {
-                    log("<font style='color:#888'>jWebSocket '" + aToken.type
-                            + "' token received, full message: '" + aEvent.data + "' "
-                            + "</font>");
-                }
                 w.reporting.onMessage(aEvent, aToken);
             },
             OnLogon: function() {
@@ -141,8 +136,6 @@ $.widget("jws.reporting", {
                 log("Retreiving list of reports via jWebSocket...");
                 mWSC.reportingGetReports({
                     OnSuccess: function(aToken) {
-                        log("Reports " + aToken.data);
-
                         while (w.reporting.eCbReportList.options.length > 0) {
                             w.reporting.eCbReportList.removeChild();
                         }

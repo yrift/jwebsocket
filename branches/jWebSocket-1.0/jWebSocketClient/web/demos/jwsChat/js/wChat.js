@@ -345,8 +345,6 @@ $.widget("jws.chat", {
 			} else if (aToken.type === "broadcast") {
 				if (aToken.msg && aToken.sourceId) {
 					//logChatMessage( aID, aString )
-					log("New <b>public </b>message received: " +
-							JSON.stringify(aToken));
 					w.chat.logChatMessage(aToken.sourceId,
 							w.auth.cleanHTML(aToken.msg));
 				}
@@ -354,8 +352,6 @@ $.widget("jws.chat", {
 				log(aToken.msg + " " + aToken.sourceId);
 				w.chat.addClient(aToken.sourceId);
 			} else if (aToken.type === "messageTo") {
-				log("<b>New private message received:</b> " +
-						JSON.stringify(aToken));
 				w.chat.onPrivateMessage(aToken);
 			}
 		}

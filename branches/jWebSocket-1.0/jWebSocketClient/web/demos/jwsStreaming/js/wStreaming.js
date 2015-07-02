@@ -31,27 +31,8 @@ $.widget( "jws.streaming", {
 		w.streaming.registerEvents( );
 	},
 	doWebSocketConnection: function( ) {
-		// Each widget uses the same authentication mechanism, please refer
-		// to the public widget ../../res/js/widgets/wAuth.js
-		var lCallbacks = {
-			OnOpen: function( aEvent ) {
-			},
-			OnClose: function( aEvent ) {
-
-			},
-			OnMessage: function( aEvent ) {
-				if ( mLog.isDebugEnabled ) {
-					log( "<font style='color:#888'>jWebSocket message received: '" +
-							aEvent.data + "'</font>" );
-				}
-			},
-			OnWelcome: function( aEvent ) {
-			},
-			OnGoodBye: function( aEvent ) {
-			}
-		};
 		// this widget will be accessible from the global variable w.auth
-		$( "#demo_box" ).auth( lCallbacks );
+		$( "#demo_box" ).auth();
 	},
 	registerEvents: function( ) {
 		//BUTTON EVENTS
