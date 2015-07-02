@@ -33,9 +33,9 @@ import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.log4j.Logger;
 import org.jwebsocket.packetProcessors.JSONProcessor;
 import org.jwebsocket.token.Token;
+import org.jwebsocket.util.Assert;
 import org.jwebsocket.util.JWSTimerTask;
 import org.jwebsocket.util.Tools;
-import org.springframework.util.Assert;
 
 /**
  *

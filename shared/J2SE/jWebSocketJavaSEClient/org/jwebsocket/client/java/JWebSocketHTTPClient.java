@@ -42,9 +42,9 @@ import org.jwebsocket.kit.WebSocketFrameType;
 import org.jwebsocket.kit.WebSocketSubProtocol;
 import org.jwebsocket.packetProcessors.JSONProcessor;
 import org.jwebsocket.token.Token;
+import org.jwebsocket.util.Assert;
 import org.jwebsocket.util.JWSTimerTask;
 import org.jwebsocket.util.Tools;
-import org.springframework.util.Assert;
 
 /**
  * HTTP WebSocket client implementation for the server-side HTTP Engine

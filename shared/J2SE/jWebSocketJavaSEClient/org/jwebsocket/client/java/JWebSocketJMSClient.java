@@ -49,8 +49,8 @@ import org.jwebsocket.kit.WebSocketFrameType;
 import org.jwebsocket.kit.WebSocketSubProtocol;
 import org.jwebsocket.packetProcessors.JSONProcessor;
 import org.jwebsocket.token.Token;
+import org.jwebsocket.util.Assert;
 import org.jwebsocket.util.MessagingControl;
-import org.springframework.util.Assert;
 
 /**
  * JMS WebSocket client implementation for the server-side JMS Engine

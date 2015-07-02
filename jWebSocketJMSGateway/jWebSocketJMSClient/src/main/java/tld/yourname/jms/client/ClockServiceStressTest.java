@@ -227,7 +227,7 @@ public class ClockServiceStressTest {
 	}
 
 	private static void startStressTest() {
-		final int lIterations = 1000;
+		final int lIterations = 10;
 		int lCounter = 0;
 		lStartTime = System.currentTimeMillis();
 		while (lCounter < lIterations) {
@@ -254,8 +254,8 @@ public class ClockServiceStressTest {
 							lEndTime = System.currentTimeMillis();
 
 							System.out.println(lResponseReceived + ", " + (((lEndTime - lStartTime)) / 1000));
-							
-							if (lResponseReceived.get() == lIterations){
+
+							if (lResponseReceived.get() == lIterations) {
 								lJWSEndPoint.shutdown();
 							}
 						}
