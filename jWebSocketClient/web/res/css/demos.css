@@ -139,7 +139,7 @@ div#container{
 	width: 100px;
 	height: 130px;
 	background: white url(../img/jws-logo-nouser.png) no-repeat;
-	 -webkit-border-radius: 6px 6px;
+	-webkit-border-radius: 6px 6px;
     -moz-border-radius: 6px 6px;
     border-radius: 6px 6px;
 }
@@ -384,6 +384,19 @@ textarea{
     font-size: 8pt;
 	line-height: 20px;
 	word-wrap: break-word;
+	resize: vertical;
+}
+
+#log_box_content pre{
+	margin: 0;
+	padding: 2px 5px;
+	background-color: #fafafa;
+	border: 1px solid #e2e2e2;
+	width: auto;
+	font-size: 10px;
+	line-height: 14px;
+	overflow-x: auto;
+	overflow-y: hidden;
 }
 
 .log_box_hidden{
@@ -396,7 +409,7 @@ textarea{
 
 .log_box_visible{
     height: 200px;
-	max-height: 200px;
+	/*max-height: 200px;*/
 	min-height: 200px;
 	overflow: auto !important;
 }
