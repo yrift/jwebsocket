@@ -71,7 +71,6 @@ import org.json.JSONException;
 import org.jwebsocket.packetProcessors.JSONProcessor;
 import org.jwebsocket.token.Token;
 import org.jwebsocket.token.TokenFactory;
-import org.springframework.util.Assert;
 
 /**
  * Provides some convenience methods to support the web socket development.

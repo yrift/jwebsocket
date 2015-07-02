@@ -53,6 +53,11 @@ public class Attributes {
 	 *
 	 */
 	public static final String NODE_ID = "nodeId";
+	
+	/**
+	 *
+	 */
+	public static final String NODE_TYPE = "nodeType";
 
 	/**
 	 *

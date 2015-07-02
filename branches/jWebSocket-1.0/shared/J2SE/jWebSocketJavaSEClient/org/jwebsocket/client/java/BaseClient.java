@@ -45,10 +45,10 @@ import org.jwebsocket.kit.WebSocketException;
 import org.jwebsocket.kit.WebSocketFrameType;
 import org.jwebsocket.packetProcessors.JSONProcessor;
 import org.jwebsocket.token.Token;
+import org.jwebsocket.util.Assert;
 import org.jwebsocket.util.JWSTimerTask;
 import org.jwebsocket.util.MessagingControl;
 import org.jwebsocket.util.Tools;
-import org.springframework.util.Assert;
 
 /**
  *
