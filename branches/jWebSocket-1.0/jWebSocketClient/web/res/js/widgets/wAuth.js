@@ -174,7 +174,7 @@ $.widget("jws.auth", {
 				}
 				if (mLog.isDebugEnabled) {
 					log("<font color='green'>jWebSocket Welcome received.</font>");
-					log(JSON.stringify(aToken));
+					log(w.auth.parseJSON(aToken));
 				}
 				if (aToken.sourceId) {
 					w.auth.eClientId.text("Client-ID: " + aToken.sourceId);
@@ -220,15 +220,10 @@ $.widget("jws.auth", {
 				if (w.auth.options.OnMessage) {
 					w.auth.options.OnMessage(aEvent, aToken);
 				} else {
-					var lDate = "";
-					if (aToken.date_val) {
-						lDate = jws.tools.ISO2Date(aToken.date_val);
-					}
-
 					if (mLog.isDebugEnabled) {
 						log("<font color='green'>jWebSocket '" + aToken.type
-								+ "' token received, full message: </font>'" + aEvent.data + "' "
-								+ lDate);
+								+ "' token received, full message: </font>" + 
+								w.auth.parseJSON(aEvent.data));
 					}
 				}
 			},
@@ -241,6 +236,15 @@ $.widget("jws.auth", {
 			}
 		};
 		return lCallbacks;
+	},
+	parseJSON: function (aMessage) {
+		var lResult = aMessage;
+		try {
+			lResult = "<pre>" + JSON.stringify(JSON.parse(aMessage), null, 3) + "</pre>";
+		} catch (aError) {
+			// Do Nothing
+		}
+		return lResult;
 	},
 	// If there is not connection with the server, opens a connection and then 
 	// tries to log the user in the system
