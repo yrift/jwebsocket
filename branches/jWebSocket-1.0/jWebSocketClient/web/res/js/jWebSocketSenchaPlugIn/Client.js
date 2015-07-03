@@ -129,6 +129,9 @@ Ext.define('Ext.jws.Client', {
 					},
 					OnWelcome: function (aToken) {
 						self.fireEvent('OnWelcome', aToken);
+						if (aToken.username && aToken.username !== "anonymous") {
+							self.fireEvent('OnLogon', aToken);
+						}
 					},
 					OnClose: function (aToken) {
 						var lMsg = "jWebSocket connection closed, please " +
