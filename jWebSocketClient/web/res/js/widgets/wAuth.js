@@ -41,16 +41,14 @@ $.widget("jws.auth", {
 		this.eLogoffButton = this.element.find('#logoff_button');
 		this.eConnectButton = this.element.find('#connect_button');
 		this.eDisConnectButton = this.element.find('#disconnect_button');
-		this.mUsername = null;
 
 		this.eDisConnectButton.hide( );
 		this.eLogoffArea.hide( );
-
 		this.mUsername = null;
 
 		this.checkWebSocketSupport( );
 
-		this.registerEvents( );
+		this.registerListeners( );
 		this.connect();
 	},
 	checkWebSocketSupport: function ( ) {
@@ -67,7 +65,7 @@ $.widget("jws.auth", {
 			}
 		}
 	},
-	registerEvents: function ( ) {
+	registerListeners: function ( ) {
 		//adding click functions
 		w.auth.eLoginButton.click(function ( ) {
 			// If there is not a connect button
@@ -98,6 +96,7 @@ $.widget("jws.auth", {
 
 		w.auth.eUsername.keypress(w.auth.eUsernameKeypress);
 		w.auth.ePassword.keypress(w.auth.ePasswordKeypress);
+		w.auth.eUserInfoName.click(w.auth.authenticatedUserLabelClick);
 	},
 	// Logs in, only if there is connection with the server, otherwise it won't work
 	login: function ( ) {
@@ -380,6 +379,24 @@ $.widget("jws.auth", {
 				if (mLog.isDebugEnabled) {
 					log("Exception: " + ex.message);
 				}
+			}
+		}
+	},
+	authenticatedUserLabelClick: function () {
+		if (mWSC) {
+			var lMessage = "<b>Id:</b> " + mWSC.getId() + "<br/>";
+			lMessage += "<b>Username:</b> " + mWSC.getUsername() + "<br/>";
+			lMessage += "<b>Subprotocol:</b> " + mWSC.getSubProt() + "<br/>";
+			lMessage += "<b>URL:</b> " + mWSC.getURL() + "<br/>";
+			lMessage += "<b>Reliability Options:</b> <pre>" + JSON.stringify(mWSC.getReliabilityOptions(), false, 3) + "</pre><br/>";
+			if ("function" === typeof jwsDialog) {
+				jwsDialog(lMessage, "Information for authenticated user: " + mWSC.getUsername(), false, "information");
+			} else if ("function" === typeof log) {
+				log("Information for authenticated user: " + mWSC.getUsername() +
+						"<br/>" + lMessage);
+			} else {
+				alert("Information for authenticated user: " + mWSC.getUsername() +
+						"<br/>" + lMessage);
 			}
 		}
 	},

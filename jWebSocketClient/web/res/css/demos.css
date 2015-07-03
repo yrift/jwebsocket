@@ -289,6 +289,10 @@ textarea{
 #client_status.offline{
     background: url(../img/disconnected.png) no-repeat 1px 1px;
 }
+#user_info_name{
+	cursor: pointer;
+	font-weight: bold;
+}
 /*--------------- DEMO_STATUSBAR -------------*/
 
 
@@ -599,8 +603,8 @@ input[type="checkbox"]{
 /* ----------------------------- ICONS --------------------------------------*/
 #icon{
 	float: left;
-	width: 45px;
-	height: 45px;
+	width: 54px;
+	height: 70px;
 }
 
 #icon.icon_error{
