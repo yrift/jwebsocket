@@ -395,8 +395,9 @@ $.widget("jws.auth", {
 				log("Information for authenticated user: " + mWSC.getUsername() +
 						"<br/>" + lMessage);
 			} else {
+				var lRegEx = /(<([^>]+)>)/ig;
 				alert("Information for authenticated user: " + mWSC.getUsername() +
-						"<br/>" + lMessage);
+						"\n" + lMessage.replace("<br/>", "\n").replace(lRegEx, ""));
 			}
 		}
 	},
