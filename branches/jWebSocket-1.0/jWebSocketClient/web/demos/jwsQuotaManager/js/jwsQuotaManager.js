@@ -32,17 +32,17 @@ Ext.define('jws.quotaPlugin.alterWindow', {
 	autoShow: false,
 	modal: true,
 	title: "Alter Quota",
-	initComponent: function() {
+	initComponent: function () {
 
 		var me = this;
 		var lQuotaObject = me.initialConfig;
 
 
-		var lQuotaValueFunction = function(aValue) {
+		var lQuotaValueFunction = function (aValue) {
 			Ext.getCmp("get_quota_value").setValue(aValue);
 		};
 
-		var lSetQuotaFunction = function() {
+		var lSetQuotaFunction = function () {
 
 			var lValue = Ext.getCmp("set_quota_field").getValue();
 
@@ -62,10 +62,10 @@ Ext.define('jws.quotaPlugin.alterWindow', {
 			};
 
 			Ext.jwsClient.send(jws.QuotaDemo.NS_QUOTA_PLUGIN, jws.QuotaDemo.TT_SET_QUOTA, lArguments, {
-				success: function(aResponse) {
+				success: function (aResponse) {
 					lQuotaValueFunction(aResponse.value);
 				},
-				failure: function(aResponse) {
+				failure: function (aResponse) {
 					if (aResponse.code == -1) {
 						Ext.Msg.alert(aResponse.msg, "Permission denied, not enough privilege");
 					}
@@ -74,7 +74,7 @@ Ext.define('jws.quotaPlugin.alterWindow', {
 
 		};
 
-		var lReduceQuotaFunction = function() {
+		var lReduceQuotaFunction = function () {
 
 			var lValue = Ext.getCmp("reduce_quota").getValue();
 
@@ -94,9 +94,9 @@ Ext.define('jws.quotaPlugin.alterWindow', {
 			};
 
 			Ext.jwsClient.send(jws.QuotaDemo.NS_QUOTA_PLUGIN, jws.QuotaDemo.TT_REDUCE_QUOTA, lArguments, {
-				success: function(aResponse) {
+				success: function (aResponse) {
 					lQuotaValueFunction(aResponse.value);
-				}, failure: function(aResponse) {
+				}, failure: function (aResponse) {
 					if (aResponse.code == -1) {
 						Ext.Msg.alert(aResponse.msg, "Permission denied, not enough privilege");
 					}
@@ -105,7 +105,7 @@ Ext.define('jws.quotaPlugin.alterWindow', {
 
 		};
 
-		var lIncreaseQuotaFunction = function() {
+		var lIncreaseQuotaFunction = function () {
 
 			var lValue = Ext.getCmp("increase_quota").getValue();
 
@@ -125,10 +125,10 @@ Ext.define('jws.quotaPlugin.alterWindow', {
 			};
 
 			Ext.jwsClient.send(jws.QuotaDemo.NS_QUOTA_PLUGIN, jws.QuotaDemo.TT_INCREASE_QUOTA, lArguments, {
-				success: function(aResponse) {
+				success: function (aResponse) {
 					lQuotaValueFunction(aResponse.value);
 				},
-				failure: function(aResponse) {
+				failure: function (aResponse) {
 					if (aResponse.code == -1) {
 						Ext.Msg.alert(aResponse.msg, "Permission denied, not enough privilege");
 					}
@@ -136,7 +136,7 @@ Ext.define('jws.quotaPlugin.alterWindow', {
 			});
 		};
 
-		var lGetQuotaFunction = function() {
+		var lGetQuotaFunction = function () {
 
 			var lValue = Ext.getCmp("get_quota_value").getValue();
 
@@ -156,7 +156,7 @@ Ext.define('jws.quotaPlugin.alterWindow', {
 			};
 
 			Ext.jwsClient.send(jws.QuotaDemo.NS_QUOTA_PLUGIN, jws.QuotaDemo.TT_GET_QUOTA, lArguments, {
-				success: function(aResponse) {
+				success: function (aResponse) {
 					lQuotaValueFunction(aResponse.value);
 				}
 			});
@@ -423,7 +423,7 @@ Ext.define('jws.quotaPlugin.alterWindow', {
 		];
 
 		this.listeners = {
-			destroy: function() {
+			destroy: function () {
 
 				var lForm = Ext.getCmp('lFilterFormPanelQuota').getForm();
 				var lStore = Ext.getCmp('gridPanelQuota').getStore();
@@ -449,12 +449,12 @@ Ext.define('jws.quotaPlugin.registerQuotaWindow', {
 	autoShow: false,
 	modal: true,
 	title: "Register Quota",
-	initComponent: function() {
+	initComponent: function () {
 
 		var me = this;
 		var lQuotaObject = me.initialConfig;
 
-		var lSetRegisterQuota = function() {
+		var lSetRegisterQuota = function () {
 
 			var lForm = Ext.getCmp("RegisterQuotaForm").getForm();
 
@@ -471,10 +471,10 @@ Ext.define('jws.quotaPlugin.registerQuotaWindow', {
 				};
 
 				Ext.jwsClient.send(jws.QuotaDemo.NS_QUOTA_PLUGIN, jws.QuotaDemo.TT_REGISTER, lArguments, {
-					success: function(aToken) {
+					success: function (aToken) {
 						log(aToken);
 					},
-					failure: function(aToken) {
+					failure: function (aToken) {
 						log(aToken);
 					}
 				});
@@ -678,7 +678,7 @@ Ext.define('jws.quotaPlugin.registerQuotaWindow', {
 		];
 
 		this.listeners = {
-			destroy: function() {
+			destroy: function () {
 
 				var lForm = Ext.getCmp('lFilterFormPanelQuota').getForm();
 				var lStore = Ext.getCmp('gridPanelQuota').getStore();
@@ -741,6 +741,8 @@ jws.QuotaDemo = {
 	TEXT_WEBSOCKET: "WebSocket: ",
 	TEXT_CLIENT_ID: "Client-ID: ",
 	TEXT_AUTHENTICATED: "authenticated",
+	TEXT_CONNECTED: "connected",
+	TEXT_DISCONNECTED: "disconnected",
 	CLS_AUTH: "authenticated",
 	CLS_ONLINE: "online",
 	CLS_OFFLINE: "offline"
@@ -807,7 +809,7 @@ jws.QuotaDemo.namespace_diskspace_store = Ext.create('Ext.data.Store', {
 });
 
 
-Ext.onReady(function() {
+Ext.onReady(function () {
 	// DOM elements
 	var eDisconnectMessage = Ext.get("not_connected"),
 			eBtnDisconnect = Ext.get("disconnect_button"),
@@ -817,7 +819,7 @@ Ext.onReady(function() {
 	eClientId = document.getElementById("client_id");
 	eWebSocketType = document.getElementById("websocket_type");
 
-	Ext.jwsClient.on(jws.QuotaDemo.LISTENER_OPEN, function() {
+	Ext.jwsClient.on(jws.QuotaDemo.LISTENER_OPEN, function () {
 		eClient.innerHTML = jws.QuotaDemo.TEXT_CONNECTED;
 		eClient.className = jws.QuotaDemo.CLS_ONLINE;
 		eBtnDisconnect.show();
@@ -826,15 +828,7 @@ Ext.onReady(function() {
 		initDemo();
 	});
 
-	Ext.jwsClient.on(jws.QuotaDemo.LISTENER_WELCOME, function(aToken) {
-		if (aToken.username !== "anonymous") {
-			// If the user is already logged in
-			Ext.jwsClient.fireEvent(jws.QuotaDemo.LISTENER_LOGON, aToken, Ext.jwsClient);
-		}
-	});
-
-
-	Ext.jwsClient.on(jws.QuotaDemo.LISTENER_CLOSE, function() {
+	Ext.jwsClient.on(jws.QuotaDemo.LISTENER_CLOSE, function () {
 		eClient.innerHTML = jws.QuotaDemo.TEXT_DISCONNECTED;
 		eClient.className = jws.QuotaDemo.CLS_OFFLINE;
 		eDisconnectMessage.show();
@@ -846,10 +840,10 @@ Ext.onReady(function() {
 	});
 	eBtnDisconnect.hide();
 
-	eBtnConnect.on("click", function() {
+	eBtnConnect.on("click", function () {
 		Ext.jwsClient.open();
 	});
-	eBtnDisconnect.on("click", function() {
+	eBtnDisconnect.on("click", function () {
 
 		var lWindowMain = Ext.WindowManager.get("mainWindowsQuotaPlugin");
 
@@ -860,13 +854,13 @@ Ext.onReady(function() {
 		Ext.jwsClient.close();
 	});
 
-	Ext.jwsClient.on('logoff', function(aResponse) {
+	Ext.jwsClient.on('OnLogoff', function (aResponse) {
 		Ext.getCmp('user_label').setText('         ');
 		closeQuotaPluginMainwindows();
 		showQuotaPluginLoginWindows();
 	});
 
-	Ext.jwsClient.on(jws.QuotaDemo.LISTENER_LOGON, function(aResponse) {
+	Ext.jwsClient.on(jws.QuotaDemo.LISTENER_LOGON, function (aResponse) {
 		eClient.innerHTML = jws.QuotaDemo.TEXT_AUTHENTICATED;
 		eClient.className = jws.QuotaDemo.CLS_AUTH;
 		showQuotaPluginMainWindows();
@@ -948,10 +942,10 @@ function showQuotaPluginMainWindows() {
 		proxy: lJWSProxy,
 		listeners: {
 			load: {
-				fn: function(records, operation, success) {
+				fn: function (records, operation, success) {
 
 					//the operation object contains all of the details of the load operation
-					Ext.each(expandedRecordRowExpandedExtQuota, function(el, index, to) {
+					Ext.each(expandedRecordRowExpandedExtQuota, function (el, index, to) {
 						var lEl = expandedRecordRowExpandedExtQuota.get(index);
 						if (lEl.expanded == true) {
 							rowExpandedExtQuota.expandRow(index);
@@ -978,7 +972,7 @@ function showQuotaPluginMainWindows() {
 	// create Vtype for vtype:'num'
 	var lNumTest = /^[0-9]+$/;
 	Ext.apply(Ext.form.field.VTypes, {
-		num: function(aVal, aField) {
+		num: function (aVal, aField) {
 			return lNumTest.test(aVal);
 		},
 		// vtype Text property: The error text to display when the validation function returns false
@@ -1041,7 +1035,7 @@ function showQuotaPluginMainWindows() {
 						text: 'Filter',
 						margins: '20 0 0 10',
 						width: 70,
-						handler: function() {
+						handler: function () {
 
 							var lForm = this.up('form').getForm();
 							if (lForm.isValid()) {
@@ -1199,7 +1193,7 @@ function showQuotaPluginMainWindows() {
 		],
 		buttons: [{
 				text: 'Reset',
-				handler: function() {
+				handler: function () {
 					this.up('form').getForm().reset();
 				}
 			}, {
@@ -1210,7 +1204,7 @@ function showQuotaPluginMainWindows() {
 				margins: '5 10 0 0',
 				alignTo: 'br',
 				bodyStyle: 'background-color:#D8E4F2',
-				handler: function() {
+				handler: function () {
 					var lForm = this.up('form').getForm();
 					var lAction = {
 						ns: jws.QuotaDemo.NS_QUOTA_PLUGIN,
@@ -1221,10 +1215,10 @@ function showQuotaPluginMainWindows() {
 
 						var lArguments = lForm.getValues();
 						Ext.jwsClient.send(lAction.ns, lAction.tokentype, lArguments, {
-							success: function(aToken) {
+							success: function (aToken) {
 								logMessage(aToken);
 							},
-							failure: function(aToken) {
+							failure: function (aToken) {
 								logMessage(aToken);
 							}
 						});
@@ -1303,10 +1297,10 @@ function showQuotaPluginMainWindows() {
 				dataIndex: 'value'
 			}],
 		listeners: {
-			select: function(aView, aRecord) {
+			select: function (aView, aRecord) {
 				lGridPanel.mLastSelected = aRecord.index;
 			},
-			selectionchange: function(aSelModel, aSelections) {
+			selectionchange: function (aSelModel, aSelections) {
 
 				Ext.getCmp('unregisterQuotabtn').setDisabled(aSelections.length === 0);
 				Ext.getCmp('alterQuotabtn').setDisabled(aSelections.length === 0);
@@ -1328,7 +1322,7 @@ function showQuotaPluginMainWindows() {
 				]
 			}]
 	});
-	lAlterQuotaChildClick = function(el) {
+	lAlterQuotaChildClick = function (el) {
 		var lSelection = lGridPanel.getView().getSelectionModel().getSelection()[0];
 		var childQuota = el.id.split("-");
 		if (lSelection && childQuota[2] === 'alter') {
@@ -1349,14 +1343,14 @@ function showQuotaPluginMainWindows() {
 
 
 	};
-	lUnregisterQuotaIconClick = function(el) {
+	lUnregisterQuotaIconClick = function (el) {
 
 		var lSelection = lGridPanel.getView().getSelectionModel().getSelection()[0];
 		if (lSelection) {
 
 			var childQuota = el.id.split("-");
 			log(childQuota);
-			Ext.Msg.confirm('Delete', 'Are you sure that you want to unregister the quota?', function(el) {
+			Ext.Msg.confirm('Delete', 'Are you sure that you want to unregister the quota?', function (el) {
 				if (el === 'yes') {
 					var lArguments = {
 						identifier: lSelection.data['identifier'],
@@ -1364,7 +1358,7 @@ function showQuotaPluginMainWindows() {
 						instance: childQuota[1]
 					};
 					Ext.jwsClient.send(jws.QuotaDemo.NS_QUOTA_PLUGIN, jws.QuotaDemo.TT_UNREGISTER, lArguments, {
-						success: function() {
+						success: function () {
 							var lForm = lFilterFormPanel.getForm();
 							if (lForm.isValid()) {
 
@@ -1379,14 +1373,14 @@ function showQuotaPluginMainWindows() {
 			});
 		}
 	};
-	var lDeleteQuotaClick = function(btn) {
+	var lDeleteQuotaClick = function (btn) {
 		var lSelection = lGridPanel.getView().getSelectionModel().getSelection()[0];
 		if (lSelection) {
-			Ext.Msg.confirm('Delete', 'Are you sure that you want to unregister the quota?', function(btn) {
+			Ext.Msg.confirm('Delete', 'Are you sure that you want to unregister the quota?', function (btn) {
 				if (btn === 'yes') {
 					var lArguments = lSelection.data;
 					Ext.jwsClient.send(jws.QuotaDemo.NS_QUOTA_PLUGIN, jws.QuotaDemo.TT_UNREGISTER, lArguments, {
-						success: function() {
+						success: function () {
 							var lForm = lFilterFormPanel.getForm();
 							if (lForm.isValid()) {
 
@@ -1401,13 +1395,13 @@ function showQuotaPluginMainWindows() {
 			});
 		}
 	};
-	var lRegisterQuotaClick = function() {
+	var lRegisterQuotaClick = function () {
 
 		var lSelection = lGridPanel.getView().getSelectionModel().getSelection()[0];
 		var lAlterWin = Ext.create('jws.quotaPlugin.registerQuotaWindow', lSelection.data);
 		lAlterWin.show();
 	};
-	var lAlterQuotaClick = function() {
+	var lAlterQuotaClick = function () {
 		var lSelection = lGridPanel.getView().getSelectionModel().getSelection()[0];
 		var lAlterWin = Ext.create('jws.quotaPlugin.alterWindow', lSelection.data);
 		lAlterWin.show();
@@ -1449,7 +1443,7 @@ function showQuotaPluginMainWindows() {
 		border: false,
 		items: [lFilterPanel, lFormPanel, lFormPanelTesting],
 		listeners: {
-			tabchange: function(aTabPanel, aNewCard, aOldCard, aOptions) {
+			tabchange: function (aTabPanel, aNewCard, aOldCard, aOptions) {
 				Ext.getCmp('msg_label').setText("");
 			}
 		}
@@ -1493,7 +1487,15 @@ function showQuotaPluginMainWindows() {
 						xtype: 'button',
 						style: 'width: auto; min-width: 50px;',
 						id: 'user_label',
-						iconCls: 'icon-user'
+						iconCls: 'icon-user',
+						handler: function () {
+							var lMessage = "<b>Id:</b> " + Ext.jwsClient.getConnection().getId() + "<br/>";
+							lMessage += "<b>Username:</b> " + Ext.jwsClient.getConnection().getUsername() + "<br/>";
+							lMessage += "<b>Subprotocol:</b> " + Ext.jwsClient.getConnection().getSubProt() + "<br/>";
+							lMessage += "<b>URL:</b> " + Ext.jwsClient.getConnection().getURL() + "<br/>";
+							lMessage += "<b>Reliability Options:</b> <pre>" + JSON.stringify(Ext.jwsClient.getConnection().getReliabilityOptions(), false, 3) + "</pre><br/>";
+							Ext.Msg.alert("User " + this.getText(), lMessage);
+						}
 					},
 					'|',
 					{
@@ -1501,18 +1503,18 @@ function showQuotaPluginMainWindows() {
 						componentCls: 'x-btn-default-toolbar-small-noicon x-over x-btn-over x-btn-default-toolbar-small-over',
 						text: 'logout',
 						listeners: {
-							'mouseout': function(aButton, aEvent) {
+							'mouseout': function (aButton, aEvent) {
 								aButton.addCls('x-btn-default-toolbar-small-noicon x-over x-btn-over x-btn-default-toolbar-small-over');
 							}
 						},
-						handler: function() {
-							Ext.jwsClient.getConnection().logout();
+						handler: function () {
+							Ext.jwsClient.getConnection().systemLogoff();
 						}
 					}
 				]
 			}],
 		listeners: {
-			afterrender: function() {
+			afterrender: function () {
 				Ext.tip.QuickTipManager.register({
 					target: Ext.get('identifier'),
 					text: 'Select the Quota Identifier to defined the behavior of your new quota',
@@ -1607,7 +1609,7 @@ function showQuotaPluginLoginWindows() {
 						fieldLabel: 'Password',
 						value: 'root',
 						listeners: {
-							specialkey: function(af, aE) {
+							specialkey: function (af, aE) {
 								if (af.getKey() === aE.ENTER) {
 									ldoQuotaPluginLogin(lLoginWin.down('form'));
 								}
@@ -1617,13 +1619,12 @@ function showQuotaPluginLoginWindows() {
 			}],
 		buttons: [{
 				text: 'Login',
-				handler: function() {
+				handler: function () {
 					ldoQuotaPluginLogin(lLoginWin.down('form'));
 				}
 			}]
 	}).show();
-	var ldoQuotaPluginLogin = function(alForm) {
-
+	var ldoQuotaPluginLogin = function (alForm) {
 		if (alForm.getForm().isValid()) {
 			Ext.jwsClient.getConnection().systemLogon(alForm.down('textfield[name=username]').getValue(),
 					alForm.down('textfield[name=password]').getValue());
@@ -1641,7 +1642,7 @@ function initDemo() {
 
 
 	var lPlugIn = {};
-	lPlugIn.processToken = function(aToken) {
+	lPlugIn.processToken = function (aToken) {
 
 //		log(aToken);
 
