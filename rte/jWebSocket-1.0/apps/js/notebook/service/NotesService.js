@@ -16,15 +16,17 @@
 //	See the License for the specific language governing permissions and
 //	limitations under the License.
 //	---------------------------------------------------------------------------
+/* global Packages, App, MongoDBUtils */
+
 NotesService = {
-	initialize: function(){
+	initialize: function () {
 		this.mongo = new Packages.com.mongodb.MongoClient('localhost');
 		this.database = this.mongo.getDB('notebook_db');
 		this.notes = this.database.getCollection('notes');
-		
+
 		App.getLogger().debug('NotesService: Initialized successfully!');
 	},
-	add: function(aUser, aTitle, aBody){
+	add: function (aUser, aTitle, aBody) {
 		this.notes.save(MongoDBUtils.toDBObject({
 			user: aUser,
 			title: aTitle,
@@ -33,7 +35,7 @@ NotesService = {
 			edited_at: new Date().getTime()
 		}));
 	},
-	edit: function(aUser, aNoteId, aTitle, aBody){
+	edit: function (aUser, aNoteId, aTitle, aBody) {
 		this.notes.update(MongoDBUtils.toDBObject({
 			_id: MongoDBUtils.toId(aNoteId),
 			user: aUser
@@ -45,29 +47,29 @@ NotesService = {
 			})
 		}));
 	},
-	list: function(aUser, aOffset, aLength){
+	list: function (aUser, aOffset, aLength) {
 		var lCursor = this.notes.find(MongoDBUtils.toDBObject({
 			user: aUser
 		})).skip(aOffset).limit(aLength).sort(MongoDBUtils.toDBObject({
 			created_at: true
 		}));
-		
+
 		return MongoDBUtils.toArray(lCursor);
-	}, 
-	remove: function(aUser, aNoteId){
+	},
+	remove: function (aUser, aNoteId) {
 		this.notes.remove(MongoDBUtils.toDBObject({
 			_id: MongoDBUtils.toId(aNoteId),
 			user: aUser
 		}));
 	},
-	count: function(aUser){
+	count: function (aUser) {
 		return this.notes.count(MongoDBUtils.toDBObject({
 			user: aUser
 		}));
 	},
-	shutdown: function(){
+	shutdown: function () {
 		this.mongo.close();
-		
+
 		App.getLogger().debug('NotesService: Shutdown successfully!');
 	}
-}
+};
