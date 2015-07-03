@@ -1,17 +1,19 @@
+/* global App, Packages */
+
 //App.importScript('${EXT}/jwsItemStoragePlugIn');
 //App.importScript('${EXT}/jwsItemStoragePlugInEE_min');
-App.loadJar('${APP_HOME}/StaticTest.jar');
 
-App.on('appLoaded', function(aHotLoad){
-	if (false === aHotLoad){
+App.on('appLoaded', function (aHotLoad) {
+	if (false === aHotLoad) {
+		App.loadJar('${APP_HOME}/StaticTest.jar');
 		App.loadToAppBeanFactory('${APP_HOME}/beans.xml');
 	}
-	
+
 //	logger = App.getLogger();
 //	server = App.getServerClient();
 //	server.addListener({
 //		processWelcome: function(){
-//			server.subscribeCollection('Contacts', 'secret');
+//			server.subscribeCollection('Contacts', 'secret');	
 //			server.setItemStorageCallbacks({
 //				OnItemSaved: function(aEvent){
 //					logger.debug(aEvent.name);
@@ -22,7 +24,7 @@ App.on('appLoaded', function(aHotLoad){
 //	server.open();
 
 	App.setModule('clock', {
-		getTime: function(){
+		getTime: function () {
 			return new Date().getTime();
 		}
 	});
@@ -30,24 +32,24 @@ App.on('appLoaded', function(aHotLoad){
 	lClock = App.getModule('clock');
 
 	App.publish('Main', {
-		list: function(aConnector){
-			server.listItems('Contacts', {
-				OnSuccess: function(aResponse){
-					App.sendToken(aConnector, aResponse);
-				}
-			});
+		list: function (aConnector) {
+//			server.listItems('Contacts', {
+//				OnSuccess: function(aResponse){
+//					App.sendToken(aConnector, aResponse);
+//				}
+//			});
 		},
-		test: function(){
+		test: function () {
 			return 'Response from test method on Main object ;)';
 		},
-		sandbox: function(){
+		sandbox: function () {
 			// should fire a security exception
 			Packages.org.jwebsocket.util.Tools.getTimer();
 		},
-		time: function(){
+		time: function () {
 			return lClock.getTime();
 		},
-		name: function(){
+		name: function () {
 			var lPerson = App.getAppBean('person');
 			return lPerson.getName();
 		}
