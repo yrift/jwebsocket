@@ -76,6 +76,7 @@
 							<outputDirectory>../../../rte/jWebSocket-${project.version}/libs</outputDirectory>
 							<descriptors>
 								<descriptor>src/assembly/one-jar.xml</descriptor>
+								<descriptor>src/assembly/android.xml</descriptor>
 							</descriptors>
 						</configuration>
 						<phase>install</phase>
