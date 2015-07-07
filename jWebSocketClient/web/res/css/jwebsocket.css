@@ -481,6 +481,9 @@ a.menulink:focus {
 	background: url(../../images/bullet_blue.png) 0px 2px no-repeat;
 	background-color: #f0f0f0;
 }
+a.menulink.nested{
+	margin-left: 10px;
+}
 
 a.sancBtnTop {
 	position: relative;
