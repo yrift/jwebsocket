@@ -1,0 +1,36 @@
+<assembly xmlns="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.3" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		  xsi:schemaLocation="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.3 http://maven.apache.org/xsd/assembly-1.1.3.xsd">
+	<!-- this id is appended to filename given in pom.xml -->
+	<id>AndroidBundle-${project.version}</id>
+	<formats>
+		<format>jar</format>
+	</formats>
+	
+	<includeBaseDirectory>false</includeBaseDirectory>
+	
+	<dependencySets>
+		<dependencySet>
+			<outputDirectory/>
+			<includes>
+				<include>${groupId}:${artifactId}</include>
+				
+				<include>log4j:log4j</include>
+				<include>org.springframework:spring-core</include>
+				<include>org.fusesource:sigar</include>
+				<include>javolution:javolution</include>
+				<include>com.fasterxml.jackson.core:jackson-databind</include>
+				<include>com.fasterxml.jackson.core:jackson-core</include>
+				<include>com.fasterxml.jackson.core:jackson-annotations</include>
+				<include>org.netbeans.external:json-2</include>
+				<include>commons-codec:commons-codec</include>
+				<include>org.apache.commons:commons-compress</include>
+				<include>commons-io:commons-io</include>
+				<include>commons-lang:commons-lang</include>
+				<!--jWebSocket Dependencies-->
+				<include>org.jwebsocket:jWebSocketCommon</include>
+				<include>org.jwebsocket:jWebSocketClientAPI</include>
+			</includes>
+			<unpack>true</unpack>
+		</dependencySet>
+	</dependencySets>
+</assembly>
