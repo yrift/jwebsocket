@@ -195,18 +195,21 @@ xcopy %libs%jWebSocketXMPPPlugIn-%ver%.jar %tempdir%libs\ /s /i /y
 xcopy %libs%jWebSocketClientAPI-%ver%.jar %tempdir%libs\ /s /i /y
 xcopy %libs%jWebSocketJavaSEClient-%ver%.jar %tempdir%libs\ /s /i /y
 xcopy %libs%jWebSocketJavaSEClient-Bundle-%ver%.jar %tempdir%libs\ /s /i /y
+xcopy %libs%jWebSocketJavaSEClient-AndroidBundle-%ver%.jar %tempdir%libs\ /s /i /y
 xcopy %libs%jWebSocketSwingGUI-%ver%.jar %tempdir%libs\ /s /i /y
 xcopy %libs%jWebSocketProxy-%ver%.jar %tempdir%libs\ /s /i /y
 xcopy %libs%jWebSocketSamples-%ver%.jar %tempdir%libs\ /s /i /y
 xcopy %libs%jWebSocketAMQStockTicker-%ver%.jar %tempdir%libs\ /s /i /y
 xcopy %libs%jWebSocketLDAP-%ver%.jar %tempdir%libs\ /s /i /y
+xcopy %libs%jWebSocketLDAP-Bundle-%ver%.jar %tempdir%libs\ /s /i /y
 xcopy %libs%jWebSocketSSO-%ver%.jar %tempdir%libs\ /s /i /y
+xcopy %libs%jWebSocketSSO-Bundle-%ver%.jar %tempdir%libs\ /s /i /y
 xcopy %libs%jWebSocketStockTickerPlugIn-%ver%.jar %tempdir%libs\ /s /i /y
 
 rem jWebSocket config and keystore files (from v1.0) for SSL
 echo f|xcopy %conf%jWebSocket.xml %tempdir%conf\jWebSocketDevFull.xml /s /i /y
 echo f|xcopy %conf%jWebSocketDeployment.xml %tempdir%conf\jWebSocket.xml /s /i /y
-xcopy xcopy %conf%jWebSocketScripting.xml %tempdir%libs\ /s /i /y
+xcopy %conf%jWebSocketScripting.xml %tempdir%libs\ /s /i /y
 
 rem spring config files (from v1.0)
 xcopy %conf%spring-beans.dtd %tempdir%conf\ /s /i /y
