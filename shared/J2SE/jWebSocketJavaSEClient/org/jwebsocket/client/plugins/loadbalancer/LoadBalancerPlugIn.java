@@ -18,6 +18,11 @@
 //	---------------------------------------------------------------------------
 package org.jwebsocket.client.plugins.loadbalancer;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import org.jwebsocket.api.WebSocketClientEvent;
+import org.jwebsocket.api.WebSocketClientListener;
+import org.jwebsocket.api.WebSocketPacket;
 import org.jwebsocket.api.WebSocketTokenClient;
 import org.jwebsocket.client.plugins.BaseClientTokenPlugIn;
 import org.jwebsocket.client.plugins.sample.SampleServicePlugIn;
@@ -37,143 +42,173 @@ import org.jwebsocket.token.WebSocketResponseTokenListener;
  */
 public class LoadBalancerPlugIn extends BaseClientTokenPlugIn {
 
-	/**
-	 *
-	 */
-	public static String DEFAULT_NS = JWebSocketClientConstants.NS_BASE + ".plugins.loadbalancer";
+        /**
+         *
+         */
+        public static String DEFAULT_NS = JWebSocketClientConstants.NS_BASE + ".plugins.loadbalancer";
 
-	/**
-	 *
-	 * @param aClient
-	 * @param aNS
-	 */
-	public LoadBalancerPlugIn(WebSocketTokenClient aClient, String aNS) {
-		super(aClient, aNS);
-	}
+        /**
+         *
+         * @param aClient
+         * @param aNS
+         */
+        public LoadBalancerPlugIn(WebSocketTokenClient aClient, String aNS) {
+                super(aClient, aNS);
+        }
 
-	/**
-	 *
-	 * @param aClient
-	 */
-	public LoadBalancerPlugIn(WebSocketTokenClient aClient) {
-		super(aClient, DEFAULT_NS);
-	}
+        /**
+         *
+         * @param aClient
+         */
+        public LoadBalancerPlugIn(WebSocketTokenClient aClient) {
+                super(aClient, DEFAULT_NS);
+        }
 
-	/**
-	 * Gets a list (of maps) with the information about all clusters.
-	 *
-	 * @param aListener
-	 * @throws WebSocketException
-	 */
-	public void clustersInfo(WebSocketResponseTokenListener aListener) throws WebSocketException {
-		Token lRequest = TokenFactory.createToken(getNS(), "clustersInfo");
+        /**
+         * Gets a list (of maps) with the information about all clusters.
+         *
+         * @param aListener
+         * @throws WebSocketException
+         */
+        public void clustersInfo(WebSocketResponseTokenListener aListener) throws WebSocketException {
+                Token lRequest = TokenFactory.createToken(getNS(), "clustersInfo");
 
-		getTokenClient().sendToken(lRequest, aListener);
-	}
+                getTokenClient().sendToken(lRequest, aListener);
+        }
 
-	/**
-	 * Gets a list of all sticky routes managed by the load balancer.
-	 *
-	 * @param aListener
-	 * @throws WebSocketException
-	 */
-	public void stickyRoutes(WebSocketResponseTokenListener aListener) throws WebSocketException {
-		Token lRequest = TokenFactory.createToken(getNS(), "stickyRoutes");
+        /**
+         * Gets a list of all sticky routes managed by the load balancer.
+         *
+         * @param aListener
+         * @throws WebSocketException
+         */
+        public void stickyRoutes(WebSocketResponseTokenListener aListener) throws WebSocketException {
+                Token lRequest = TokenFactory.createToken(getNS(), "stickyRoutes");
 
-		getTokenClient().sendToken(lRequest, aListener);
-	}
+                getTokenClient().sendToken(lRequest, aListener);
+        }
 
-	/**
-	 * Changes the type of algorithm used by the load balancer.
-	 *
-	 * @param aValue
-	 * @param aListener
-	 * @throws WebSocketException
-	 */
-	public void changeAlgorithm(int aValue, WebSocketResponseTokenListener aListener) throws WebSocketException {
-		Token lRequest = TokenFactory.createToken(getNS(), "changeAlgorithm");
+        /**
+         * Changes the type of algorithm used by the load balancer.
+         *
+         * @param aValue
+         * @param aListener
+         * @throws WebSocketException
+         */
+        public void changeAlgorithm(int aValue, WebSocketResponseTokenListener aListener) throws WebSocketException {
+                Token lRequest = TokenFactory.createToken(getNS(), "changeAlgorithm");
 
-		lRequest.setInteger("algorithm", aValue);
+                lRequest.setInteger("algorithm", aValue);
 
-		getTokenClient().sendToken(lRequest, aListener);
-	}
+                getTokenClient().sendToken(lRequest, aListener);
+        }
 
-	/**
-	 * Registers a new service endpoint in specific cluster.
-	 *
-	 * @param aClusterAlias
-	 * @param aPassword
-	 * @param aListener
-	 * @throws WebSocketException
-	 */
-	public void registerServiceEndPoint(String aClusterAlias, String aPassword,
-			WebSocketResponseTokenListener aListener) throws WebSocketException {
-		Token lRequest = TokenFactory.createToken(getNS(), "registerServiceEndPoint");
+        /**
+         * Registers a new service endpoint in specific cluster.
+         *
+         * @param aClusterAlias
+         * @param aPassword
+         * @param aListener
+         * @throws WebSocketException
+         */
+        public void registerServiceEndPoint(String aClusterAlias, String aPassword,
+                WebSocketResponseTokenListener aListener) throws WebSocketException {
+                Token lRequest = TokenFactory.createToken(getNS(), "registerServiceEndPoint");
 
-		lRequest.setString("password", aPassword);
-		lRequest.setString("clusterAlias", aClusterAlias);
+                lRequest.setString("password", aPassword);
+                lRequest.setString("clusterAlias", aClusterAlias);
 
-		getTokenClient().sendToken(lRequest, aListener);
-	}
+                getTokenClient().sendToken(lRequest, aListener);
+        }
 
-	/**
-	 * De-registers a connected service endpoint.
-	 *
-	 * @param aClusterAlias
-	 * @param aPassword
-	 * @param aEndpoinId
-	 * @param aListener
-	 * @throws WebSocketException
-	 */
-	public void deregisterServiceEndPoint(String aClusterAlias, String aPassword, String aEndpoinId,
-			WebSocketResponseTokenListener aListener) throws WebSocketException {
-		Token lRequest = TokenFactory.createToken(getNS(), "deregisterServiceEndPoint");
+        /**
+         * De-registers a connected service endpoint.
+         *
+         * @param aClusterAlias
+         * @param aPassword
+         * @param aEndpoinId
+         * @param aListener
+         * @throws WebSocketException
+         */
+        public void deregisterServiceEndPoint(String aClusterAlias, String aPassword, String aEndpoinId,
+                WebSocketResponseTokenListener aListener) throws WebSocketException {
+                Token lRequest = TokenFactory.createToken(getNS(), "deregisterServiceEndPoint");
 
-		lRequest.setString("password", aPassword);
-		lRequest.setString("clusterAlias", aClusterAlias);
-		lRequest.setString("endPointId", aEndpoinId);
+                lRequest.setString("password", aPassword);
+                lRequest.setString("clusterAlias", aClusterAlias);
+                lRequest.setString("endPointId", aEndpoinId);
 
-		getTokenClient().sendToken(lRequest, aListener);
-	}
+                getTokenClient().sendToken(lRequest, aListener);
+        }
 
-	/**
-	 * Should send a message to the referenced endpoint to gracefully shutdown.
-	 *
-	 * @param aClusterAlias
-	 * @param aPassword
-	 * @param aEndpoinId
-	 * @param aListener
-	 * @throws WebSocketException
-	 */
-	public void shutdownEndPoint(String aClusterAlias, String aPassword, String aEndpoinId,
-			WebSocketResponseTokenListener aListener) throws WebSocketException {
-		Token lRequest = TokenFactory.createToken(getNS(), "shutdownServiceEndPoint");
+        /**
+         * Should send a message to the referenced endpoint to gracefully
+         * shutdown.
+         *
+         * @param aClusterAlias
+         * @param aPassword
+         * @param aEndpoinId
+         * @param aListener
+         * @throws WebSocketException
+         */
+        public void shutdownEndPoint(String aClusterAlias, String aPassword, String aEndpoinId,
+                WebSocketResponseTokenListener aListener) throws WebSocketException {
+                Token lRequest = TokenFactory.createToken(getNS(), "shutdownServiceEndPoint");
 
-		lRequest.setString("password", aPassword);
-		lRequest.setString("clusterAlias", aClusterAlias);
-		lRequest.setString("endPointId", aEndpoinId);
+                lRequest.setString("password", aPassword);
+                lRequest.setString("clusterAlias", aClusterAlias);
+                lRequest.setString("endPointId", aEndpoinId);
 
-		getTokenClient().sendToken(lRequest, aListener);
-	}
+                getTokenClient().sendToken(lRequest, aListener);
+        }
 
-	/**
-	 * Create a new sample service endpoint.
-	 *
-	 * @param aClusterAlias The target service cluster to register the service.
-	 * @param aPassword The service cluster password.
-	 * @param aEndpointNS The service cluster name-space.
-	 * @param aListener
-	 * @throws WebSocketException
-	 */
-	public void sampleService(String aClusterAlias, String aPassword, String aEndpointNS,
-			WebSocketResponseTokenListener aListener) throws WebSocketException {
-		JWebSocketTokenClient lClient = new JWebSocketTokenClient();
-		lClient.open(getTokenClient().getURI().toString());
-		lClient.login("root", "root");
+        /**
+         * Create a new sample service endpoint.
+         *
+         * @param aClusterAlias The target service cluster to register the
+         * service.
+         * @param aPassword The service cluster password.
+         * @param aEndpointNS The service cluster name-space.
+         * @param aListener
+         * @throws WebSocketException
+         */
+        public void sampleService(final String aClusterAlias, final String aPassword, final String aEndpointNS,
+                final WebSocketResponseTokenListener aListener) throws WebSocketException {
+                final JWebSocketTokenClient lClient = new JWebSocketTokenClient();
 
-		SampleServicePlugIn lServiceEndpoint = new SampleServicePlugIn(lClient, aEndpointNS);
-		LoadBalancerPlugIn lServiceEndpointPlugIn = new LoadBalancerPlugIn(lServiceEndpoint.getTokenClient());
+                lClient.addListener(new WebSocketClientListener() {
+                        @Override
+                        public void processOpening(WebSocketClientEvent aEvent) {
+                        }
 
-		lServiceEndpointPlugIn.registerServiceEndPoint(aClusterAlias, aPassword, aListener);
-	}
+                        @Override
+                        public void processOpened(WebSocketClientEvent aEvent) {
+                                SampleServicePlugIn lServiceEndpoint = new SampleServicePlugIn(lClient, aEndpointNS);
+                                LoadBalancerPlugIn lServiceEndpointPlugIn = new LoadBalancerPlugIn(lServiceEndpoint.getTokenClient());
+
+                                try {
+                                        lServiceEndpointPlugIn.registerServiceEndPoint(aClusterAlias, aPassword, aListener);
+                                } catch (WebSocketException ex) {
+                                        Logger.getLogger(LoadBalancerPlugIn.class.getName()).log(Level.SEVERE, null, ex);
+                                }
+                        }
+
+                        @Override
+                        public void processPacket(WebSocketClientEvent aEvent, WebSocketPacket aPacket) {
+                        }
+
+                        @Override
+                        public void processClosed(WebSocketClientEvent aEvent) {
+
+                        }
+
+                        @Override
+                        public void processReconnecting(WebSocketClientEvent aEvent) {
+                        }
+                });
+
+                lClient.open(getTokenClient().getURI().toString());
+                lClient.login("root", "root");
+
+        }
 }
