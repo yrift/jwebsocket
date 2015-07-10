@@ -160,6 +160,10 @@ $.widget("jws.fileUploaderDemo", {
 					OnFileDeleted: w.fileUploader.onFileDeleted
 				});
 			},
+			OnWelcome: function (aToken) {
+				console.log(aToken);
+				w.fileUploader.mMaxFrameSize = aToken.maxFrameSize;
+			},
 			OnClose: function ( ) {
 				w.fileUploader.eChunkInput.attr('disabled', true);
 				w.fileUploader.eAliasInput.attr('disabled', true);
@@ -233,6 +237,7 @@ $.widget("jws.fileUploaderDemo", {
 		mWSC.startUpload( );
 	},
 	onFileSelected: function (aEvent, aFiles) {
+		var lBigFiles = [];
 		for (var lIdx = 0; lIdx < aFiles.length; lIdx++) {
 			var lExists = false;
 			for (var lFileIdx = 0; lFileIdx < mWSC.queue.length; lFileIdx++) {
@@ -241,10 +246,21 @@ $.widget("jws.fileUploaderDemo", {
 					break;
 				}
 			}
+			if (aFiles[lIdx].size > w.fileUploader.mMaxFrameSize) {
+				lExists = true;
+				lBigFiles.push(aFiles[lIdx].name);
+			}
 			if (!lExists) {
 				w.fileUploader.addFileToTable(aFiles[lIdx]);
 			}
 //			w.fileUploader.updateProgress( aFiles[lIdx].name, 100 );
+		}
+		if (lBigFiles.length > 0) {
+			jwsDialog("The file" + (lBigFiles.length > 1 ? "s" : "") + " <b>" +
+					lBigFiles.join(", ") + "</b> could not be added because exceed" +
+					(lBigFiles.length > 1 ? "" : "s") + " the maximum frame size " +
+					"allowed by the server: " + w.fileUploader.mMaxFrameSize + " bytes.",
+					"Not allowed to upload", true, "alert");
 		}
 	},
 	onFileDeleted: function (aEvent, aData) {
