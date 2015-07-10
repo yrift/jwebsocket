@@ -395,9 +395,15 @@ public class SenchaDemoPlugIn extends TokenPlugIn {
 				lResult.setInteger("code", -1);
 				lMsg = "there is no customer with id " + lUserId + " and name " + lName;
 			} else {
-				lUser.setEmail(lEmail);
-				lUser.setName(lName);
-				lUser.setAge(lAge);
+				if (null != lEmail) {
+					lUser.setEmail(lEmail);
+				}
+				if (null != lName) {
+					lUser.setName(lName);
+				}
+				if (null != lAge) {
+					lUser.setAge(lAge);
+				}
 
 				lMsg = "User with id: " + lUserId + " updated correctly";
 
