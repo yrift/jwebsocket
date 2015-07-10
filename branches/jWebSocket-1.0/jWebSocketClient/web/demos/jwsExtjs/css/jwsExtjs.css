@@ -104,3 +104,16 @@ p.feeds{
 	font-size: 14px;
 	color:#afafaf;
 }
+input[type=text], input[type=password], textarea {
+	 font-size: 13px; 
+	 text-shadow: none; 
+	 border: none;
+	 height: 20px; 
+	  padding: 5px;
+	 -webkit-border-radius: initial; 
+	-moz-border-radius: initial;
+	 border-radius: initial; 
+	-moz-box-shadow: none;
+	 -webkit-box-shadow: none;
+	 box-shadow: none;
+}

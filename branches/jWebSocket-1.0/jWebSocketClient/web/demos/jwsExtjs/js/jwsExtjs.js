@@ -477,9 +477,11 @@ function initDemo() {
 
 		Ext.create('Ext.panel.Panel', {
 			id: 'main_layout_container',
-			width: '100%',
+			width: '96.5%',
+			margin: '0 12',
 			height: 500,
 			layout: 'border',
+			style: 'border: 1px solid #157fcc;',
 			items: [{
 					xtype: 'panel',
 					title: 'ExtJS Grid jWebSocket demo',
