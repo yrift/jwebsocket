@@ -59,7 +59,6 @@ Ext.application({
 			Ext.jwsClient.addPlugIn({
 				// global behiavor for failure messages
 				processToken: function (aMessage) {
-					console.log(aMessage)
 					if ('response' === aMessage.type && 0 !== aMessage.code && aMessage.reqType !== "getAuthorities") {
 						Ext.Msg.show({
 							msg: aMessage.msg,
