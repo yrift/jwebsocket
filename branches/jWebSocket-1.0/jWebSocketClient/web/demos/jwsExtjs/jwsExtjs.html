@@ -29,22 +29,20 @@
 
         <title>jWebSocket Sencha Demo</title>
 
-        <!-- ExtJS STYLES  -->
-		<link rel="stylesheet" type="text/css" href="../../lib/ExtJS/css/ext-all-4.1.1.css"/>
-
         <!-- DEMO STYLES  -->
         <link rel="stylesheet" type="text/css" href="../../res/css/demos.css"/>
 		<link rel="stylesheet" type="text/css" href="css/jwsExtjs.css" />
 
 		<!-- EXTJS LIBRARIES	-->
-		<script type="text/javascript" src="../../lib/ExtJS/ext-all-4.1.1.js"></script>
+		<link rel="stylesheet" type="text/css" href="../../lib/ExtJS/ExtJS-5.1.0/build/packages/ext-theme-neptune/build/resources/ext-theme-neptune-all.css"/>
+		<script type="text/javascript" src="../../lib/ExtJS/ExtJS-5.1.0/build/ext-all.js"></script>
+		<script type="text/javascript" src="../../lib/ExtJS/ExtJS-5.1.0/build/packages/ext-theme-neptune/build/ext-theme-neptune.js"></script>
 
 		<!-- JWEBSOCKET JAVASCRIPT CLIENT LIBRARIES -->
         <script type="text/javascript" src="../../res/js/jWebSocket.js"></script>
 
 		<!--DEMO LIBRARIES -->
 		<script type="text/javascript" src="js/jwsExtjs.js"></script>
-
     </head>
     <body>
         <div id="demo_box">
@@ -99,8 +97,9 @@
 						in real-time.
 					</div>
                     <div id="main_content">
+						<div id="ext_render_container"></div>
 						<div id="not_connected">You are not connected, please press connect button!</div>
-                        <div  style="display: none;">
+                        <div style="display: none;">
 							<div id="contact">
 								<b id="header">jWebSocket Sencha Demo</b>
 								<div id="line"></div>
@@ -111,7 +110,7 @@
 									with ExtJS-Sencha framework.
 								</p>
 								<p class="feeds">Authors:
-									<b>Osvaldo Aguilar Lauzurique, Alexander Rojas Hern&aacute;ndez</b>
+									<b>Osvaldo Aguilar Lauzurique, Alexander Rojas Hern&aacute;ndez, Victor Antonio Barzana Crespo</b>
 								</p>
 							</div>
 						</div>
