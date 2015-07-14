@@ -62,7 +62,7 @@ cd
 pushd ..\jWebSocketClient\web\test\js
 
 echo Creating jWebSocket_Test_Bundle.js...
-copy /b jwsAutomatedAPITests.js + jwsBenchmarks.js + jwsChannelTests.js + jwsEventsTests.js + jwsFilesystemTests.js + jwsIOC.js + jwsItemStorageTests.js + jwsJDBCTests.js + jwsJMSTests.js + jwsLoadBalancerTests.js + jwsLoadTests.js + jwsLoggingTests.js + jwsQuotaTests.js + jwsReportingTests.js + jwsREST.js + jwsRPCTests.js + jwsScriptingPlugInTest.js + jwsSharedTests.js + jwsStreamingTests.js + jwsSystemTests.js jWebSocket_Test_Bundle.js
+copy /b jwsAutomatedAPITests.js + jwsBenchmarks.js + jwsChannelTests.js + jwsFilesystemTests.js + jwsIOC.js + jwsItemStorageTests.js + jwsJDBCTests.js + jwsJMSTests.js + jwsLoadBalancerTests.js + jwsLoadTests.js + jwsLoggingTests.js + jwsQuotaTests.js + jwsReportingTests.js + jwsREST.js + jwsRPCTests.js + jwsScriptingPlugInTest.js + jwsSharedTests.js + jwsStreamingTests.js + jwsSystemTests.js jWebSocket_Test_Bundle.js
 echo jWebSocket_Test_Bundle.js successfully created!
 
 popd
