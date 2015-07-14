@@ -67,7 +67,7 @@
 					<execution>
 						<id>Bundle</id>
 						<configuration>
-							<finalName>jWebSocketDynamicSQL</finalName>
+							<finalName>jWebSocketDynamicSQL-Bundle</finalName>
 							<outputDirectory>../../../../rte/jWebSocket-${project.version}/libs</outputDirectory>
 							<descriptors>
 								<descriptor>src/assembly/one-jar.xml</descriptor>
