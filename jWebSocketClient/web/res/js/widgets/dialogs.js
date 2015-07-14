@@ -49,13 +49,13 @@
  * @param aWidth Optional, the width of the dialog window
  */
 
-jws.dialog = {
+jwsDialogs = {
 	showBootstrapDialog: function (aTitle, aBody, aButtons) {
 		// TODO: optimize this here to not remove the dialog, but instead hide 
 		// it every time, this condition checks if there is no dialog to remove, 
 		// then we create a new Id
-		if (!this.hideBootstrapDialog('#' + jws.dialog.mSavedId)) {
-			jws.dialog.mSavedId = jws.tools.createUUID();
+		if (!this.hideBootstrapDialog('#' + jwsDialogs.mSavedId)) {
+			jwsDialogs.mSavedId = jws.tools.createUUID();
 		}
 
 		var lBody = '<div class="modal-body">' + aBody + '</div>',
@@ -67,7 +67,7 @@ jws.dialog = {
 				'<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>' +
 				'<h4 class="modal-title">' + aTitle + '</h4>' +
 				'</div>',
-				lModal = $('<div class="modal fade"  id="' + jws.dialog.mSavedId + '">' +
+				lModal = $('<div class="modal fade"  id="' + jwsDialogs.mSavedId + '">' +
 						'<div class="modal-dialog">' +
 						'<div class="modal-content">' +
 						lModalHeader +
