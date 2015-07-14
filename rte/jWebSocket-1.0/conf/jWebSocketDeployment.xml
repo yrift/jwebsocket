@@ -2256,18 +2256,6 @@
 			</server-assignments>
 		</plugin>
 		
-		<!--
-		<plugin>
-		   <name>org.jwebsocket.plugins.events.EventsPlugIn</name>
-		   <ns>test</ns>
-		   <id>jws.events.test</id>
-		   <jar>jWebSocketEventsPlugIn-1.0.jar</jar>
-		   <server-assignments>
-			  <server-assignment>ts0</server-assignment>
-		   </server-assignments>
-		</plugin>
-		-->
-		
 		<!-- Sample for Java Card -->
 		<!--
 		<plugin>
