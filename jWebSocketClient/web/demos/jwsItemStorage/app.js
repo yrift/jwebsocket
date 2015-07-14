@@ -49,12 +49,6 @@ Ext.application({
 		});
 		
 		Ext.jwsClient.on('OnOpen', function () {
-			Ext.jwsClient.getConnection().systemGetAuthorities({
-				OnSuccess: function(aToken){
-					// Authenticated
-					Ext.jwsClient.fireEvent("OnLogon", aToken);
-				}
-			});
 			Ext.getBody().unmask();
 			Ext.jwsClient.addPlugIn({
 				// global behiavor for failure messages
@@ -120,7 +114,6 @@ Ext.application({
 						self.fireEvent('collectionAuthorization', aEvent);
 					}
 				});
-
 
 				// openning main view
 				Ext.create('Ext.container.Viewport', {
