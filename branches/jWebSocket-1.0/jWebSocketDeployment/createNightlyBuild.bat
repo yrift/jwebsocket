@@ -101,18 +101,31 @@ echo -----------------------------------------------------
 echo         NIGHTLY BUILD SUCCESSFULLY CREATED!
 echo -----------------------------------------------------
 
-set /p option=Do you want to deploy the created Nightly Build to our Maven Repository now (y/n)?
-if "%option%"=="y" goto proceedDeployment
+set /p option=Do you want to deploy the created Nightly Build to our FTP Repository now (y/n)?
+if "%option%"=="y" goto proceedFTPDeployment
 goto scan
 
-:proceedDeployment
+:proceedFTPDeployment
 echo.
 echo -----------------------------------------------------
-echo Running 4_uploadNightlyBuildToMaven.bat to upload all the 
+echo Running 4_uploadNightlyBuildToFTP.bat to upload all the 
+echo generated nightly build packages to our FTP Repository
+echo -----------------------------------------------------
+rem Upload nightly build to the repository, parameters %1: "skip prompts", %2: "skip compilation", %3: "log output folder"
+call 4_uploadNightlyBuildToFTP.bat /y %logfolder_deployment%\
+
+set /p option=Do you want to deploy the created Nightly Build to our Maven Repository now (y/n)?
+if "%option%"=="y" goto proceedMavenDeployment
+goto scan
+
+:proceedMavenDeployment
+echo.
+echo -----------------------------------------------------
+echo Running 5_uploadNightlyBuildToMaven.bat to upload all the 
 echo generated nightly build packages to our Maven Repository
 echo -----------------------------------------------------
 rem Upload nightly build to the repository, parameters %1: "skip prompts", %2: "skip compilation", %3: "log output folder"
-call 4_uploadNightlyBuildToMaven.bat /y /y %logfolder_deployment%
+call 5_uploadNightlyBuildToMaven.bat /y /y %logfolder_deployment%
 
 :scan
 
