@@ -23,6 +23,7 @@ pause
 :dontAsk1
 set ver=%JWEBSOCKET_VER%
 set src=..\
+set fciv=tools\fciv.exe
 
 set rte=..\..\..\rte\jWebSocket-%ver%\
 set bin=%rte%bin\
@@ -470,6 +471,20 @@ rem 7z u -mx9 -r -tzip "%dest%" "%down%jWebSocketServer-Bundle-%JWEBSOCKET_VER%.
 7z u -mx9 -r -tzip "%dest%" "%down%jWebSocketAMQStockTickerService64-%JWEBSOCKET_VER%.zip"
 7z u -mx9 -r -tzip "%dest%" "%depl%ReadMe_jWebSocket.txt"
 
+:createSHA1
+rem Now we create all SHA1 files for integrity check in the download files
+%fciv% -add %down%jWebSocket-%ver%.zip -sha1 >%down%jWebSocket-%ver%.zip.sha1
+%fciv% -add %down%jWebSocketAMQStockTicker-%ver%.zip -sha1 >%down%jWebSocketAMQStockTicker-%ver%.zip.sha1
+%fciv% -add %down%jWebSocketAppSrvDemo-%ver%.zip -sha1 >%down%jWebSocketAppSrvDemo-%ver%.zip.sha1
+%fciv% -add %down%jWebSocketClient-%ver%.zip -sha1 >%down%jWebSocketClient-%ver%.zip.sha1
+%fciv% -add %down%jWebSocketFullSources-%ver%.zip -sha1 >%down%jWebSocketFullSources-%ver%.zip.sha1
+%fciv% -add %down%jWebSocketJetty-%ver%.zip -sha1 >%down%jWebSocketJetty-%ver%.zip.sha1
+%fciv% -add %down%jWebSocketProxy-%ver%.zip -sha1 >%down%jWebSocketProxy-%ver%.zip.sha1
+%fciv% -add %down%jWebSocketServer-%ver%.zip -sha1 >%down%jWebSocketServer-%ver%.zip.sha1
+%fciv% -add %down%jWebSocketServer-Bundle-%ver%.zip -sha1 >%down%jWebSocketServer-Bundle-%ver%.zip.sha1
+%fciv% -add %down%jWebSocketTomcatEngine-%ver%.zip -sha1 >%down%jWebSocketTomcatEngine-%ver%.zip.sha1
+%fciv% -add %down%jWebSocketWebAppDemo-%ver%.zip -sha1 >%down%jWebSocketWebAppDemo-%ver%.zip.sha1
+%fciv% -add %down%jWebSocketWindows-%ver%.zip -sha1 >%down%jWebSocketWindows-%ver%.zip.sha1
 
 :end
 
