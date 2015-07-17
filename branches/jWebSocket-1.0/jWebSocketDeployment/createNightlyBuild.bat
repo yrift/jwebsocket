@@ -69,7 +69,7 @@ echo Starting Nightly Build into %logfile_0%, %logfile_1%, %logfile_2%, %logfile
 if "%2"=="/y" goto no_javadocs
 echo.
 echo -----------------------------------------------------
-echo Running createJavaDocs.bat...
+echo Running 0_createJavaDocs.bat...
 echo -----------------------------------------------------
 if "%1"=="/y" goto createJavaDocs
 set /p option=Do you want to create jWebSocket Java Docs now (y/n)?
@@ -78,37 +78,37 @@ goto minifyJS
 
 :createJavaDocs
 rem generate the java docs (saved to client web) Passing as parameter the log file location
-call createJavaDocs.bat /y %logfile_java_docs%
+call 0_createJavaDocs.bat /y %logfile_java_docs%
 :no_javadocs
 
 :minifyJS
 rem create client side bundles and minified versions
 echo.
 echo -----------------------------------------------------
-echo Running 0_createJSDocs.bat...
+echo Running 1_createJavaDocs.bat...
 echo -----------------------------------------------------
 rem First parameter skips prompts, second is the logs folder for jasob output
-call 0_createJSDocs.bat /y %logfolder_jasob% > %logfile_0%
+call 1_createJavaDocs.bat /y %logfolder_jasob% > %logfile_0%
 
 echo.
 echo -----------------------------------------------------
-echo Running 1_cleanAndBuildAll.bat...
+echo Running 2_cleanAndBuildAll.bat...
 echo -----------------------------------------------------
 echo Cleaning and building the project MAY TAKE SEVERAL MINUTES.
 echo Please check the compilation logs here: %logfile_1%
-call 1_cleanAndBuildAll.bat /y > %logfile_1%
+call 2_cleanAndBuildAll.bat /y > %logfile_1%
 
 echo.
 echo -----------------------------------------------------
 echo Running 2_createRunTimeFiles...
 echo -----------------------------------------------------
-call 2_createRunTimeFiles.bat /y > %logfile_2%
+call 3_createRunTimeFiles.bat /y > %logfile_2%
 
 echo.
 echo -----------------------------------------------------
 echo Running 3_createDownloadFiles...
 echo -----------------------------------------------------
-call 3_createDownloadFiles.bat /y > %logfile_3%
+call 4_createDownloadFiles.bat /y > %logfile_3%
 
 echo.
 echo -----------------------------------------------------
@@ -119,10 +119,10 @@ if "%3"=="/y" goto no_ftp_deployment
 :proceed_to_ftp_deployment
 echo.
 echo -----------------------------------------------------
-echo Running 4_uploadNightlyBuildToFTP.bat to upload all the generated nightly build packages to our FTP Repository
+echo Running 5_uploadNightlyBuildToFTP.bat to upload all the generated nightly build packages to our FTP Repository
 echo -----------------------------------------------------
 rem Upload nightly build to the repository, parameters %1: "skip prompts", %2: "skip compilation", %3: "log output folder"
-call 4_uploadNightlyBuildToFTP.bat /y %logfolder_deployment%\
+call 5_uploadNightlyBuildToFTP.bat /y %logfolder_deployment%\
 :no_ftp_deployment
 
 if "%1"=="/y" goto proceed_to_maven_deployment
@@ -134,11 +134,11 @@ goto scan
 if "%4"=="/y" goto no_maven_deployment
 echo.
 echo -----------------------------------------------------
-echo Running 5_uploadNightlyBuildToMaven.bat to upload all the 
+echo Running 6_uploadNightlyBuildToMaven.bat to upload all the 
 echo generated nightly build packages to our Maven Repository
 echo -----------------------------------------------------
 rem Upload nightly build to the repository, parameters %1: "skip prompts", %2: "skip compilation", %3: "log output folder"
-call 5_uploadNightlyBuildToMaven.bat /y /y %logfolder_deployment%
+call 6_uploadNightlyBuildToMaven.bat /y /y %logfolder_deployment%
 
 :no_maven_deployment
 :scan
