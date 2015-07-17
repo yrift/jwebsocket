@@ -77,6 +77,8 @@ goto start
 	rem Now we need to ignore the logs folder and commit the chages to subversion automatically
 	echo Ignoring the logs folder NIGHTLY_BUILD_LOGS from being uploaded to subversion
 	svn propset svn:ignore NIGHTLY_BUILD_LOGS .
+	echo Skipping the file 5_uploadNightlyBuildToFTP.bat because it may have a configured password on it :)
+	svn propset svn:ignore 5_uploadNightlyBuildToFTP.bat .
 	echo.
 	echo The following files have been changed:
 	svn status %JWEBSOCKET_HOME%..\..\branches\
