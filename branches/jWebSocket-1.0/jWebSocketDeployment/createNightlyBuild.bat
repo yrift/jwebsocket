@@ -63,6 +63,7 @@ set logfile_2=%LOGS_FOLDER%/2_createRunTimeFiles.log
 set logfile_3=%LOGS_FOLDER%/3_createDownloadFiles.log
 set logfolder_deployment=%CD%/%LOGS_FOLDER%/DEPLOYMENT_LOGS
 set logfolder_jasob=%CD%/%LOGS_FOLDER%/
+set logfolder_update_build_number=%CD%/%LOGS_FOLDER%/updateBuildNumbers.log
 
 echo Starting Nightly Build into %logfile_0%, %logfile_1%, %logfile_2%, %logfile_3%...
 
@@ -73,7 +74,7 @@ echo -----------------------------------------------------
 rem the following script receives two parameters:
 rem %1: do not show pause or prompts
 rem %2: do not upload changes to subversion repository
-call 0_updateSVNReplaceBuildNumbers.bat /y /y
+call 0_updateSVNReplaceBuildNumbers.bat /y /y > %logfolder_update_build_number%
 
 
 if "%2"=="/y" goto no_javadocs
@@ -132,7 +133,7 @@ echo -----------------------------------------------------
 echo Running 5_uploadNightlyBuildToFTP.bat to upload all the generated nightly build packages to our FTP Repository
 echo -----------------------------------------------------
 rem Upload nightly build to the repository, parameters %1: "skip prompts", %2: "skip compilation", %3: "log output folder"
-call 5_uploadNightlyBuildToFTP.bat /y %logfolder_deployment%\
+call 5_uploadNightlyBuildToFTP.bat /y %logfolder_deployment%\ > %logfolder_deployment%\5_uploadNightlyBuildToFTP.log
 :no_ftp_deployment
 
 if "%1"=="/y" goto proceed_to_maven_deployment
