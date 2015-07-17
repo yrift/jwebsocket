@@ -398,7 +398,7 @@ for /L %%i in (1,1,%LENGTH%) do (
 	echo VERSION: %JWEBSOCKET_VER%!JWS_DEPLOY_VER[%%i]!
 	echo REPOSITORY ID - URL: %REPO_ID% - %REPO_URL%
 	echo Please wait until the process finishes the execution...
-	call 5_1_doMavenUploadModule.bat !MODULES[%%i]! !ARTIFACT_ID[%%i]! !JWS_DEPLOY_VER[%%i]! > %log%\!MODULES[%%i]!\output.log
+	call 6_1_doMavenUploadModule.bat !MODULES[%%i]! !ARTIFACT_ID[%%i]! !JWS_DEPLOY_VER[%%i]! > %log%\!MODULES[%%i]!\output.log
 	echo REVERTING VERSION TO THE ORIGINAL %JWEBSOCKET_VER%
 	pushd ..\!MODULES[%%i]!
 	call mvn versions:set -DnewVersion=%JWEBSOCKET_VER% > %log%\!MODULES[%%i]!\version_reverted.log
