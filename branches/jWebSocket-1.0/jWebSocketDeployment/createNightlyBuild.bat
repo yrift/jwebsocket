@@ -66,10 +66,20 @@ set logfolder_jasob=%CD%/%LOGS_FOLDER%/
 
 echo Starting Nightly Build into %logfile_0%, %logfile_1%, %logfile_2%, %logfile_3%...
 
+echo.
+echo -----------------------------------------------------
+echo Running 1.1_createJSDocs.bat...
+echo -----------------------------------------------------
+rem the following script receives two parameters:
+rem %1: do not show pause or prompts
+rem %2: do not upload changes to subversion repository
+call 0_updateSVNReplaceBuildNumbers.bat /y /y
+
+
 if "%2"=="/y" goto no_javadocs
 echo.
 echo -----------------------------------------------------
-echo Running 0_createJavaDocs.bat...
+echo Running 1.0_createJavaDocs.bat...
 echo -----------------------------------------------------
 if "%1"=="/y" goto createJavaDocs
 set /p option=Do you want to create jWebSocket Java Docs now (y/n)?
@@ -78,17 +88,17 @@ goto minifyJS
 
 :createJavaDocs
 rem generate the java docs (saved to client web) Passing as parameter the log file location
-call 0_createJavaDocs.bat /y %logfile_java_docs%
+call 1.0_createJavaDocs.bat /y %logfile_java_docs%
 :no_javadocs
 
 :minifyJS
 rem create client side bundles and minified versions
 echo.
 echo -----------------------------------------------------
-echo Running 1_createJavaDocs.bat...
+echo Running 1.1_createJSDocs.bat...
 echo -----------------------------------------------------
 rem First parameter skips prompts, second is the logs folder for jasob output
-call 1_createJavaDocs.bat /y %logfolder_jasob% > %logfile_0%
+call 1.1_createJSDocs.bat /y %logfolder_jasob% > %logfile_0%
 
 echo.
 echo -----------------------------------------------------

@@ -28,17 +28,7 @@ pause
 set CD_SAVE=%CD%
 echo.
 echo -----------------------------------------------------------------------
-echo .       Step 1: Getting latest changes from jWebSocket SVN server     .
-echo -----------------------------------------------------------------------
-echo.
-echo Updating parent jWebSocket directory: %JWEBSOCKET_HOME%..\..\
-echo.
-
-svn update %JWEBSOCKET_HOME%../../
-
-echo.
-echo -----------------------------------------------------------------------
-echo .       Step 2: Building jWebSocket Community Edition (CE)            .
+echo .       Step 1: Building jWebSocket Community Edition (CE)            .
 echo -----------------------------------------------------------------------
 echo.
 
@@ -51,7 +41,7 @@ call mvn clean install
 
 echo.
 echo -----------------------------------------------------------------------
-echo .       Step 3: Building jWebSocketActiveMQStockTicker                .
+echo .       Step 2: Building jWebSocketActiveMQStockTicker                .
 echo -----------------------------------------------------------------------
 echo.
 cd %JWEBSOCKET_HOME%..\..\branches\jWebSocket-%JWEBSOCKET_VER%\jWebSocketActiveMQStockTicker
@@ -68,7 +58,7 @@ if not exist "%CATALINA_HOME%\lib\jWebSocketServer-Bundle-%JWEBSOCKET_VER%.jar" 
 
 echo.
 echo -----------------------------------------------------------------------
-echo .       Step 4: Building jWebSocketWebAppDemo                          .
+echo .       Step 3: Building jWebSocketWebAppDemo                          .
 echo -----------------------------------------------------------------------
 echo.
 pushd %JWEBSOCKET_HOME%..\..\branches\jWebSocket-%JWEBSOCKET_VER%\jWebSocketWebAppDemo
