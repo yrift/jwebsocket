@@ -3,6 +3,11 @@ echo -------------------------------------------------------------------------
 echo jWebSocket Nightly Build Generator
 echo (C) Copyright 2013-2015 Innotrade GmbH
 echo -------------------------------------------------------------------------
+rem PARAMETERS DESCRIPTION:
+rem %1 (/y or /n): no pause and prompts
+rem %2 (/y or /n): no javadocs
+rem %3 (/y or /n): no FTP deployment
+rem %4 (/y or /n): no Maven deployment
 
 IF NOT EXIST %JAVA_HOME% GOTO NO_JAVA_HOME
 GOTO PRINT_JAVA_VERSION
@@ -23,8 +28,11 @@ if "%JWEBSOCKET_VER%"=="" goto error
 goto continue
 :error
 echo Environment variable(s) JWEBSOCKET_HOME and/or JWEBSOCKET_VER not set!
+if "%1"=="/y" goto no_pause_1
 pause
+:no_pause_1
 exit
+
 :continue
 
 echo This will create the entire jWebSocket v%JWEBSOCKET_VER% Nightly Build. 
@@ -39,7 +47,10 @@ echo - that all browsers which might have jWebSocket clients running are closed
 echo - that the Apache Web Server is stopped to not lock anything
 echo.
 echo Are you sure?
+
+if "%1"=="/y" goto no_pause_2
 pause
+:no_pause_2
 
 set LOGS_FOLDER=NIGHTLY_BUILD_LOGS
 if not exist "%LOGS_FOLDER%" (
@@ -55,10 +66,12 @@ set logfolder_jasob=%CD%/%LOGS_FOLDER%/
 
 echo Starting Nightly Build into %logfile_0%, %logfile_1%, %logfile_2%, %logfile_3%...
 
+if "%2"=="/y" goto no_javadocs
 echo.
 echo -----------------------------------------------------
 echo Running createJavaDocs.bat...
 echo -----------------------------------------------------
+if "%1"=="/y" goto createJavaDocs
 set /p option=Do you want to create jWebSocket Java Docs now (y/n)?
 if "%option%"=="y" goto createJavaDocs
 goto minifyJS
@@ -66,6 +79,7 @@ goto minifyJS
 :createJavaDocs
 rem generate the java docs (saved to client web) Passing as parameter the log file location
 call createJavaDocs.bat /y %logfile_java_docs%
+:no_javadocs
 
 :minifyJS
 rem create client side bundles and minified versions
@@ -101,24 +115,23 @@ echo -----------------------------------------------------
 echo         NIGHTLY BUILD SUCCESSFULLY CREATED!
 echo -----------------------------------------------------
 
-set /p option=Do you want to deploy the created Nightly Build to our FTP Repository now (y/n)?
-if "%option%"=="y" goto proceedFTPDeployment
-goto scan
-
-:proceedFTPDeployment
+if "%3"=="/y" goto no_ftp_deployment
+:proceed_to_ftp_deployment
 echo.
 echo -----------------------------------------------------
-echo Running 4_uploadNightlyBuildToFTP.bat to upload all the 
-echo generated nightly build packages to our FTP Repository
+echo Running 4_uploadNightlyBuildToFTP.bat to upload all the generated nightly build packages to our FTP Repository
 echo -----------------------------------------------------
 rem Upload nightly build to the repository, parameters %1: "skip prompts", %2: "skip compilation", %3: "log output folder"
 call 4_uploadNightlyBuildToFTP.bat /y %logfolder_deployment%\
+:no_ftp_deployment
 
+if "%1"=="/y" goto proceed_to_maven_deployment
 set /p option=Do you want to deploy the created Nightly Build to our Maven Repository now (y/n)?
-if "%option%"=="y" goto proceedMavenDeployment
+if "%option%"=="y" goto proceed_to_maven_deployment
 goto scan
 
-:proceedMavenDeployment
+:proceed_to_maven_deployment
+if "%4"=="/y" goto no_maven_deployment
 echo.
 echo -----------------------------------------------------
 echo Running 5_uploadNightlyBuildToMaven.bat to upload all the 
@@ -127,6 +140,7 @@ echo -----------------------------------------------------
 rem Upload nightly build to the repository, parameters %1: "skip prompts", %2: "skip compilation", %3: "log output folder"
 call 5_uploadNightlyBuildToMaven.bat /y /y %logfolder_deployment%
 
+:no_maven_deployment
 :scan
 
 echo.
@@ -142,4 +156,6 @@ echo -----------------------------------------------------
 echo ----------------------------------------------------
 echo Please check above section for error messages.
 :end
+if "%1"=="/y" goto exit_now
 pause
+:exit_now
