@@ -75,8 +75,8 @@ goto start
 	echo ------------------------------------------------------------------------
 	cd %CD_SAVE%
 	rem Now we need to ignore the logs folder and commit the chages to subversion automatically
-	echo Ignoring the logs folder DEPLOYMENT_LOGS from being uploaded to subversion
-	svn propset svn:ignore DEPLOYMENT_LOGS .
+	echo Ignoring the logs folder NIGHTLY_BUILD_LOGS from being uploaded to subversion
+	svn propset svn:ignore NIGHTLY_BUILD_LOGS .
 	echo.
 	echo The following files have been changed:
 	svn status %JWEBSOCKET_HOME%..\..\branches\
