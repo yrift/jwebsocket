@@ -90,6 +90,7 @@ public class DynaDB implements IDatabase {
 	public void dropTable(String aTableName) {
 		if (existsTable(aTableName)) {
 			mPlatform.dropTable(mDB, mDB.findTable(aTableName), true);
+                        mDB.removeTable(mDB.findTable(aTableName));
 		}
 	}
 
