@@ -131,7 +131,7 @@
 						}
 					}
 				},
-				OnTimeOut: function() {
+				OnTimeout: function() {
 					if (aCallbacks &&
 							typeof aCallbacks.timeout === "function") {
 						return aCallbacks.timeout();
