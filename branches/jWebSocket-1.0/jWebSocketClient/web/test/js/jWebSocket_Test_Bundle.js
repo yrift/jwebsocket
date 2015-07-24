@@ -94,8 +94,7 @@ jws.tests.AutomatedAPI = {
 		// run all the obtained default specs
 		// this.testRunAPIDefaults();
 	}
-};
-//	---------------------------------------------------------------------------
+};//	---------------------------------------------------------------------------
 //	jWebSocket Benchmark test specs (Community Edition, CE)
 //	---------------------------------------------------------------------------
 //	Copyright 2010-2015 Innotrade GmbH (jWebSocket.org)
@@ -999,7 +998,6 @@ jws.tests.Channels = {
 
 	}
 };
-
 //	---------------------------------------------------------------------------
 //	jWebSocket Filesystem Plug-in CE test specs (Community Edition, CE)
 //	---------------------------------------------------------------------------
