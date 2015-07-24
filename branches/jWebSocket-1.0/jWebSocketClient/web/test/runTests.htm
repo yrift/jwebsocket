@@ -146,7 +146,7 @@
 				$(".select-all-text").text(!lIsChecked ? "Select all" : "Select none");
 			});
 			$.each(lTests.categories, function (aIndex, aCategory) {
-				lCategoriesSelectStr += "<option value'" + aCategory + "'>" + aCategory + "</option>";
+				lCategoriesSelectStr += "<option value='" + aCategory + "'>" + aCategory + "</option>";
 			});
 			lCategoriesSelectStr += "</select/>";
 			lCategories.html(lCategoriesSelectStr);
@@ -263,7 +263,8 @@
 					speed: $('#speed').val(),
 					tls: $('#tls_set').val(),
 					category: $('#test_set').val(),
-					selectedTests: getSelectedTests()
+					selectedTests: getSelectedTests(),
+					selectAll: $('#select-all-cb').attr("checked")
 				};
 				sessionStorage.setItem("page_state", JSON.stringify(lPageState));
 			}
@@ -275,11 +276,15 @@
 					$('#speed').val(lPageState.speed);
 					$('#tls_set').val(lPageState.tls);
 					$('#test_set').val(lPageState.category);
+					$('#select-all-cb').attr("checked", lPageState.selectAll);
 
 					return lPageState;
 				} else {
-					$('#tls_set').val('__ALL__');
-
+					if ($("[value='Enterprise Edition']").get(0)) {
+						$('#test_set').val('Enterprise Edition');
+					} else {
+						$('#test_set').val('__ALL__');
+					}
 					return null;
 				}
 			}
