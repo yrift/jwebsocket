@@ -106,3 +106,44 @@ span#tests span {
 .toolbar .btn_center label *{
 	margin-top: 2px;
 }
+
+.entry{
+	float: left;
+	padding: 10px;
+	clear: right;
+}
+
+.entry.right{
+	float: right;
+}
+
+.entry *{
+	display: inline;
+}
+
+.test-area{
+	float: left;
+	margin-top: 5px;
+}
+
+.entry span{
+	font-size: 18px;
+}
+
+h3{
+	margin-bottom: 0px;
+}
+select{
+	background: url(../../res/img/buttons/n_c.png) center left repeat-x;
+	color: white;
+	padding: 0 5px;
+	border: 1px solid white;
+	-webkit-box-shadow: 0 0 2px 0px #515F22;
+	box-shadow: 0 0 2px 0px #515F22;
+	-moz-border-radius: 3px;
+    -webkit-border-radius: 3px;
+    border-radius: 3px;
+}
+option{
+	color: black;
+}
