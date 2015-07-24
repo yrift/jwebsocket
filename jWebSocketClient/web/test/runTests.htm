@@ -60,10 +60,20 @@
 				<tr>
 					<td>
 						<h3>Select tests to be executed</h3>
-						&nbsp;Test categories:
-						<div id="categories">
+						<div class="entry right">
+							<span>TLS:</span>
+							<select id="tls_set">
+								<option value="ws">Unsecure (ws)</option>
+								<option value="wss">Secure (wss)</option>
+							</select>
 						</div>
-						&nbsp;System Speed:<select id="speed">
+						<div class="entry">
+							<span>Test categories:</span>
+							<div id="categories"></div>
+						</div>
+						<div class="entry right">
+							<span>System Speed:</span>
+							<select id="speed">
 							<option value="generic">Generic</option>
 							<option value="generic_debug">Generic [log_mode=debug]</option>
 							<option value="normal">Normal</option>
@@ -73,10 +83,8 @@
 							<option value="ultra_fast">Ultra fast</option>
 							<option value="fastest">Fastest</option>
 						</select>
-						&nbsp;TLS:<select id="tls_set">
-							<option value="ws">Unsecure (ws)</option>
-							<option value="wss">Secure (wss)</option>
-						</select>
+						</div>
+
 						<div class="toolbar">
 							<div class="button onmouseup" 
 								 onmouseover="this.className = 'button onmouseover'" 
@@ -90,7 +98,7 @@
 								<div class="btn_right"></div>
 							</div>
 						</div>
-						<p>
+						<p class="test-area">
 							<label><input id="openConns" type="checkbox" disabled checked="checked"> Open connections for admin and guest</label>
 							<br>
 							<span id="tests"></span>
