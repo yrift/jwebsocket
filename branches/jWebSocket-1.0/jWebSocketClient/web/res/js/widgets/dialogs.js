@@ -1,3 +1,5 @@
+/* global jws */
+
 //	---------------------------------------------------------------------------
 //	jWebSocket jQuery dialog widget (Community Edition, CE)
 //	---------------------------------------------------------------------------
@@ -158,16 +160,16 @@ function jwsDialog(aMessage, aTitle, aIsModal, aIconType, aCloseFunction, aMoreB
 		lButtonsArea.append(lButton);
 	}
 	if (aIconType) {
-		if (aIconType == "error" || aIconType == "information" ||
-				aIconType == "warning" || aIconType == "alert" ||
-				aIconType == "important") {
+		if (aIconType === "error" || aIconType === "information" ||
+				aIconType === "warning" || aIconType === "alert" ||
+				aIconType === "important") {
 			var lIcon = $("<div id='icon' class='" + "icon_" +
 					aIconType + "'></div>");
 			lDialog.append(lIcon);
 		}
 		else {
-			console.log("Unrecognized type of icon+' " + aIconType +
-					"', the allowed types are { error|information|warning|alert }")
+			console.log("Unrecognized type of icon '" + aIconType +
+					"', the allowed types are { error|information|warning|alert }");
 		}
 	}
 	lDialog.append(lContent);

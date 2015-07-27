@@ -335,7 +335,7 @@ jws.CanvasPlugIn = {
 	doCanvasBeginImage: function(aId, aPublisher, aX1, aY1, aWidth, aHeight, aSelectedImg) {
 		var lCanvas = this.fCanvas[ aId ];
 		if (lCanvas !== null) {
-			var lSrc = "../../res/img/image" + aSelectedImg + ".jpg",
+			var lSrc = "css/images/image" + aSelectedImg + ".jpg",
 					lImage = new Image();
 			lImage.setAttribute("src", lSrc);
 			if (typeof this.mClientsImages[aPublisher] === "undefined") {

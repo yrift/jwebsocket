@@ -92,7 +92,7 @@
     color: #777;
 }
 #word-status .x-status-busy {
-    background-image: url(../../../res/img/saving.gif);
+    background-image: url(../../../res/img/loading.gif);
 }
 #word-status .x-status-saved {
     background-image: url(../../../res/img/saved.png);
@@ -102,7 +102,7 @@
 
 .x-statusbar .x-status-error {
     color: #C33;
-    background-image: url(.../../../res/img/exclamation.gif);
+    background-image: url(.../../../res/img/exclamation.png);
 }
 .x-statusbar .x-status-valid {
     background-image: url(../../../res/img/accept.png);
