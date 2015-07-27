@@ -608,23 +608,23 @@ input[type="checkbox"]{
 }
 
 #icon.icon_error{
-	background: url( ../img/error.png ) no-repeat;
+	background: url( ../img/jwsdialog/error.png ) no-repeat;
 }
 
 #icon.icon_information{
-	background: url( ../img/information.png ) no-repeat;
+	background: url( ../img/jwsdialog/information.png ) no-repeat;
 }
 
 #icon.icon_warning{
-	background: url( ../img/warning.png ) no-repeat;
+	background: url( ../img/jwsdialog/warning.png ) no-repeat;
 }
 
 #icon.icon_alert{
-	background: url( ../img/alert.png ) no-repeat;
+	background: url( ../img/jwsdialog/alert.png ) no-repeat;
 }
 
 #icon.icon_important{
-	background: url( ../img/important.png ) no-repeat;
+	background: url( ../img/jwsdialog/important.png ) no-repeat;
 }
 /* ----------------------------- ICONS --------------------------------------*/
 
