@@ -32,7 +32,7 @@
 		<script type="text/javascript" src="../lib/JSZip/jszip-load_min.js"></script>
 
 		<!-- use bundle to check if all plug-ins are embedded in the bundle -->
-		<script type="text/javascript" src="../res/js/jWebSocket_Bundle.js"></script> 
+		<script type="text/javascript" src="../res/js/jWebSocket_Bundle.js"></script>
 
 		<!-- also use minified version to check/validate obfuscator -->
 		<!-- <script type="text/javascript" src="../res/js/jWebSocket_Bundle_min.js"></script> -->
@@ -43,9 +43,30 @@
 			#####################################
 		-->
 
-		<!-- shared test specs for opening and closing connections -->
-        <script type="text/javascript" src="js/jWebSocket_Test_Bundle.js"></script>
-		<!-- the central test suite code contains the various test suites -->
+		<!-- Shared test specs for opening and closing connections -->
+        <script type="text/javascript" src="js/tests/jwsSharedTests.js"></script>
+		
+		<!-- All the other tests -->
+        <script type="text/javascript" src="js/tests/jwsAutomatedAPITests.js"></script>
+        <script type="text/javascript" src="js/tests/jwsBenchmarks.js"></script>
+        <script type="text/javascript" src="js/tests/jwsChannelTests.js"></script>
+        <script type="text/javascript" src="js/tests/jwsFilesystemTests.js"></script>
+        <script type="text/javascript" src="js/tests/jwsIOC.js"></script>
+        <script type="text/javascript" src="js/tests/jwsItemStorageTests.js"></script>
+        <script type="text/javascript" src="js/tests/jwsJDBCTests.js"></script>
+        <script type="text/javascript" src="js/tests/jwsJMSTests.js"></script>
+        <script type="text/javascript" src="js/tests/jwsLoadBalancerTests.js"></script>
+        <script type="text/javascript" src="js/tests/jwsLoadTests.js"></script>
+        <script type="text/javascript" src="js/tests/jwsLoggingTests.js"></script>
+        <script type="text/javascript" src="js/tests/jwsQuotaTests.js"></script>
+        <script type="text/javascript" src="js/tests/jwsREST.js"></script>
+        <script type="text/javascript" src="js/tests/jwsRPCTests.js"></script>
+        <script type="text/javascript" src="js/tests/jwsReportingTests.js"></script>
+        <script type="text/javascript" src="js/tests/jwsScriptingPlugInTest.js"></script>
+        <script type="text/javascript" src="js/tests/jwsStreamingTests.js"></script>
+        <script type="text/javascript" src="js/tests/jwsSystemTests.js"></script>
+
+		<!-- The central test suite code contains the various test suites -->
 		<script type="text/javascript" src="js/jwsTestSuites.js"></script>
 
 	</head>
@@ -74,15 +95,15 @@
 						<div class="entry right">
 							<span>System Speed:</span>
 							<select id="speed">
-							<option value="generic">Generic</option>
-							<option value="generic_debug">Generic [log_mode=debug]</option>
-							<option value="normal">Normal</option>
-							<option value="slow">Slow</option>
-							<option value="very_slow">Very slow</option>
-							<option value="fast">Fast</option>
-							<option value="ultra_fast">Ultra fast</option>
-							<option value="fastest">Fastest</option>
-						</select>
+								<option value="generic">Generic</option>
+								<option value="generic_debug">Generic [log_mode=debug]</option>
+								<option value="normal">Normal</option>
+								<option value="slow">Slow</option>
+								<option value="very_slow">Very slow</option>
+								<option value="fast">Fast</option>
+								<option value="ultra_fast">Ultra fast</option>
+								<option value="fastest">Fastest</option>
+							</select>
 						</div>
 
 						<div class="toolbar">
@@ -190,7 +211,6 @@
 										type: TT_GET_PLUGINS_INFO
 									}, {
 										OnSuccess: function (aToken) {
-											console.log(aToken);
 											lPlugInsEnginesInfo = lEngines.concat(aToken.data);
 											$("#demo_box").unmask();
 											var lState = restorePageState();
