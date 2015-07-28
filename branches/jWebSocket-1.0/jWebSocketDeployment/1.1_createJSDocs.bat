@@ -53,18 +53,6 @@ echo Creating jWebSocket_Bundle.js Community Edition...
 copy /b jWebSocket.js + jWebSocketComet.js + jwsCache.js + jwsWorker.js + jwsAPIPlugIn.js +  jwsCanvasPlugIn.js + jwsChannelPlugIn.js + jwsChatPlugIn.js + jwsClientGamingPlugIn.js + jwsEventsPlugIn.js + jwsLoadBalancerPlugIn.js + jwsExtProcessPlugIn.js + jwsFileSystemPlugIn.js + jwsIOC.js + jwsItemStoragePlugIn.js + jwsJDBCPlugIn.js + jwsJMSPlugIn.js + jwsLoggingPlugIn.js + jwsMailPlugIn.js + jwsQuotaPlugIn.js + jwsReportingPlugIn.js + jwsRPCPlugIn.js + jwsRTCPlugIn.js + jwsSamplesPlugIn.js + jwsScriptingPlugIn.js + jwsSharedObjectsPlugIn.js + jwsStreamingPlugIn.js + jwsTestPlugIn.js + jwsTwitterPlugIn.js + jwsXMPPPlugIn.js jWebSocket_Bundle.js
 echo jWebSocket_Bundle.js Community Edition successfully created!
 
-rem switch back to deployment folder
-popd
-set cd=%cd%
-
-rem PROCEEDING TO PACKAGE THE COMMUNITY EDITION TESTS
-cd
-pushd ..\jWebSocketClient\web\test\js\tests
-
-echo Creating jWebSocket_Test_Bundle.js...
-copy /b jwsAutomatedAPITests.js + jwsBenchmarks.js + jwsChannelTests.js + jwsFilesystemTests.js + jwsIOC.js + jwsItemStorageTests.js + jwsJDBCTests.js + jwsJMSTests.js + jwsLoadBalancerTests.js + jwsLoadTests.js + jwsLoggingTests.js + jwsQuotaTests.js + jwsReportingTests.js + jwsREST.js + jwsRPCTests.js + jwsScriptingPlugInTest.js + jwsSharedTests.js + jwsStreamingTests.js + jwsSystemTests.js ..\jWebSocket_Test_Bundle.js
-echo jWebSocket_Test_Bundle.js successfully created!
-
 popd
 set cd=%cd%
 
