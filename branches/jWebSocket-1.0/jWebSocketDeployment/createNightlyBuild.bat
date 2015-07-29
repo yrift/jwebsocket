@@ -8,6 +8,7 @@ rem %1 (/y or /n): no pause and prompts
 rem %2 (/y or /n): no javadocs
 rem %3 (/y or /n): no FTP deployment
 rem %4 (/y or /n): no Maven deployment
+rem %5 (/y or /n): no upload nightly build number change to jWebSocket Subversion repository
 
 IF NOT EXIST %JAVA_HOME% GOTO NO_JAVA_HOME
 GOTO PRINT_JAVA_VERSION
@@ -34,7 +35,6 @@ pause
 exit
 
 :continue
-
 echo This will create the entire jWebSocket v%JWEBSOCKET_VER% Nightly Build. 
 echo.
 echo PLEASE ENSURE....
@@ -49,10 +49,72 @@ echo - that you have your ftp username and password properly configured in the f
 echo.
 echo Are you sure?
 
-if "%1"=="/y" goto no_pause_2
+if "%1"=="/y" goto auto_declare_variables
 pause
-:no_pause_2
+rem start prompting the user for required data
+if "%1"=="" goto prompt_variables
+goto auto_declare_variables
 
+:prompt_variables
+	rem %1 (/y or /n): no pause and prompts
+	set /p option=Do you want to have prompts or pause during the deployment(y/n)?
+	if "%option%"=="y" goto set_pause_and_prompts
+	set param_no_pause_and_prompts=/y
+	goto no_javadocs
+	:set_pause_and_prompts
+	set param_no_pause_and_prompts=/n
+	
+	rem %2 (/y or /n): no javadocs
+	:no_javadocs
+	set /p option=Do you want to generate JavaDocs(y/n)?
+	if "%option%"=="y" goto set_java_docs
+	set param_no_java_docs=/y
+	goto no_ftp_deployment
+	:set_java_docs
+	set param_no_java_docs=/n
+	
+	rem %3 (/y or /n): no FTP deployment
+	:no_ftp_deployment
+	set /p option=Do you want to deploy automatically via FTP(y/n)?
+	if "%option%"=="y" goto set_ftp_deployment
+	set param_no_ftp_deploy=/y
+	goto no_nightly_upload
+	:set_ftp_deployment
+	set param_no_ftp_deploy=/n
+	
+	rem %4 (/y or /n): no Maven deployment
+	:no_nightly_upload
+	set /p option=Do you want to upload generated artifacts to Maven repository(y/n)?
+	if "%option%"=="y" goto set_maven_deployment
+	set param_no_maven_deploy=/y
+	goto no_subversion_upload
+	:set_maven_deployment
+	set param_no_maven_deploy=/n
+	
+	rem %5 (/y or /n): no upload nightly build number change to jWebSocket Subversion repository
+	:no_subversion_upload
+	set /p option=Do you want to upload local changes to jWebSocket Subversion(y/n)?
+	if "%option%"=="y" goto set_upload_to_subversion
+	set param_no_subversion_upload=/y
+	goto no_pause_2
+	:set_upload_to_subversion
+	set param_no_subversion_upload=/n
+
+echo no pause and prompts %param_no_pause_and_prompts%
+echo no javadocs %param_no_java_docs%
+echo no ftp %param_no_ftp_deploy%
+echo no maven %param_no_maven_deploy%
+echo no subversion %param_no_subversion_upload%
+
+:auto_declare_variables
+set param_no_pause_and_prompts=%1
+set param_no_java_docs=%2
+set param_no_ftp_deploy=%3
+set param_no_maven_deploy=%4
+set param_no_subversion_upload=%5
+
+:no_pause_2
+:declare_variables
 set LOGS_FOLDER=NIGHTLY_BUILD_LOGS
 if not exist "%LOGS_FOLDER%" (
 	mkdir "%LOGS_FOLDER%"
@@ -66,6 +128,11 @@ set logfolder_deployment=%CD%/%LOGS_FOLDER%/DEPLOYMENT_LOGS
 set logfolder_jasob=%CD%/%LOGS_FOLDER%/
 set logfolder_update_build_number=%CD%/%LOGS_FOLDER%/updateBuildNumbers.log
 
+rem by default do not commit to subversion
+if "%param_no_subversion_upload%"=="" (
+	set param_no_subversion_upload=/y
+)
+
 echo Starting Nightly Build into %logfile_0%, %logfile_1%, %logfile_2%, %logfile_3%...
 
 echo.
@@ -75,15 +142,15 @@ echo -----------------------------------------------------
 rem the following script receives two parameters:
 rem %1: do not show pause or prompts
 rem %2: do not upload changes to subversion repository
-call 0_updateSVNReplaceBuildNumbers.bat /y /y > %logfolder_update_build_number%
+call 0_updateSVNReplaceBuildNumbers.bat /y %param_no_subversion_upload% > %logfolder_update_build_number%
 
 
-if "%2"=="/y" goto no_javadocs
+if "%param_no_java_docs%"=="/y" goto no_javadocs
 echo.
 echo -----------------------------------------------------
 echo Running 1.0_createJavaDocs.bat...
 echo -----------------------------------------------------
-if "%1"=="/y" goto createJavaDocs
+if "%param_no_pause_and_prompts%"=="/y" goto createJavaDocs
 set /p option=Do you want to create jWebSocket Java Docs now (y/n)?
 if "%option%"=="y" goto createJavaDocs
 goto minifyJS
@@ -127,7 +194,7 @@ echo -----------------------------------------------------
 echo         NIGHTLY BUILD SUCCESSFULLY CREATED!
 echo -----------------------------------------------------
 
-if "%3"=="/y" goto no_ftp_deployment
+if "%param_no_ftp_deploy%"=="/y" goto no_ftp_deployment
 :proceed_to_ftp_deployment
 echo.
 echo -----------------------------------------------------
@@ -137,13 +204,13 @@ rem Upload nightly build to the repository, parameters %1: "skip prompts", %2: "
 call 5_uploadNightlyBuildToFTP.bat /y %logfolder_deployment%\ > %logfolder_deployment%\5_uploadNightlyBuildToFTP.log
 :no_ftp_deployment
 
-if "%1"=="/y" goto proceed_to_maven_deployment
+if "%param_no_pause_and_prompts%"=="/y" goto proceed_to_maven_deployment
 set /p option=Do you want to deploy the created Nightly Build to our Maven Repository now (y/n)?
 if "%option%"=="y" goto proceed_to_maven_deployment
 goto scan
 
 :proceed_to_maven_deployment
-if "%4"=="/y" goto no_maven_deployment
+if "%param_no_maven_deploy%"=="/y" goto no_maven_deployment
 echo.
 echo -----------------------------------------------------
 echo Running 6_uploadNightlyBuildToMaven.bat to upload all the 
@@ -168,6 +235,6 @@ echo -----------------------------------------------------
 echo ----------------------------------------------------
 echo Please check above section for error messages.
 :end
-if "%1"=="/y" goto exit_now
+if "%param_no_pause_and_prompts%"=="/y" goto exit_now
 pause
 :exit_now
