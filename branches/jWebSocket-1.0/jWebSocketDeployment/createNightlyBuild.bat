@@ -45,6 +45,7 @@ echo - that NetBeans is NOT running
 echo - that no folder of jWebSocket is currently in use (e.g. by Windows Explorer)
 echo - that all browsers which might have jWebSocket clients running are closed
 echo - that the Apache Web Server is stopped to not lock anything
+echo - that you have your ftp username and password properly configured in the file 5_uploadNightlyBuildToFTP.bat
 echo.
 echo Are you sure?
 
