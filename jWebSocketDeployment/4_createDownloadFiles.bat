@@ -54,7 +54,6 @@ del /p /s %src%*.?.nblh~
 echo cloning jWebSocket.ks KeyStore to Jetty Project /conf folder
 copy "%conf%/jWebSocket.ks" "%src%jWebSocketJetty/conf"
 
-
 echo -------------------------------------------------------------------------
 echo Packaging full sources...
 echo -------------------------------------------------------------------------
@@ -485,6 +484,12 @@ rem Now we create all SHA1 files for integrity check in the download files
 %fciv% -add %down%jWebSocketTomcatEngine-%ver%.zip -sha1 >%down%jWebSocketTomcatEngine-%ver%.zip.sha1
 %fciv% -add %down%jWebSocketWebAppDemo-%ver%.zip -sha1 >%down%jWebSocketWebAppDemo-%ver%.zip.sha1
 %fciv% -add %down%jWebSocketWindows-%ver%.zip -sha1 >%down%jWebSocketWindows-%ver%.zip.sha1
+
+:copyLatestNightlyBuildNumber
+pushd %depl%..\
+echo Copying latest nightly build number to be automatically updated in our website
+echo f|xcopy current_build_number.txt %down%latest_nightly_build.txt /s /i /y
+popd
 
 :end
 
