@@ -138,7 +138,7 @@ echo Starting Nightly Build into %logfile_0%, %logfile_1%, %logfile_2%, %logfile
 
 echo.
 echo -----------------------------------------------------
-echo Running 1.1_createJSDocs.bat...
+echo Running 0_updateSVNReplaceBuildNumbers.bat...
 echo -----------------------------------------------------
 rem the following script receives two parameters:
 rem %1: do not show pause or prompts
@@ -180,13 +180,13 @@ call 2_cleanAndBuildAll.bat /y > %logfile_1%
 
 echo.
 echo -----------------------------------------------------
-echo Running 2_createRunTimeFiles...
+echo Running 3_createRunTimeFiles...
 echo -----------------------------------------------------
 call 3_createRunTimeFiles.bat /y > %logfile_2%
 
 echo.
 echo -----------------------------------------------------
-echo Running 3_createDownloadFiles...
+echo Running 4_createDownloadFiles...
 echo -----------------------------------------------------
 call 4_createDownloadFiles.bat /y > %logfile_3%
 
