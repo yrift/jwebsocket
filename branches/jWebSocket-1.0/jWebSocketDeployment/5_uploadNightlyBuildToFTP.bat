@@ -112,6 +112,8 @@ if "%1"=="/y" goto skipPrompt3
 	echo user %USERNAME%>%FTP_UPLOAD_SCRIPT%
 	echo %PASSWORD%>>%FTP_UPLOAD_SCRIPT%
 	echo mkdir %UPLOADS_DIR%\%BUILD_NUMBER%>>%FTP_UPLOAD_SCRIPT%
+	echo cd %UPLOADS_DIR%>>%FTP_UPLOAD_SCRIPT%
+	echo put latest_nightly_build.txt>>%FTP_UPLOAD_SCRIPT%
 	echo cd %UPLOADS_DIR%\%BUILD_NUMBER%>>%FTP_UPLOAD_SCRIPT%
 
 	for /L %%i in (1,1,%LENGTH%) do (
