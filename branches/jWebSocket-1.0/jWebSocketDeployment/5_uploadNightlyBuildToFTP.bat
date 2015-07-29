@@ -27,7 +27,7 @@ goto start
 	set CD_SAVE=%CD%
 	set FTP_HOST=cdn.jwebsocket.org
 	set USERNAME=vbarzana
-	set PASSWORD=Nabuconodosor1492
+	set PASSWORD=
 	set CURRENT_YEAR=%DATE:~6,10%
 	set UPLOADS_DIR=jwebsocket\nightly-builds\%CURRENT_YEAR%
 	rem Build Number must be automatically generated
