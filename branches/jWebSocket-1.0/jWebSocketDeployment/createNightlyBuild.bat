@@ -99,22 +99,23 @@ goto auto_declare_variables
 	goto no_pause_2
 	:set_upload_to_subversion
 	set param_no_subversion_upload=/n
+	goto show_variables
 
+:auto_declare_variables
+	set param_no_pause_and_prompts=%1
+	set param_no_java_docs=%2
+	set param_no_ftp_deploy=%3
+	set param_no_maven_deploy=%4
+	set param_no_subversion_upload=%5
+
+:no_pause_2
+:show_variables
 echo no pause and prompts %param_no_pause_and_prompts%
 echo no javadocs %param_no_java_docs%
 echo no ftp %param_no_ftp_deploy%
 echo no maven %param_no_maven_deploy%
 echo no subversion %param_no_subversion_upload%
 
-:auto_declare_variables
-set param_no_pause_and_prompts=%1
-set param_no_java_docs=%2
-set param_no_ftp_deploy=%3
-set param_no_maven_deploy=%4
-set param_no_subversion_upload=%5
-
-:no_pause_2
-:declare_variables
 set LOGS_FOLDER=NIGHTLY_BUILD_LOGS
 if not exist "%LOGS_FOLDER%" (
 	mkdir "%LOGS_FOLDER%"
