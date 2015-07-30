@@ -26,8 +26,8 @@ goto start
 	rem +-----------------------------------------------------------------------+
 	set CD_SAVE=%CD%
 	set FTP_HOST=cdn.jwebsocket.org
-	set USERNAME=yourusernamehere
-	set PASSWORD=yourftppasswordhere
+	set USERNAME=yourusername
+	set PASSWORD=yourpassword
 	set CURRENT_YEAR=%DATE:~6,10%
 	set UPLOADS_DIR=jwebsocket\nightly-builds\%CURRENT_YEAR%
 	rem Build Number must be automatically generated
@@ -112,9 +112,7 @@ if "%1"=="/y" goto skipPrompt3
 	echo user %USERNAME%>%FTP_UPLOAD_SCRIPT%
 	echo %PASSWORD%>>%FTP_UPLOAD_SCRIPT%
 	echo mkdir %UPLOADS_DIR%\%BUILD_NUMBER%>>%FTP_UPLOAD_SCRIPT%
-	echo cd %UPLOADS_DIR%>>%FTP_UPLOAD_SCRIPT%
-	echo put latest_nightly_build.txt>>%FTP_UPLOAD_SCRIPT%
-	echo cd ..\..\..\%UPLOADS_DIR%\%BUILD_NUMBER%>>%FTP_UPLOAD_SCRIPT%
+	echo cd %UPLOADS_DIR%\%BUILD_NUMBER%>>%FTP_UPLOAD_SCRIPT%
 
 	for /L %%i in (1,1,%LENGTH%) do (
 		if not exist "%DOWNLOADS_DIR%!PACKAGES[%%i]!" (
@@ -122,6 +120,10 @@ if "%1"=="/y" goto skipPrompt3
 		)
 		echo put !PACKAGES[%%i]!>>%FTP_UPLOAD_SCRIPT%
 	)
+	rem once we ensure that the deployment was successful or at least finished, 
+	rem then we can put the latest_nightly_build up there for visibility in the website
+	echo cd ..\..\..\..\%UPLOADS_DIR%>>%FTP_UPLOAD_SCRIPT%
+	echo put latest_nightly_build.txt>>%FTP_UPLOAD_SCRIPT%
 	echo quit>>%FTP_UPLOAD_SCRIPT%
 	echo Executing the FTP deployment script on %FTP_HOST%
 	echo Please wait until the deployment finishes the execution...
