@@ -33,7 +33,14 @@ goto start
 	rem Build Number must be automatically generated
 	set BUILD_NUMBER=b%DATE:~9,1%%DATE:~3,2%%DATE:~0,2%
 	set DOWNLOADS_DIR=%JWEBSOCKET_HOME%..\..\downloads\jWebSocket-%JWEBSOCKET_VER%\
-	set FTP_DEPLOYMENT_LOG_FILE=%2ftp_deployment_results.log
+	set LOGS_FOLDER=%2
+	if "%2"=="" goto no_logs_folder
+	goto log_folder_provided
+:no_logs_folder
+	set LOGS_FOLDER=%CD%
+	
+:log_folder_provided
+	set FTP_DEPLOYMENT_LOG_FILE=%LOGS_FOLDER%ftp_deployment_results.log
 	
 	if not exist %DOWNLOADS_DIR% goto missing_downloads_folder
 	goto check_build_number
