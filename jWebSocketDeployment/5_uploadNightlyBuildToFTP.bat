@@ -26,8 +26,8 @@ goto start
 	rem +-----------------------------------------------------------------------+
 	set CD_SAVE=%CD%
 	set FTP_HOST=cdn.jwebsocket.org
-	set USERNAME=vbarzana
-	set PASSWORD=yourpasswordhere
+	set USERNAME=yourusernamehere
+	set PASSWORD=yourftppasswordhere
 	set CURRENT_YEAR=%DATE:~6,10%
 	set UPLOADS_DIR=jwebsocket\nightly-builds\%CURRENT_YEAR%
 	rem Build Number must be automatically generated
@@ -114,7 +114,7 @@ if "%1"=="/y" goto skipPrompt3
 	echo mkdir %UPLOADS_DIR%\%BUILD_NUMBER%>>%FTP_UPLOAD_SCRIPT%
 	echo cd %UPLOADS_DIR%>>%FTP_UPLOAD_SCRIPT%
 	echo put latest_nightly_build.txt>>%FTP_UPLOAD_SCRIPT%
-	echo cd %UPLOADS_DIR%\%BUILD_NUMBER%>>%FTP_UPLOAD_SCRIPT%
+	echo cd ..\..\..\%UPLOADS_DIR%\%BUILD_NUMBER%>>%FTP_UPLOAD_SCRIPT%
 
 	for /L %%i in (1,1,%LENGTH%) do (
 		if not exist "%DOWNLOADS_DIR%!PACKAGES[%%i]!" (
@@ -125,8 +125,8 @@ if "%1"=="/y" goto skipPrompt3
 	echo quit>>%FTP_UPLOAD_SCRIPT%
 	echo Executing the FTP deployment script on %FTP_HOST%
 	echo Please wait until the deployment finishes the execution...
-	echo If you wish to monitorize your upload status, please see the file %DOWNLOADS_DIR%\%FTP_UPLOAD_SCRIPT%...
-	ftp -n -s:%FTP_UPLOAD_SCRIPT% %FTP_HOST% > %CD_SAVE%\%FTP_DEPLOYMENT_LOG_FILE%
+	echo If you wish to monitorize your upload status, please see the file %DOWNLOADS_DIR%%FTP_UPLOAD_SCRIPT%...
+	ftp -n -s:%FTP_UPLOAD_SCRIPT% %FTP_HOST% > %FTP_DEPLOYMENT_LOG_FILE%
 	echo FTP deployment is complete, please check the file %FTP_DEPLOYMENT_LOG_FILE% for details
 	del %FTP_UPLOAD_SCRIPT%
 :end
