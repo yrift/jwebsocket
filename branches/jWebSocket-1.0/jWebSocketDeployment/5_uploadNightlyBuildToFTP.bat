@@ -37,7 +37,7 @@ goto start
 	if "%2"=="" goto no_logs_folder
 	goto log_folder_provided
 :no_logs_folder
-	set LOGS_FOLDER=%CD%
+	set LOGS_FOLDER=%CD%\
 	
 :log_folder_provided
 	set FTP_DEPLOYMENT_LOG_FILE=%LOGS_FOLDER%ftp_deployment_results.log
