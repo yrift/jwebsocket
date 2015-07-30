@@ -120,15 +120,17 @@ set LOGS_FOLDER=NIGHTLY_BUILD_LOGS
 if not exist "%LOGS_FOLDER%" (
 	mkdir "%LOGS_FOLDER%"
 )
-set logfile_java_docs=%CD%/%LOGS_FOLDER%/createJavaDocs.log
-set logfile_0=%LOGS_FOLDER%/0_createJSDocs.log
-set logfile_1=%LOGS_FOLDER%/1_cleanAndBuildAll.log
-set logfile_2=%LOGS_FOLDER%/2_createRunTimeFiles.log
-set logfile_3=%LOGS_FOLDER%/3_createDownloadFiles.log
-set logfolder_deployment=%CD%/%LOGS_FOLDER%/DEPLOYMENT_LOGS
-set logfolder_jasob=%CD%/%LOGS_FOLDER%/
-set logfolder_update_build_number=%CD%/%LOGS_FOLDER%/updateBuildNumbers.log
+set logfile_java_docs=%CD%\%LOGS_FOLDER%\createJavaDocs.log
+set logfile_0=%CD%\%LOGS_FOLDER%\0_createJSDocs.log
+set logfile_1=%CD%\%LOGS_FOLDER%\1_cleanAndBuildAll.log
+set logfile_2=%CD%\%LOGS_FOLDER%\2_createRunTimeFiles.log
+set logfile_3=%CD%\%LOGS_FOLDER%\3_createDownloadFiles.log
+set logfile_5=%CD%\%LOGS_FOLDER%\5_uploadNightlyBuildToFTP.log
+set logfolder_deployment=%CD%\%LOGS_FOLDER%
+set logfolder_jasob=%CD%\%LOGS_FOLDER%\
+set logfolder_update_build_number=%CD%\%LOGS_FOLDER%\1.0_updateSVNReplaceBuildNumbers.log
 
+echo %logfile_java_docs%
 rem by default do not commit to subversion
 if "%param_no_subversion_upload%"=="" (
 	set param_no_subversion_upload=/y
@@ -205,7 +207,7 @@ echo -----------------------------------------------------
 echo Running 5_uploadNightlyBuildToFTP.bat to upload all the generated nightly build packages to our FTP Repository
 echo -----------------------------------------------------
 rem Upload nightly build to the repository, parameters %1: "skip prompts", %2: "skip compilation", %3: "log output folder"
-call 5_uploadNightlyBuildToFTP.bat /y %logfolder_deployment%\ > %logfolder_deployment%\5_uploadNightlyBuildToFTP.log
+call 5_uploadNightlyBuildToFTP.bat /y %logfolder_deployment%\ > %logfile_5%
 :no_ftp_deployment
 
 if "%param_no_pause_and_prompts%"=="/y" goto proceed_to_maven_deployment
