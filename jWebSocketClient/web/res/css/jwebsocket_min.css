@@ -54,7 +54,7 @@ padding:1px 10px 1px 20px;background:url(../../images/bullet_grey.png) 0px 2px n
 a.menulink{padding:1px 10px 1px 20px;background:url(../../images/bullet_grey.png) 0px 2px no-repeat;background-color:white;
 color:#202020;}a.menulink:active{background:url(../../images/bullet_blue.png) 0px 2px no-repeat;background-color:#f0f0f0;}
 a.menulink:hover{background:url(../../images/bullet_blue.png) 0px 2px no-repeat;background-color:#f0f0f0;}a.menulink:focus{
-background:url(../../images/bullet_blue.png) 0px 2px no-repeat;background-color:#f0f0f0;}a.menulink.mG{margin-left:10px;}
+background:url(../../images/bullet_blue.png) 0px 2px no-repeat;background-color:#f0f0f0;}a.menulink.mz{margin-left:10px;}
 a.sancBtnTop{position:relative;display:inline-block;text-align:center;text-decoration:none;border:1px solid #808080;
  -moz-border-radius:11px; -webkit-border-radius:11px;margin:1px;padding:3px 0 0 0;font-family:Arial,Helvetica,sans-serif;
 font-weight:bold;font-size:11pt;color:white;background-color:#81a0b5;width:140px;height:22px;}a.sancBtnTop:hover{
