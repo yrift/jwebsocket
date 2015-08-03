@@ -84,7 +84,7 @@
 						subProtocol: jws.WS_SUBPROT_JSON,
 						OnOpen: function (aEvent) {
 							log("jWebSocket connection established.");
-							jws.$("simgStatus").src = "../../images/connected.png";
+							jws.$("simgStatus").src = "../../res/img/connected.png";
 						},
 						OnWelcome: function (aEvent) {
 							log("<font style=\"color:red\">jWebSocket Welcome received.</font>");
@@ -96,9 +96,9 @@
 							log("jWebSocket message received: '" + aEvent.data + "'");
 
 							if (lWSC.isLoggedIn()) {
-								jws.$("simgStatus").src = "../../images/authenticated.png";
+								jws.$("simgStatus").src = "../../res/img/authenticated.png";
 							} else {
-								jws.$("simgStatus").src = "../../images/connected.png";
+								jws.$("simgStatus").src = "../../res/img/connected.png";
 							}
 							jws.$("slblClientId").innerHTML =
 									"{nbsp}Client{nbdash}Id:{nbsp}"
@@ -109,7 +109,7 @@
 						OnClose: function (aEvent) {
 							log("jWebSocket connection closed.");
 
-							jws.$("simgStatus").src = "../../images/disconnected.png";
+							jws.$("simgStatus").src = "../../res/img/disconnected.png";
 							jws.$("slblClientId").innerHTML = "{nbsp}Client{nbdash}Id:{nbsp}-";
 						}
 
@@ -298,7 +298,7 @@
 		<table class="tblHeader" width="100%" cellspacing="0" cellpadding="0">
 			<tr>
 				<td class="tdHeader" width="">{header}</td>
-				<td class="tdHeader" width="1%"><img id="simgStatus" src="../../images/disconnected.png" align="right"/></td>
+				<td class="tdHeader" width="1%"><img id="simgStatus" src="../../res/img/disconnected.png" align="right"/></td>
 				<td class="tdHeader" width="1%"><span id="slblClientId">{nbsp}Client{nbdash}Id:{nbsp}-</span></td>
 			</tr>
 		</table>

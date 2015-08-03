@@ -70,7 +70,7 @@
 						// OnOpen callback
 						OnOpen: function( aEvent ) {
 							log( "jWebSocket connection established." );
-							jws.$("simgStatus").src = "../../images/connected.png";
+							jws.$("simgStatus").src = "../../res/img/connected.png";
 						},
 
 						// OnWelcome event
@@ -88,9 +88,9 @@
 							log( "jWebSocket message received: '" + aEvent.data + "'" );
 
 							if( lWSC.isLoggedIn() ) {
-								jws.$("simgStatus").src = "../../images/authenticated.png";
+								jws.$("simgStatus").src = "../../res/img/authenticated.png";
 							} else {
-								jws.$("simgStatus").src = "../../images/connected.png";
+								jws.$("simgStatus").src = "../../res/img/connected.png";
 							}
 							jws.$("slblClientId").innerHTML =
 								"&nbsp;Client&#x2011;Id:&nbsp;"
@@ -103,7 +103,7 @@
 						OnClose: function( aEvent ) {
 							log( "jWebSocket connection closed." );
 
-							jws.$("simgStatus").src = "../../images/disconnected.png";
+							jws.$("simgStatus").src = "../../res/img/disconnected.png";
 							jws.$("slblClientId").innerHTML = "&nbsp;Client&#x2011;Id:&nbsp;-";
 						}
 
@@ -282,7 +282,7 @@
 		<table class="tblHeader" width="100%" cellspacing="0" cellpadding="0">
 			<tr>
 				<td class="tdHeader" width="">jWebSocket Charting Demo</td>
-				<td class="tdHeader" width="1%"><img id="simgStatus" src="../../images/disconnected.png" align="right"/></td>
+				<td class="tdHeader" width="1%"><img id="simgStatus" src="../../res/img/disconnected.png" align="right"/></td>
 				<td class="tdHeader" width="1%"><span id="slblClientId">&nbsp;Client&#x2011;Id:&nbsp;-</span></td>
 			</tr>
 		</table>

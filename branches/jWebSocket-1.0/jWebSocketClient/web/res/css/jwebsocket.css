@@ -441,43 +441,43 @@ p.imageFooter {
 
 p.menuDisabled {
 	padding: 1px 10px 1px 20px;
-	background: url(../../images/bullet_grey.png) 0px 2px no-repeat;
+	background: url(../../res/img/bullet_grey.png) 0px 2px no-repeat;
 	background-color: white;
 	color: #808080;
 }
 
 a.menulink:visited {
 	padding: 1px 10px 1px 20px;
-	background: url(../../images/bullet_grey.png) 0px 2px no-repeat;
+	background: url(../../res/img/bullet_grey.png) 0px 2px no-repeat;
 	background-color: white;
 	color: #202020;
 }
 
 a.menulink:link {
 	padding: 1px 10px 1px 20px;
-	background: url(../../images/bullet_grey.png) 0px 2px no-repeat;
+	background: url(../../res/img/bullet_grey.png) 0px 2px no-repeat;
 	background-color: white;
 	color: #202020;
 }
 
 a.menulink {
 	padding: 1px 10px 1px 20px;
-	background: url(../../images/bullet_grey.png) 0px 2px no-repeat;
+	background: url(../../res/img/bullet_grey.png) 0px 2px no-repeat;
 	background-color: white;
 	color: #202020;
 }
 a.menulink:active {
-	background: url(../../images/bullet_blue.png) 0px 2px no-repeat;
+	background: url(../../res/img/bullet_blue.png) 0px 2px no-repeat;
 	background-color: #f0f0f0;
 }
 
 a.menulink:hover {
-	background: url(../../images/bullet_blue.png) 0px 2px no-repeat;
+	background: url(../../res/img/bullet_blue.png) 0px 2px no-repeat;
 	background-color: #f0f0f0;
 }
 
 a.menulink:focus {
-	background: url(../../images/bullet_blue.png) 0px 2px no-repeat;
+	background: url(../../res/img/bullet_blue.png) 0px 2px no-repeat;
 	background-color: #f0f0f0;
 }
 a.menulink.nested{

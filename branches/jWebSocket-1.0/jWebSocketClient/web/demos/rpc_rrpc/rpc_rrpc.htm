@@ -64,7 +64,7 @@
 					// OnOpen callback
 					OnOpen: function( aEvent ) {
 						log( "<font style='color:#888'>jWebSocket connection established.</font>" );
-						jws.$("simgStatus").src = "../../images/connected.png";
+						jws.$("simgStatus").src = "../../res/img/connected.png";
 					},
 
 					// OnMessage callback
@@ -76,7 +76,7 @@
 					// OnClose callback
 					OnClose: function( aEvent ) {
 						log( "<font style='color:#888'>jWebSocket connection closed.</font>" );
-						jws.$("simgStatus").src = "../../images/disconnected.png";
+						jws.$("simgStatus").src = "../../res/img/disconnected.png";
 						jws.$("slblClientId").innerHTML = "&nbsp;Client&#x2011;Id:&nbsp;-";
 					}
 				});
@@ -294,7 +294,7 @@
 		<table class="tblHeader" width="100%" cellspacing="0" cellpadding="0">
 			<tr>
 				<td class="tdHeader" width="">jWebSocket Remote Procedure Calls (RPC) Demo</td>
-				<td class="tdHeader" width="1%"><img id="simgStatus" src="../../images/disconnected.png" align="right"/></td>
+				<td class="tdHeader" width="1%"><img id="simgStatus" src="../../res/img/disconnected.png" align="right"/></td>
 				<td class="tdHeader" width="1%"><span id="slblClientId">&nbsp;Client&#x2011;Id:&nbsp;-</span></td>
 			</tr>
 		</table>
