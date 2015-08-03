@@ -48,6 +48,7 @@
 				<include>org.codehaus.jackson:jackson-core-asl</include>
 				<include>org.codehaus.jackson:jackson-mapper-asl</include>
 				-->
+				<include>org.netbeans.external:json-2</include>
 				<include>org.springframework:spring-core</include>
 				<include>commons-io:commons-io</include>
 				<include>commons-codec:commons-codec</include>
