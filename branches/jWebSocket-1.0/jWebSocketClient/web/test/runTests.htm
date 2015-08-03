@@ -30,47 +30,14 @@
 		<script type="text/javascript" src="../lib/JSZip/jszip-deflate_min.js"></script>
 		<script type="text/javascript" src="../lib/JSZip/jszip-inflate_min.js"></script>
 		<script type="text/javascript" src="../lib/JSZip/jszip-load_min.js"></script>
-
-		<!-- use bundle to check if all plug-ins are embedded in the bundle -->
-		<script type="text/javascript" src="../res/js/jWebSocket_Bundle.js"></script>
-
-		<!-- also use minified version to check/validate obfuscator -->
-		<!-- <script type="text/javascript" src="../res/js/jWebSocket_Bundle_min.js"></script> -->
-
-		<!-- 
-			#####################################
-			#  INCLUDE YOUR TEST FILES HERE		#
-			#####################################
-		-->
-
-		<!-- Shared test specs for opening and closing connections -->
-        <script type="text/javascript" src="js/tests/jwsSharedTests.js"></script>
 		
-		<!-- All the other tests -->
-        <script type="text/javascript" src="js/tests/jwsAutomatedAPITests.js"></script>
-        <script type="text/javascript" src="js/tests/jwsBenchmarks.js"></script>
-        <script type="text/javascript" src="js/tests/jwsChannelTests.js"></script>
-        <script type="text/javascript" src="js/tests/jwsFilesystemTests.js"></script>
-        <script type="text/javascript" src="js/tests/jwsIOC.js"></script>
-        <script type="text/javascript" src="js/tests/jwsItemStorageTests.js"></script>
-        <script type="text/javascript" src="js/tests/jwsJDBCTests.js"></script>
-        <script type="text/javascript" src="js/tests/jwsJMSTests.js"></script>
-        <script type="text/javascript" src="js/tests/jwsLoadBalancerTests.js"></script>
-        <script type="text/javascript" src="js/tests/jwsLoadTests.js"></script>
-        <script type="text/javascript" src="js/tests/jwsLoggingTests.js"></script>
-        <script type="text/javascript" src="js/tests/jwsQuotaTests.js"></script>
-        <script type="text/javascript" src="js/tests/jwsREST.js"></script>
-        <script type="text/javascript" src="js/tests/jwsRPCTests.js"></script>
-        <script type="text/javascript" src="js/tests/jwsReportingTests.js"></script>
-        <script type="text/javascript" src="js/tests/jwsScriptingPlugInTest.js"></script>
-        <script type="text/javascript" src="js/tests/jwsStreamingTests.js"></script>
-        <script type="text/javascript" src="js/tests/jwsSystemTests.js"></script>
+		<script type="text/javascript" src="../lib/requirejs/require.js"></script>
 
-		<!-- The central test suite code contains the various test suites -->
-		<script type="text/javascript" src="js/jwsTestSuites.js"></script>
+		<!-- Using requirejs to load all Tests Specifications -->
+		<script type="text/javascript" src="js/requireTests.js"></script>
 
 	</head>
-	<body onunload="storePageState();">
+	<body onunload="TestSuite.storePageState();">
 		<div id="demo_box">
 			<!--       DEMO_HEADER       -->
             <div id="demo_box_header">
@@ -135,7 +102,7 @@
 							 onmousedown="this.className = 'button onmousedown'" 
 							 onmouseup="this.className = 'button onmouseup'" 
 							 onmouseout="this.className = 'button onmouseout'" 
-							 onclick="run();
+							 onclick="TestSuite.run();
 									 this.className = 'button onmouseover';"
 							 title="Runs the manual (programmatic) test suite.">
 							<div class="btn_left"></div>
@@ -143,179 +110,9 @@
 							<div class="btn_right"></div>
 						</div>
 
-						<div id="sbtnBenchmarkTest" class="button onmouseup" 
-							 onmouseover="this.className = 'button onmouseover'" 
-							 onmousedown="this.className = 'button onmousedown'" 
-							 onmouseup="this.className = 'button onmouseup'" 
-							 onmouseout="this.className = 'button onmouseout'" 
-							 onclick="runBenchmarkTests();
-									 this.className = 'button onmouseover';"
-							 title="Runs the benchmark suite.">
-							<div class="btn_left"></div>
-							<div class="btn_center">Run benchmark test!</div>
-							<div class="btn_right"></div>
-						</div>
 					</td>
 				</tr>
 			</table>
 		</div>
-		<script type="text/javascript">
-			jws.console.setActive(true);
-			jws.console.setLevel(jws.console.ERROR);
-			var lCategories = $("#categories"),
-					NS_SYSTEM = "org.jwebsocket.plugins.system",
-					lEngines = [],
-					lPlugInsInfo = [],
-					TT_GET_PLUGINS_INFO = "getPlugInsInfo",
-					lCategoriesSelectStr = "<select id='test_set'><option value='__ALL__'>All</option>";
-			var lTests = initTestsIndex();
-			$("#select-all-cb").change(function (aEvent, aValue) {
-				var lIsChecked = $(this).attr("checked");
-				$("#tests").find("input[type=checkbox]:enabled").attr("checked", lIsChecked ? true : false);
-				$(".select-all-text").text(!lIsChecked ? "Select all" : "Select none");
-			});
-			$.each(lTests.categories, function (aIndex, aCategory) {
-				lCategoriesSelectStr += "<option value='" + aCategory + "'>" + aCategory + "</option>";
-			});
-			lCategoriesSelectStr += "</select/>";
-			lCategories.html(lCategoriesSelectStr);
-			// rendering category tests
-			var lCombo = $('#test_set');
-			lCombo.bind('change', function (aSelect) {
-				var lCategory = $(aSelect.target).val();
-				renderTests(lTests.getTestsByCategory(lCategory), $("#tests"), lCategory, lPlugInsEnginesInfo);
-			});
-			function runBenchmarkTests() {
-				lCombo.val('Server Benchmarks');
-				renderTests(lTests.getTestsByCategory($(lCombo).val()), $("#tests"), $(lCombo).val(), lPlugInsEnginesInfo);
-				run();
-			}
-			// This section will try to bring the possible modules that can be tested in the server
-			jws.Tests.setAdminConn(new jws.jWebSocketJSONClient());
-			var lResponse = {}, lWasOpen = false;
-			$("#demo_box").mask("Retrieving tests information from the server, please wait...");
-			// open a separate control connection
-			jws.Tests.getAdminConn().logon(jws.getDefaultServerURL(),
-					jws.Tests.ADMIN_USER,
-					jws.Tests.ADMIN_PWD, {
-						OnToken: function (aToken) {
-							lWasOpen = true;
-							if (NS_SYSTEM === aToken.ns) {
-								if ("welcome" === aToken.type) {
-									lEngines = aToken.engines;
-								}
-								if ("login" === aToken.reqType) {
-									// Successfully authenticated, proceed to get the tests
-									jws.Tests.getAdminConn().sendToken({
-										ns: NS_SYSTEM,
-										type: TT_GET_PLUGINS_INFO
-									}, {
-										OnSuccess: function (aToken) {
-											lPlugInsEnginesInfo = lEngines.concat(aToken.data);
-											$("#demo_box").unmask();
-											var lState = restorePageState();
-											renderTests(lTests.getTestsByCategory(lCombo.val()), $("#tests"), lCombo.val(), lPlugInsEnginesInfo);
-											if (null !== lState) {
-												selectTests(lState.selectedTests);
-											}
-										},
-										OnFailure: function (aToken) {
-											$("#demo_box").unmask();
-											// Notify the user we could not load the 
-											// plug-ins info from the server
-											wsDialog("Failed to load tests from the " +
-													"server, this may lead to test failures.<br/>" +
-													"The server returned the following message: <br/>" +
-													aToken.msg, "Failure loading tests from the server",
-													true, "alert", null, null, 400);
-										}
-									});
-								}
-							}
-						},
-						OnClose: function () {
-							$("#demo_box").unmask();
-							if (!lWasOpen) {
-								jwsDialog("Please check your connection with the server, it " +
-										"may not be running properly. jWebSocket Tests Executor " +
-										"could not load the tests information from the server, " +
-										"this may lead to test failures.",
-										"Failure loading tests from the server",
-										true, "alert", null, null, 400);
-							}
-						}
-					});
-
-
-			function run() {
-				if (!jws.browserSupportsWebSockets()) {
-					var lMsg = jws.MSG_WS_NOT_SUPPORTED;
-					jwsDialog(lMsg, "jWebSocket Message", true, "alert");
-				} else {
-					// creating a new jasmine evironment to refresh from previous execution
-					jasmine.currentEnv_ = new jasmine.Env();
-					// removing previous jasmine report logs if exists
-					$('.jasmine_reporter').remove();
-					var lSelectedTests = getSelectedTests();
-					runFullTestSuite({
-						speed: $('#speed').val(),
-						tests: lSelectedTests
-					});
-					jws.TestPlugIn.execTests();
-				}
-			}
-
-			function getSelectedTests() {
-				var lCheckboxes = $('#tests').find('input[type=checkbox]');
-				var lSelectedTests = [];
-				$.each(lCheckboxes, function (aIndex, aItem) {
-					if ($(aItem).prop('checked'))
-						lSelectedTests.push($(aItem).prop('id'));
-				});
-				return lSelectedTests;
-			}
-
-			function selectTests(aTests) {
-				var lCheckboxes = $('#tests').find('input[type=checkbox]');
-				$.each(lCheckboxes, function (aIndex, aItem) {
-					if (aTests.indexOf($(aItem).attr('id')) == -1) {
-						$(aItem).attr('checked', false);
-					} else {
-						$(aItem).attr('checked', true);
-					}
-				});
-			}
-
-			function storePageState() {
-				var lPageState = {
-					speed: $('#speed').val(),
-					tls: $('#tls_set').val(),
-					category: $('#test_set').val(),
-					selectedTests: getSelectedTests(),
-					selectAll: $('#select-all-cb').attr("checked")
-				};
-				sessionStorage.setItem("page_state", JSON.stringify(lPageState));
-			}
-
-			function restorePageState() {
-				var lJSON = sessionStorage.getItem("page_state");
-				if (null != lJSON) {
-					var lPageState = JSON.parse(lJSON);
-					$('#speed').val(lPageState.speed);
-					$('#tls_set').val(lPageState.tls);
-					$('#test_set').val(lPageState.category);
-					$('#select-all-cb').attr("checked", lPageState.selectAll);
-
-					return lPageState;
-				} else {
-					if ($("[value='Enterprise Edition']").get(0)) {
-						$('#test_set').val('Enterprise Edition');
-					} else {
-						$('#test_set').val('__ALL__');
-					}
-					return null;
-				}
-			}
-		</script>
 	</body>
 </html>
