@@ -64,7 +64,7 @@
 								// OnOpen callback
 								OnOpen: function(aEvent) {
 									log("<font style='color:#888'>jWebSocket connection established.</font>");
-									jws.$("simgStatus").src = "../../images/connected.png";
+									jws.$("simgStatus").src = "../../res/img/connected.png";
 								},
 								OnWelcome: function() {
 									//getChannels();
@@ -76,9 +76,9 @@
 									 + aEvent.data + "'</font>");
 									 */
 									if (lWSC.isLoggedIn()) {
-										jws.$("simgStatus").src = "../../images/authenticated.png";
+										jws.$("simgStatus").src = "../../res/img/authenticated.png";
 									} else {
-										jws.$("simgStatus").src = "../../images/connected.png";
+										jws.$("simgStatus").src = "../../res/img/connected.png";
 									}
 									jws.$("slblClientId").innerHTML = "&nbsp;Client&#x2011;Id:&nbsp;"
 											+ lWSC.getId()
@@ -89,7 +89,7 @@
 								// OnClose callback
 								OnClose: function(aEvent) {
 									log("<font style='color:#888'>jWebSocket connection closed.</font>");
-									jws.$("simgStatus").src = "../../images/disconnected.png";
+									jws.$("simgStatus").src = "../../res/img/disconnected.png";
 									jws.$("slblClientId").innerHTML = "&nbsp;Client&#x2011;Id:&nbsp;-";
 								}
 
@@ -258,7 +258,7 @@
 			<tr>
 				<td class="tdHeader" width="">jWebSocket JMS Stock Ticker Demo</td>
 				<td class="tdHeader" width="1%">
-					<img id="simgStatus" src="../../images/disconnected.png" align="right" />
+					<img id="simgStatus" src="../../res/img/disconnected.png" align="right" />
 				</td>
 				<td class="tdHeader" width="1%"><span id="slblClientId">&nbsp;Client&#x2011;Id:&nbsp;-</span>
 				</td>
