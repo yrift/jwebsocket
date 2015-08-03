@@ -66,7 +66,7 @@
 							log( "jWebSocket connection established." );
 							// no authentication here! Anyway, show green
 							// icon when using custom protocol.
-							jws.$("simgStatus").src = "../../images/authenticated.png";
+							jws.$("simgStatus").src = "../../res/img/authenticated.png";
 						},
 
 						// OnMessage callback
@@ -81,7 +81,7 @@
 						// OnClose callback
 						OnClose: function( aEvent ) {
 							log( "jWebSocket connection closed." );
-							jws.$("simgStatus").src = "../../images/disconnected.png";
+							jws.$("simgStatus").src = "../../res/img/disconnected.png";
 							jws.$("slblClientId").innerHTML = "&nbsp;Client&#x2011;Id:&nbsp;-";
 						}
 
@@ -157,7 +157,7 @@
 		<table class="tblHeader" width="100%" cellspacing="0" cellpadding="0">
 			<tr>
 				<td class="tdHeader" width="">jWebSocket Custom Demo</td>
-				<td class="tdHeader" width="1%"><img id="simgStatus" src="../../images/disconnected.png" align="right"/></td>
+				<td class="tdHeader" width="1%"><img id="simgStatus" src="../../res/img/disconnected.png" align="right"/></td>
 				<td class="tdHeader" width="1%"><span id="slblClientId">&nbsp;Client&#x2011;Id:&nbsp;-</span></td>
 			</tr>
 		</table>

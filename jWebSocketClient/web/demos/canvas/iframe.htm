@@ -59,7 +59,7 @@
 					OnOpen: function( aEvent ) {
 						// start keep alive if user selected that option
 						lWSC.startKeepAlive({ interval: 30000 });
-						eStatus.src = "../../images/authenticated.png";
+						eStatus.src = "../../res/img/authenticated.png";
 						lIsConnected = true;
 					},
 
@@ -69,7 +69,7 @@
 
 					// OnClose callback
 					OnClose: function( aEvent ) {
-						eStatus.src = "../../images/disconnected.png";
+						eStatus.src = "../../res/img/disconnected.png";
 						lIsConnected = false;
 						lWSC.stopKeepAlive();
 					}
@@ -333,7 +333,7 @@
 					   title="Paints some images on the canvas.">&nbsp;
 				<input style="width:80px" class="sbtnDlg" id="sbtnSend" type="button" value="Snapshot" onclick="snapshot();"
 					   title="Creates a snapshot, save it on the server and broadcasts a 'filesave' event.">&nbsp;
-				<img id="simgStatus" alt="status"  src="../../images/disconnected.png"/>
+				<img id="simgStatus" alt="status"  src="../../res/img/disconnected.png"/>
 			</p>
 			<p id="spnAvg" style="display:none">0ms</p>
 			<canvas id="cnvDemo" width="265" height="230"
