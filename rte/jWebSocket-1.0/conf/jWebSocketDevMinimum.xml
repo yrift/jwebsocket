@@ -44,8 +44,8 @@
 			<!-- CAUTION! -->
 			<!-- not all browsers automatically accept self-signed certificates -->
 			<!-- please follow instructions on the jWebSocket.org website, how
-			     to trust self-signed certificates for the various browsers or
-				 how to import signed private key/certificate bundles into the keystore -->
+			to trust self-signed certificates for the various browsers or
+			how to import signed private key/certificate bundles into the keystore -->
 
 			<!-- these domains are accepted by the engine listening on the above mentioned port -->
 			<!-- you optionally can add asterisks as wild cards -->
@@ -96,10 +96,10 @@
 			<id>ts0</id>
 			<jar>jWebSocketTokenServer-1.0.jar</jar>
 			<!-- define the thread pool properties. Thread are spawned when Token's spawnThread value is true 
-			 Queue sizes and maximum pool sizes may be traded off for each other: Using large queues and small pools minimizes CPU usage, OS resources, and context-switching overhead, but can lead to artificially low throughput. 
-			 If tasks frequently block (for example if they are I/O bound), a system may be able to schedule time for more threads than you otherwise allow. 
-			 Use of small queues generally requires larger pool sizes, which keeps CPUs busier but may encounter unacceptable scheduling overhead, which also decreases throughput.
-			 -->
+			Queue sizes and maximum pool sizes may be traded off for each other: Using large queues and small pools minimizes CPU usage, OS resources, and context-switching overhead, but can lead to artificially low throughput. 
+			If tasks frequently block (for example if they are I/O bound), a system may be able to schedule time for more threads than you otherwise allow. 
+			Use of small queues generally requires larger pool sizes, which keeps CPUs busier but may encounter unacceptable scheduling overhead, which also decreases throughput.
+			-->
 			<threadPool>
 				<!--  number of thread that are "waiting" even if the queue is empty  -->
 				<corePoolSize>10</corePoolSize>
@@ -155,6 +155,12 @@
 		</role>
 	</roles>
 
+	<!--jWebSocket static users used to test the system, to run the tests, etc...
+	of course, you can just remove existing users and switch your own 
+	authentication mechanism, please follow the instructions in our website 
+	of how to include a personalized AuthenticationProvider:
+	http://jwebsocket.org/documentation/reference-guide/authentication
+	-->
 	<users>
 		<user>
 			<uuid>000-000-002-2011-07-14-11-33-20-493</uuid>
