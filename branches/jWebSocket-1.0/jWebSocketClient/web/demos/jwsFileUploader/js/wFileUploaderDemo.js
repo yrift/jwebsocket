@@ -225,7 +225,7 @@ $.widget("jws.fileUploaderDemo", {
 		});
 	},
 	startUpload: function ( ) {
-		var lIsEE = this.isEE(),
+		var lIsEE = w.fileUploader.isEE(),
 				lIdx, lQueue = mWSC.getQueue();
 		// Can't upload the files chunked if no Enterprise Edition FileSystem PlugIn loaded
 		if (!lIsEE) {
@@ -239,7 +239,7 @@ $.widget("jws.fileUploaderDemo", {
 		return typeof mWSC.fileSaveByChunks === "function";
 	},
 	onFileSelected: function (aEvent, aFiles) {
-		var lBigFiles = [], lIsEE = this.isEE();
+		var lBigFiles = [], lIsEE = w.fileUploader.isEE();
 		for (var lIdx = 0; lIdx < aFiles.length; lIdx++) {
 			var lExists = false;
 			for (var lFileIdx = 0; lFileIdx < mWSC.queue.length; lFileIdx++) {
