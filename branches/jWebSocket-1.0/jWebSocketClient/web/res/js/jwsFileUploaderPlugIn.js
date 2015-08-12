@@ -96,7 +96,7 @@ jws.FileUploaderPlugIn = {
 				}
 			});
 
-			this.chunkSize = aConfig.chunkSize || this.chunkSize;
+			this.chunkSize = parseInt(aConfig.chunkSize || this.chunkSize, 10);
 			this.defaultScope = aConfig.defaultScope || this.defaultScope;
 			this.defaultAlias = aConfig.defaultAlias || this.defaultAlias;
 			this.dropZone = aConfig.drop_area || '';
@@ -227,7 +227,7 @@ jws.FileUploaderPlugIn = {
 				aUploadItem.getStatus() === this.STATUS_ERROR) {
 			aUploadItem.setStatus(this.STATUS_UPLOADING);
 			var lFile = aUploadItem.getFile(),
-					lChunkSize = this.chunkSize,
+					lChunkSize = parseInt(this.chunkSize, 10),
 					lMe = this,
 					lReader = new FileReader(),
 					lTotalBytes = lFile.size,
@@ -601,7 +601,7 @@ jws.oop.declareClass('jws', 'UploadItem', null, {
 		this.uploadPaused = false;
 	},
 	setChunkSize: function (aChunkSize) {
-		this.chunkSize = aChunkSize;
+		this.chunkSize = parseInt(aChunkSize, 10);
 	},
 	setUploadedBytes: function (aBytes) {
 		this.uploadedBytes = aBytes;
