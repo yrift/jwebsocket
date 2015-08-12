@@ -161,7 +161,6 @@ $.widget("jws.fileUploaderDemo", {
 				});
 			},
 			OnWelcome: function (aToken) {
-				console.log(aToken);
 				w.fileUploader.mMaxFrameSize = aToken.maxFrameSize;
 			},
 			OnClose: function ( ) {
@@ -226,18 +225,21 @@ $.widget("jws.fileUploaderDemo", {
 		});
 	},
 	startUpload: function ( ) {
-		var lIsEnterpriseEdition = (typeof mWSC.fileSaveByChunks === "function"),
+		var lIsEE = this.isEE(),
 				lIdx, lQueue = mWSC.getQueue();
 		// Can't upload the files chunked if no Enterprise Edition FileSystem PlugIn loaded
-		if (!lIsEnterpriseEdition) {
+		if (!lIsEE) {
 			for (lIdx = 0; lIdx < lQueue.length; lIdx++) {
 				lQueue[lIdx].setChunked(false);
 			}
 		}
 		mWSC.startUpload( );
 	},
+	isEE: function () {
+		return typeof mWSC.fileSaveByChunks === "function";
+	},
 	onFileSelected: function (aEvent, aFiles) {
-		var lBigFiles = [];
+		var lBigFiles = [], lIsEE = this.isEE();
 		for (var lIdx = 0; lIdx < aFiles.length; lIdx++) {
 			var lExists = false;
 			for (var lFileIdx = 0; lFileIdx < mWSC.queue.length; lFileIdx++) {
@@ -246,7 +248,7 @@ $.widget("jws.fileUploaderDemo", {
 					break;
 				}
 			}
-			if (aFiles[lIdx].size > w.fileUploader.mMaxFrameSize) {
+			if (!lIsEE && aFiles[lIdx].size > w.fileUploader.mMaxFrameSize) {
 				lExists = true;
 				lBigFiles.push(aFiles[lIdx].name);
 			}
