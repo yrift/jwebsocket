@@ -256,7 +256,8 @@ public class JMSAdvisoryListener implements MessageListener {
 						mLog.error(lEx.getClass().getSimpleName() + ": " + lEx.getMessage() + ", for " + aMessage);
 					}
 				}
-				if (mBroadcastEvents && lBroadcast) {
+				if (mBroadcastEvents && lBroadcast && null != lBroadcastToken) {
+					lBroadcastToken.setString("sourceId", mJMSSender.getEndPointId());
 					mJMSPlugIn.broadcastToken(null, lBroadcastToken,
 							new BroadcastOptions(
 									false, // lIsSenderIncluded

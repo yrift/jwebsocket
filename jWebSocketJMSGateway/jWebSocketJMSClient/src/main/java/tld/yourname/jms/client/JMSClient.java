@@ -334,6 +334,42 @@ public class JMSClient {
 			System.exit(0);
 		}
 
+		lJWSEndPoint.addMessageListener(new JWSMessageListener(lJWSEndPoint) {
+			@Override
+			public void processToken(String aSourceId, Token aToken) {
+				// get the type of the token
+				String lType = aToken.getType();
+				// here we are interested in events only
+				if ("event".equals(lType)) {
+					// get the name of the event
+					String lName = aToken.getString("name");
+					// show the entire event token in the logs
+					if (mLog.isDebugEnabled()) {
+						mLog.debug("JMS event '" + lName + "' captured: " + aToken.getLogString());
+					}
+
+					// get the endpoint id (only for JMS events, so check for null)
+					String lEndPointId = aToken.getString("endPointId");
+					if (null != lEndPointId) {
+						// process JMS endpoint connected event
+						if ("endPointConnected".equals(lName)) {
+							// here only logging
+							if (mLog.isDebugEnabled()) {
+								mLog.debug("JMS endpoint '" + lEndPointId + "' connected.");
+							}
+						// process JMS endpoint disconnected event
+						} else if ("endPointDisconnected".equals(lName)) {
+							// here only logging
+							if (mLog.isDebugEnabled()) {
+								mLog.debug("JMS endpoint '" + lEndPointId + "' disconnected.");
+							}
+						}
+					}
+				}
+			}
+		}
+		);
+
 		// on welcome message from jWebSocket, authenticate against jWebSocket
 		lJWSEndPoint.addRequestListener("org.jwebsocket.jms.gateway", "welcome", new JWSMessageListener(lJWSEndPoint) {
 			@Override
