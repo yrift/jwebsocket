@@ -18,7 +18,6 @@
 //	---------------------------------------------------------------------------
 package org.jwebsocket.plugins.scripting;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.FileNotFoundException;
@@ -62,7 +61,7 @@ import org.jwebsocket.plugins.ActionPlugIn;
 import org.jwebsocket.plugins.TokenPlugIn;
 import org.jwebsocket.plugins.scripting.app.BaseScriptApp;
 import org.jwebsocket.plugins.scripting.app.ClusterMessageTypes;
-import org.jwebsocket.plugins.scripting.app.Manifest;
+import org.jwebsocket.plugins.scripting.app.ManifestProcessor;
 import org.jwebsocket.plugins.scripting.app.js.JavaScriptApp;
 import org.jwebsocket.token.Token;
 import org.jwebsocket.token.TokenFactory;
@@ -100,7 +99,8 @@ public class ScriptingPlugIn extends ActionPlugIn {
 	 */
 	protected ApplicationContext mBeanFactory;
 	/**
-	 * Configuration settings for the scripting plug-in. Controlled by Spring configuration.
+	 * Configuration settings for the scripting plug-in. Controlled by Spring
+	 * configuration.
 	 */
 	protected Settings mSettings;
 
@@ -261,36 +261,25 @@ public class ScriptingPlugIn extends ActionPlugIn {
 	}
 
 	private void execAppBeforeLoadChecks(final String aAppName, String aAppPath) throws Exception {
-		// parsing app manifest
-		File lManifestFile = new File(aAppPath + "/manifest.json");
-		if (!lManifestFile.exists() || !lManifestFile.canRead()) {
-			String lMsg = "Unable to load '" + aAppName + "' application. Manifest file no found!";
-			mLog.error(lMsg);
-			throw new FileNotFoundException(lMsg);
-		}
-		// parsing app manifest file
-		ObjectMapper lMapper = new ObjectMapper();
-		Map<String, Object> lTree = lMapper.readValue(lManifestFile, Map.class);
-		Token lManifestJSON = TokenFactory.createToken();
-		lManifestJSON.setMap(lTree);
+		// reading app manifest
+		Token lManifest = ManifestProcessor.readManifest(aAppName, aAppPath);
 
 		// getting script language extension
-		String lExt = lManifestJSON.getString(Manifest.LANGUAGE_EXT, "js");
+		String lExt = lManifest.getString(ManifestProcessor.ATTR_LANGUAGE_EXT, "js");
 
 		// checking jWebSocket version 
-		Manifest.checkJwsVersion(lManifestJSON.getString(Manifest.JWEBSOCKET_VERSION, "1.0.0"));
+		ManifestProcessor.checkJwsVersion(lManifest.getString(ManifestProcessor.ATTR_JWEBSOCKET_VERSION, "1.0.0"));
 
 		// checking jWebSocket plug-ins dependencies
-		Manifest.checkJwsDependencies(lManifestJSON.getList(
-				Manifest.JWEBSOCKET_PLUGINS_DEPENDENCIES, new ArrayList<String>()));
+		ManifestProcessor.checkJwsDependencies(lManifest.getList(ManifestProcessor.ATTR_JWEBSOCKET_PLUGINS_DEPENDENCIES, new ArrayList<String>()));
 
 		// checking sandbox permissions dependency
-		Manifest.checkPermissions(lManifestJSON.getList(Manifest.PERMISSIONS,
+		ManifestProcessor.checkPermissions(lManifest.getList(ManifestProcessor.ATTR_PERMISSIONS,
 				new ArrayList()), mSettings.getAppPermissions(aAppName, aAppPath),
 				aAppPath);
 
 		// validating bootstrap file
-		final File lBootstrap = new File(aAppPath + "/App." + lExt);
+		final File lBootstrap = new File(aAppPath + "/" + lManifest.getString(ManifestProcessor.ATTR_MAIN, "App." + lExt));
 		if (!lBootstrap.exists() || !lBootstrap.canRead()) {
 			String lMsg = "Unable to load '" + aAppName + "' application. Bootstrap file not found!";
 			mLog.error(lMsg);
@@ -315,7 +304,7 @@ public class ScriptingPlugIn extends ActionPlugIn {
 
 		// creating the high level script app instance
 		if ("js".equals(lExt)) {
-			lApp = new JavaScriptApp(this, aAppName, aAppPath, lScriptApp, lClassLoader);
+			lApp = new JavaScriptApp(this, aAppName, aAppPath, lScriptApp, lClassLoader, lManifest);
 		} else {
 			String lMsg = "The extension '" + lExt + "' is not currently supported!";
 			mLog.error(lMsg);
@@ -329,7 +318,7 @@ public class ScriptingPlugIn extends ActionPlugIn {
 					public Object run() {
 						try {
 							// evaluating app content
-							lScriptApp.eval(FileUtils.readFileToString(lBootstrap));
+							lApp.eval(lBootstrap);
 							return null;
 						} catch (Exception lEx) {
 							String lAction = (mApps.containsKey(aAppName)) ? "reloaded" : "loaded";
@@ -364,27 +353,21 @@ public class ScriptingPlugIn extends ActionPlugIn {
 				destroyAppBeans(lScript);
 			}
 		}
-
-		// parsing app manifest
-		File lManifestFile = new File(aAppPath + "/manifest.json");
-
-		// parsing app manifest file
-		ObjectMapper lMapper = new ObjectMapper();
-		Map<String, Object> lTree = lMapper.readValue(lManifestFile, Map.class);
-		Token lManifestJSON = TokenFactory.createToken();
-		lManifestJSON.setMap(lTree);
+		
+		// reading app manifest
+		Token lManifest = ManifestProcessor.readManifest(aAppName, aAppPath);
 
 		// getting script language extension
-		String lExt = lManifestJSON.getString(Manifest.LANGUAGE_EXT, "js");
+		String lExt = lManifest.getString(ManifestProcessor.ATTR_LANGUAGE_EXT, "js");
 
 		// validating bootstrap file
-		final File lBootstrap = new File(aAppPath + "/App." + lExt);
+		final File lBootstrap = new File(aAppPath + "/" + lManifest.getString(ManifestProcessor.ATTR_MAIN, "App." + lExt));
 
 		// support hot app load
 		if (aHotLoad && mApps.containsKey(aAppName)) {
 			try {
 				// loading app
-				mApps.get(aAppName).eval(lBootstrap.getPath());
+				mApps.get(aAppName).eval(lBootstrap);
 			} catch (ScriptException lEx) {
 				mLog.error("Script applicaton '" + aAppName + "' failed to start: " + lEx.getMessage());
 				mApps.remove(aAppName);
@@ -408,7 +391,7 @@ public class ScriptingPlugIn extends ActionPlugIn {
 
 			// crating the high level script app instance
 			if ("js".equals(lExt)) {
-				mApps.put(aAppName, new JavaScriptApp(this, aAppName, aAppPath, lScriptApp, lClassLoader));
+				mApps.put(aAppName, new JavaScriptApp(this, aAppName, aAppPath, lScriptApp, lClassLoader, lManifest));
 			} else {
 				String lMsg = "The extension '" + lExt + "' is not currently supported!";
 				mLog.error(lMsg);
@@ -423,7 +406,7 @@ public class ScriptingPlugIn extends ActionPlugIn {
 						public Object run() {
 							try {
 								// loading app
-								lApp.eval(lBootstrap.getPath());
+								lApp.eval(lBootstrap);
 								return null;
 							} catch (Exception lEx) {
 								mLog.error("Script applicaton '" + aAppName + "' failed to start: " + lEx.getMessage());
@@ -882,13 +865,8 @@ public class ScriptingPlugIn extends ActionPlugIn {
 			return;
 		}
 
-		// parsing app manifest
-		File lManifestFile = new File(lScriptApp.getPath() + "/manifest.json");
-		ObjectMapper lMapper = new ObjectMapper();
-		Map<String, Object> lContent = lMapper.readValue(lManifestFile, Map.class);
-
 		Token lResponse = createResponse(aToken);
-		lResponse.setMap("data", lContent);
+		lResponse.setToken("data", ManifestProcessor.readManifest(lApp, lScriptApp.getPath()));
 
 		sendToken(aConnector, lResponse);
 	}

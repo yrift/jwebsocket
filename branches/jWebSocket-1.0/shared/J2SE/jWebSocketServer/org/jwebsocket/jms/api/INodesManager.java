@@ -30,12 +30,11 @@ import org.jwebsocket.api.IInitializable;
 public interface INodesManager extends IInitializable {
 
 	/**
-	 * 
-	 * @return
-	 * @throws Exception 
+	 *
+	 * @return @throws Exception
 	 */
 	List<Map<String, Object>> listNodes() throws Exception;
-	
+
 	/**
 	 * Get the nodes load average.
 	 *
@@ -50,12 +49,13 @@ public interface INodesManager extends IInitializable {
 	 *
 	 * @param aConsumerId The consumer id
 	 * @param aNodeId The node id
+	 * @param aNodeType  The node type
 	 * @param aDescription The node description
 	 * @param aIpAddress The node ip-address
 	 * @param aCpuUsage The node CPU usage
 	 * @throws Exception
 	 */
-	void register(String aConsumerId, String aNodeId, String aDescription,
+	void register(String aConsumerId, String aNodeId, String aNodeType, String aDescription,
 			String aIpAddress, double aCpuUsage) throws Exception;
 
 	/**
@@ -76,13 +76,13 @@ public interface INodesManager extends IInitializable {
 	 * @throws java.lang.Exception
 	 */
 	void setStatus(String aNodeId, int aStatus) throws Exception;
-	
+
 	/**
 	 * Get a jWebSocket server node status
-	 * 
+	 *
 	 * @param aNodeId The node identifier
 	 * @return
-	 * @throws Exception 
+	 * @throws Exception
 	 */
 	Integer getStatus(String aNodeId) throws Exception;
 
@@ -112,8 +112,8 @@ public interface INodesManager extends IInitializable {
 	String getNodeId(String aConsumerId) throws Exception;
 
 	/**
-	 * Return TRUE if exists a jWebSocket server node id, matches the given
-	 * node id, FALSE otherwise
+	 * Return TRUE if exists a jWebSocket server node id, matches the given node
+	 * id, FALSE otherwise
 	 *
 	 * @param aNodeId
 	 * @return
@@ -134,6 +134,35 @@ public interface INodesManager extends IInitializable {
 	 * @return
 	 */
 	String getNodeDescription();
+
+	/**
+	 * Set the jWebSocket server node type. Supported values: controller,
+	 * worker, hybrid
+	 *
+	 * @param aNodeType
+	 */
+	void setNodeType(String aNodeType);
+
+	/**
+	 * Get the jWebSocket server node type.
+	 *
+	 * @return
+	 */
+	String getNodeType();
+
+	/**
+	 * Set the node performance factor for custom node load calculation.
+	 *
+	 * @param aPerformanceFactor
+	 */
+	void setNodePerformanceFactor(double aPerformanceFactor);
+
+	/**
+	 * Get the node performance factor for custom node load calculation.
+	 *
+	 * @return
+	 */
+	double getNodePerformanceFactor();
 
 	/**
 	 * Get the available jWebSocket server nodes count.

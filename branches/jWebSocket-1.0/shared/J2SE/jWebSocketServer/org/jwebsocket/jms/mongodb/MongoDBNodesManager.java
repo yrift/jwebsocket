@@ -18,6 +18,7 @@
 //	---------------------------------------------------------------------------
 package org.jwebsocket.jms.mongodb;
 
+import com.mongodb.BasicDBList;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBCollection;
 import com.mongodb.DBCursor;
@@ -41,8 +42,20 @@ public class MongoDBNodesManager implements INodesManager {
 
 	private DBCollection mNodes;
 	private String mNodeDescription;
+	private String mNodeType = "hybrid";
 	private IClusterSynchronizer mSynchronizer;
 	private IConsumerAdviceTempStorage mConsumerAdviceTempStorage;
+	private double mPerformanceFactor = 1.0;
+
+	@Override
+	public String getNodeType() {
+		return mNodeType;
+	}
+
+	@Override
+	public void setNodeType(String aNodeType) {
+		mNodeType = aNodeType;
+	}
 
 	@Override
 	public IConsumerAdviceTempStorage getConsumerAdviceTempStorage() {
@@ -57,6 +70,17 @@ public class MongoDBNodesManager implements INodesManager {
 	@Override
 	public IClusterSynchronizer getSynchronizer() {
 		return mSynchronizer;
+	}
+
+	@Override
+	public double getNodePerformanceFactor() {
+		return mPerformanceFactor;
+	}
+
+	@Override
+	public void setNodePerformanceFactor(double aPerformanceFactor) {
+		Assert.isTrue(aPerformanceFactor > 0, "Expecting node 'performance factor' attribute value > 0");
+		mPerformanceFactor = aPerformanceFactor;
 	}
 
 	/**
@@ -84,7 +108,7 @@ public class MongoDBNodesManager implements INodesManager {
 	}
 
 	@Override
-	public void register(String aConsumerId, String aNodeId, String aDescription,
+	public void register(String aConsumerId, String aNodeId, String aNodeType, String aDescription,
 			String aIpAddress, double aCpuUsage) throws Exception {
 		if (exists(aNodeId)) {
 			mNodes.update(new BasicDBObject().append(Attributes.NODE_ID, aNodeId),
@@ -93,6 +117,7 @@ public class MongoDBNodesManager implements INodesManager {
 							.append(Attributes.CONSUMER_ID, aConsumerId)
 							.append(Attributes.DESCRIPTION, aDescription)
 							.append(Attributes.IP_ADDRESS, aIpAddress)
+							.append(Attributes.NODE_TYPE, aNodeType)
 							.append(Attributes.STATUS, NodeStatus.UP)
 							.append(Attributes.START_TIME, new Date().getTime())
 							.append(Attributes.CPU, aCpuUsage)));
@@ -102,6 +127,7 @@ public class MongoDBNodesManager implements INodesManager {
 					.append(Attributes.CONSUMER_ID, aConsumerId)
 					.append(Attributes.DESCRIPTION, aDescription)
 					.append(Attributes.IP_ADDRESS, aIpAddress)
+					.append(Attributes.NODE_TYPE, aNodeType)
 					.append(Attributes.STATUS, NodeStatus.UP)
 					.append(Attributes.START_TIME, new Date().getTime())
 					.append(Attributes.CPU, aCpuUsage));
@@ -141,7 +167,12 @@ public class MongoDBNodesManager implements INodesManager {
 
 	@Override
 	public String getOptimumNode() throws Exception {
-		DBCursor lCursor = mNodes.find(new BasicDBObject().append(Attributes.STATUS, NodeStatus.UP))
+		BasicDBList lAnd = new BasicDBList();
+		// worker nodes intended for distributed event-driven communication only
+		lAnd.add(new BasicDBObject(Attributes.NODE_TYPE, new BasicDBObject().append("$ne", "worker")));
+		lAnd.add(new BasicDBObject().append(Attributes.STATUS, NodeStatus.UP));
+
+		DBCursor lCursor = mNodes.find(new BasicDBObject("$and", lAnd))
 				.sort(new BasicDBObject().append(Attributes.CPU, 1)
 						.append(Attributes.REQUESTS, 1)).limit(1);
 
@@ -174,8 +205,12 @@ public class MongoDBNodesManager implements INodesManager {
 
 	@Override
 	public void initialize() throws Exception {
-		// creating index for CPU and REQUESTS fields for sorting
-		mNodes.createIndex(new BasicDBObject().append(Attributes.CPU, 1).append(Attributes.REQUESTS, 1));
+		// creating index for CPU, NODE_TYPE and REQUESTS fields for sorting
+		mNodes.createIndex(new BasicDBObject()
+				.append(Attributes.CPU, 1)
+				.append(Attributes.REQUESTS, 1)
+				.append(Attributes.NODE_TYPE, 1)
+		);
 
 		// setting 'CONSUMER_ID' as primary key
 		mNodes.createIndex(new BasicDBObject().append(Attributes.CONSUMER_ID, 1),

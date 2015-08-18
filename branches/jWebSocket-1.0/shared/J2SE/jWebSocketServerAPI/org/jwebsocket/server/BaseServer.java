@@ -67,7 +67,7 @@ public class BaseServer implements WebSocketServer {
 	 *
 	 */
 	protected WebSocketFilterChain mFilterChain = null;
-	private List<WebSocketServerListener> mListeners = new FastList<WebSocketServerListener>();
+	private final List<WebSocketServerListener> mListeners = new FastList<WebSocketServerListener>();
 	private ServerConfiguration mConfiguration;
 
 	/**

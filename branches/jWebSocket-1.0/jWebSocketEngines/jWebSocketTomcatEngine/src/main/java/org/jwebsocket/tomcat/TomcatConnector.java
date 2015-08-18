@@ -42,7 +42,6 @@ public class TomcatConnector extends BaseConnector {
 
 	private static final Logger mLog = Logging.getLogger();
 	private boolean mIsRunning = false;
-	private CloseReason mCloseReason = CloseReason.TIMEOUT;
 	private final WsOutbound mOutbound;
 	private InetAddress mRemoteHost;
 	private int mRemotePort;
@@ -93,7 +92,6 @@ public class TomcatConnector extends BaseConnector {
 				mOutbound.close(0, null);
 			} catch (IOException ex) {
 			}
-			mCloseReason = aCloseReason;
 			mIsRunning = false;
 			if (mLog.isInfoEnabled()) {
 				mLog.info("Tomcat connector '" + getId() + "' at port " + lRemotePort + " stopped.");
@@ -159,7 +157,6 @@ public class TomcatConnector extends BaseConnector {
 	@Override
 	public String toString() {
 		String lRes = getRemoteHost().getHostAddress() + ":" + getRemotePort();
-		// TODO: don't hard code. At least use JWebSocketConstants field here.
 		String lUsername = getUsername();
 		if (lUsername != null) {
 			lRes += " (" + lUsername + ")";
