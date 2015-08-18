@@ -28,6 +28,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.apache.log4j.Logger;
+import org.jwebsocket.api.WebSocketConnector;
 import org.jwebsocket.api.WebSocketPacket;
 import org.jwebsocket.config.JWebSocketServerConstants;
 import org.jwebsocket.engines.ServletUtils;
@@ -114,11 +115,15 @@ public class HTTPServlet extends HttpServlet {
 		return Tools.getMD5(lConnectionId + aReq.getRemoteAddr());
 	}
 
-	void updateSessionTimeout(String aSessionId) {
-		mConnectorsManager.getSessionManager().getReconnectionManager()
-				.getSessionIdsTrash()
-				.put(aSessionId, System.currentTimeMillis()
-						+ (mEngine.getConfiguration().getTimeout() * 60 * 1000));
+	void updateSessionTimeout(String aConnectorId) {
+		WebSocketConnector lConnector = mEngine.getConnectorById(aConnectorId);
+		if (null != lConnector) {
+			mConnectorsManager.getSessionManager().getReconnectionManager()
+					.getSessionIdsTrash()
+					.put(lConnector.getSession().getSessionId(),
+							System.currentTimeMillis()
+							+ (mEngine.getConfiguration().getTimeout() * 60 * 1000));
+		}
 	}
 
 	/**
@@ -169,7 +174,7 @@ public class HTTPServlet extends HttpServlet {
 		}
 
 		// session management 
-		updateSessionTimeout(lSessionId);
+		updateSessionTimeout(lConnectorId);
 	}
 
 	/**
@@ -190,7 +195,7 @@ public class HTTPServlet extends HttpServlet {
 		}
 
 		if (!mConnectorsManager.connectorExists(lConnectorId)) {
-			sendMessage(411, "Invalid connection state!", aResp);
+			sendMessage(400, "Invalid connection state!", aResp);
 			return;
 		}
 
@@ -201,7 +206,7 @@ public class HTTPServlet extends HttpServlet {
 		}
 
 		// session management 
-		updateSessionTimeout(lSessionId);
+		updateSessionTimeout(lConnectorId);
 	}
 
 	/**

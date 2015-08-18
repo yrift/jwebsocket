@@ -31,7 +31,8 @@ import org.jwebsocket.kit.WebSocketException;
 /**
  * Provides the basic implementation of the jWebSocket engines. The
  * {@literal BaseEngine} is supposed to be used as ancestor for the engine
- * implementations like e.g. the {@literal TCPEngine} or the {@literal NettyEngine}.
+ * implementations like e.g. the {@literal TCPEngine} or the
+ * {@literal NettyEngine}.
  *
  * @author Alexander Schulze
  */
@@ -295,7 +296,7 @@ public abstract class BaseEngine implements WebSocketEngine {
 
 	@Override
 	public Long getConnectorsCount() {
-		return new Long(getConnectors().size());
+		return (long) getConnectors().size();
 	}
 
 	@Override

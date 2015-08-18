@@ -258,7 +258,8 @@ public class TokenServer extends BaseServer {
 	}
 
 	/**
-	 * Broadcast a token to all the connectors that share a custom role (authority)
+	 * Broadcast a token to all the connectors that share a custom role
+	 * (authority)
 	 *
 	 * @param aRole
 	 * @param aToken
@@ -322,7 +323,7 @@ public class TokenServer extends BaseServer {
 		if (!WebSocketFrameType.BINARY.equals(aDataPacket.getFrameType())) {
 			if (aConnector.supportTokens()) {
 				final Token lToken = packetToToken(aConnector, aDataPacket);
-				if (lToken != null) {
+				if (null != lToken && !lToken.getMap().isEmpty()) {
 					boolean lRunReqInOwnThread
 							= TRUE.equals(lToken.getBoolean("spawnThread"))
 							|| "true".equals(lToken.getString("spawnThread"));
@@ -899,8 +900,8 @@ public class TokenServer extends BaseServer {
 	}
 
 	/**
-	 * Iterate through all connectors of all engines and sends the token to
-	 * each connector. The token format is considered for each connection
+	 * Iterate through all connectors of all engines and sends the token to each
+	 * connector. The token format is considered for each connection
 	 * individually so that the application can broadcast a token to all kinds
 	 * of clients.
 	 *

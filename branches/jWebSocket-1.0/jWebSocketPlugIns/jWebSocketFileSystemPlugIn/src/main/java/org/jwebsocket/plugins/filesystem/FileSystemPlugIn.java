@@ -565,8 +565,7 @@ public class FileSystemPlugIn extends TokenPlugIn {
 
 			if (aConnector instanceof HTTPConnector) {
 				// supporting HTTP download
-				ServletUtils.sendFile(((HTTPConnector) aConnector).getHttpResponse(), lFile);
-				((HTTPConnector) aConnector).setHttpResponse(null);
+				((HTTPConnector) aConnector).sendFile(lFile);
 				if (mLog.isDebugEnabled()) {
 					mLog.debug("File '" + lFilename + "' sent in the HTTP response!");
 				}

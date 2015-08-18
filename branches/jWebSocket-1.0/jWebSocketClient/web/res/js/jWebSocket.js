@@ -1941,7 +1941,7 @@ jws.oop.declareClass( "jws", "jWebSocketBaseClient", null, {
 				}
 
 				// create a new web socket instance
-				this.fConn = new lWsClass( aURL, lSubProt );
+				this.fConn = new lWsClass( aURL);//, lSubProt );
 				// save URL and sub prot for optional re-connect
 				this.fURL = aURL; 
 				this.fSubProt = lSubProt;

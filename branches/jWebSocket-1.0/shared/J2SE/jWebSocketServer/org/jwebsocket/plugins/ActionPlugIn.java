@@ -39,6 +39,7 @@ import org.jwebsocket.spring.JWebSocketBeanFactory;
 import org.jwebsocket.token.Token;
 import org.jwebsocket.util.MapAppender;
 import org.jwebsocket.util.ReflectionUtils;
+import org.springframework.scheduling.annotation.Async;
 
 /**
  *
@@ -257,6 +258,8 @@ public abstract class ActionPlugIn extends TokenPlugIn {
 								lInvokationParams.add(this);
 							} else if (lMethodParam.getType().equals(TokenServer.class)) {
 								lInvokationParams.add(this.getServer());
+							} else if (lMethodParam.getType().equals(Token.class)) {
+								lInvokationParams.add(aToken);
 							} else {
 								lInvokationParams.add(JWebSocketBeanFactory.getInstance(getNamespace()).getBean(lMethodParam.getType()));
 							}
@@ -314,7 +317,7 @@ public abstract class ActionPlugIn extends TokenPlugIn {
 			// invoke method
 			Object lResult = aMethod.invoke(aSubject, aParams.toArray());
 			boolean lIsServiceMethod = aMethod.isAnnotationPresent(AllowMethodInvokation.class) || aMethod.isAnnotationPresent(ServiceActionMapping.class);
-			if (lIsServiceMethod) {
+			if (lIsServiceMethod && !aMethod.isAnnotationPresent(Async.class)) {
 				// send method's invokation result to calling client
 				Token lResponse = createResponse(aToken);
 				lResponse.getMap().put("data", lResult);
@@ -395,9 +398,7 @@ public abstract class ActionPlugIn extends TokenPlugIn {
 		try {
 			aMethodName += "Action";
 			// processing annotations
-			lMethod
-					= getClass().getMethod(aMethodName, WebSocketConnector.class, Token.class
-					);
+			lMethod = getClass().getMethod(aMethodName, WebSocketConnector.class, Token.class);
 
 			processAnnotations(lMethod, aConnector, aToken);
 		} catch (Exception lEx) {
@@ -458,7 +459,9 @@ public abstract class ActionPlugIn extends TokenPlugIn {
 			lMethods = lService.getClass().getMethods();
 			for (Method lMethod : lMethods) {
 				if (lMethod.isAnnotationPresent(AllowMethodInvokation.class)) {
-					lAPI.add(getMethodAPI(lMethod));
+					Map lMethodAPI = getMethodAPI(lMethod);
+					lMethodAPI.put("service", lService.getClass().getSimpleName());
+					lAPI.add(lMethodAPI);
 				}
 			}
 		}
@@ -497,12 +500,14 @@ public abstract class ActionPlugIn extends TokenPlugIn {
 			List<ReflectionUtils.MethodParameter> lParamAnnotations = ReflectionUtils.getMethodParameters(aMethod);
 			for (ReflectionUtils.MethodParameter lParamAnnotation : lParamAnnotations) {
 				Param lParam = (Param) lParamAnnotation.getAnnotation(Param.class);
-				lParams.add(new MapAppender()
-						.append("name", lParam.id())
-						.append("required", lParam.required())
-						.append("type", lParamAnnotation.getType().getCanonicalName())
-						.getMap()
-				);
+				if (null != lParam) {
+					lParams.add(new MapAppender()
+							.append("name", lParam.id())
+							.append("required", lParam.required())
+							.append("type", lParamAnnotation.getType().getCanonicalName())
+							.getMap()
+					);
+				}
 			}
 		}
 

@@ -512,4 +512,15 @@ public class TokenPlugIn extends BasePlugIn {
 	public boolean isClusterEnabled() {
 		return getServer() instanceof JMSServer;
 	}
+
+	/**
+	 * Return TRUE if the running node is declared as worker. Transparent
+	 * support for clusters.
+	 *
+	 * @return
+	 */
+	public boolean isWorkerNode() {
+		return !isClusterEnabled()
+				|| false == "controller".equals(((JMSServer) getServer()).getClusterEngine().getNodesManager().getNodeType());
+	}
 }

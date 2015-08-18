@@ -253,7 +253,7 @@ public class JMSEngine extends BaseEngine {
 		super.engineStarted();
 
 		if (mLog.isDebugEnabled()) {
-			mLog.info("Engine successfully started! Listenning on topic: '"
+			mLog.info("Engine successfully started! Listenning on queue: '"
 					+ mDestination + "'...");
 		}
 	}
