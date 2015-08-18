@@ -4552,6 +4552,7 @@ jws.SystemClientPlugIn = {
 					// iterating by app controllers
 					for (var lMethodsIndex in lAPI) {
 						var lMethodName = lAPI[lMethodsIndex].name;
+						var lService = lAPI[lMethodsIndex]["service"];
 						var lParams = [];
 						for (var lParamsIndex in lAPI[lMethodsIndex].params) {
 							lParams.push(lAPI[lMethodsIndex].params[lParamsIndex].name);
@@ -4565,7 +4566,9 @@ jws.SystemClientPlugIn = {
 						lFn += "var lToken = {";
 						lFn += "ns: '" + aNS + "',";
 						lFn += "type: '" + lMethodName + "'";
-						
+						if (lService){
+							lFn += ", _service: '" + lService + "'";
+						}
 						for (var lIndex in lParams) {
 							lFn += "," + lParams[lIndex] + ": " + lParams[lIndex];
 						}
