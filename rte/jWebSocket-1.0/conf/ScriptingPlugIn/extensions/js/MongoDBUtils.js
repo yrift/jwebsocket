@@ -42,7 +42,7 @@ MongoDBUtils = {
      * @returns {Packages.org.bson.types.ObjectId}
      */
     toId: function (aStrId) {
-        return new Packages.org.bson.types.ObjectId(aStrId)
+        return new Packages.org.bson.types.ObjectId(aStrId);
     },
     /**
      * Converts a DBCursor object to JavaScript Array
@@ -51,11 +51,11 @@ MongoDBUtils = {
      * @returns {Array|MongoDBUtils.toArray.lArray}
      */
     toArray: function (aDBCursor) {
-        var lArray = []
+        var lArray = [];
         while (aDBCursor.hasNext()) {
             lArray.push(aDBCursor.next().toMap());
         }
 
         return lArray;
     }
-}
+};

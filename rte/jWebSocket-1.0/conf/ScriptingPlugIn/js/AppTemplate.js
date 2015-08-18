@@ -505,6 +505,9 @@ var App = (function () {
 					? AppUtils.getBean(aBeanId)
 					: AppUtils.getBean(aBeanId, aNamespace);
 		},
+		isWorkerNode: function () {
+			return AppUtils.isWorkerNode();
+		},
 		getType: function (aObject) {
 			var lRes = typeof aObject;
 			if (aObject === undefined) {
