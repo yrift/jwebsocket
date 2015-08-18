@@ -54,7 +54,8 @@
 				<constructor-arg value="nodes"/>
 			</bean>
 		</property>
-		<property name="nodeDescription" ref="nodeDescription"></property>
+		<property name="nodeDescription" ref="nodeDescription" />
+		<property name="nodePerformanceFactor" value="1.0" />
 		<!-- the cluster 'synchronizer' instance for nodes processes synchronization -->
 		<property name="synchronizer" ref="clusterSynchronizer" />
 		<!-- utility temporary storage to access consumers information -->
