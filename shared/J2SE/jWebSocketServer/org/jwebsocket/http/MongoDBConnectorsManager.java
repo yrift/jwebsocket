@@ -43,9 +43,9 @@ import org.springframework.util.Assert;
 public class MongoDBConnectorsManager implements IConnectorsManager {
 
 	private DBCollection mConnectors;
-	private ISessionManager mSessionManager;
-	private WebSocketEngine mEngine;
-	private IConnectorsPacketQueue mPacketsQueue;
+	protected ISessionManager mSessionManager;
+	protected WebSocketEngine mEngine;
+	protected IConnectorsPacketQueue mPacketsQueue;
 
 	/**
 	 *
@@ -165,7 +165,7 @@ public class MongoDBConnectorsManager implements IConnectorsManager {
 	 * @throws Exception
 	 */
 	@Override
-	public HTTPConnector getConnectorById(String aConnectorId) throws Exception {
+	public WebSocketConnector getConnectorById(String aConnectorId) throws Exception {
 		return getConnectorById(aConnectorId, false);
 	}
 
@@ -177,7 +177,7 @@ public class MongoDBConnectorsManager implements IConnectorsManager {
 	 * @throws Exception
 	 */
 	@Override
-	public HTTPConnector getConnectorById(String aConnectorId, boolean aStartupConnection) throws Exception {
+	public WebSocketConnector getConnectorById(String aConnectorId, boolean aStartupConnection) throws Exception {
 		DBObject lConnector = mConnectors.findOne(new BasicDBObject()
 				.append(Attributes.CONNECTION_ID, aConnectorId));
 
@@ -191,17 +191,22 @@ public class MongoDBConnectorsManager implements IConnectorsManager {
 	 * @throws Exception
 	 */
 	@Override
-	public HTTPConnector getConnectorBySessionId(String aSessionId) throws Exception {
+	public WebSocketConnector getConnectorBySessionId(String aSessionId) throws Exception {
 		DBObject lConnector = mConnectors.findOne(new BasicDBObject()
 				.append(Attributes.SESSION_ID, aSessionId));
 
 		return (null == lConnector) ? null : toConnector(lConnector, false);
 	}
 
-	private HTTPConnector toConnector(DBObject aRecord, boolean aStartupConnection) throws Exception {
+	protected HTTPConnector buildConnectorInstance(WebSocketEngine aEngine, String lConnectorId,
+			IConnectorsPacketQueue mPacketsQueue) {
+		return new HTTPConnector(mEngine, lConnectorId, mPacketsQueue);
+	}
+
+	private WebSocketConnector toConnector(DBObject aRecord, boolean aStartupConnection) throws Exception {
 		String lConnectorId = (String) aRecord.get(Attributes.CONNECTION_ID);
 
-		HTTPConnector lConnector = new HTTPConnector(mEngine, lConnectorId, mPacketsQueue);
+		HTTPConnector lConnector = buildConnectorInstance(mEngine, lConnectorId, mPacketsQueue);
 
 		String lSessionId = (String) aRecord.get(Attributes.SESSION_ID);
 		lConnector.getSession().setSessionId(lSessionId);
@@ -237,7 +242,7 @@ public class MongoDBConnectorsManager implements IConnectorsManager {
 	 * @throws Exception
 	 */
 	@Override
-	public HTTPConnector add(String aSessionId, String aConnectionId) throws Exception {
+	public WebSocketConnector add(String aSessionId, String aConnectionId) throws Exception {
 		Assert.notNull(aConnectionId);
 		Assert.notNull(aSessionId);
 
@@ -253,8 +258,7 @@ public class MongoDBConnectorsManager implements IConnectorsManager {
 
 	/**
 	 *
-	 * @return
-	 * @throws Exception
+	 * @return @throws Exception
 	 */
 	@Override
 	public Map<String, WebSocketConnector> getAll() throws Exception {

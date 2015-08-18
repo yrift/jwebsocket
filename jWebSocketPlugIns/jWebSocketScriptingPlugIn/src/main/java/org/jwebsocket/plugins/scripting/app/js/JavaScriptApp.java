@@ -32,7 +32,9 @@ import org.jwebsocket.logging.Logging;
 import org.jwebsocket.plugins.scripting.ScriptingPlugIn;
 import org.jwebsocket.plugins.scripting.Settings;
 import org.jwebsocket.plugins.scripting.app.BaseScriptApp;
+import org.jwebsocket.plugins.scripting.app.ManifestProcessor;
 import org.jwebsocket.spring.JWebSocketBeanFactory;
+import org.jwebsocket.token.Token;
 import org.jwebsocket.util.Tools;
 import org.springframework.util.Assert;
 
@@ -57,19 +59,35 @@ public class JavaScriptApp extends BaseScriptApp {
 	 * @param aAppPath The application directory path
 	 * @param aScriptApp The scripting engine that runs the application
 	 * @param aLoader The application class loader
+	 * @param aManifest The application manifest JSON
 	 */
 	@SuppressWarnings("OverridableMethodCallInConstructor")
-	public JavaScriptApp(ScriptingPlugIn aServer, String aAppName, String aAppPath, ScriptEngine aScriptApp, LocalLoader aLoader) {
+	public JavaScriptApp(ScriptingPlugIn aServer, String aAppName, String aAppPath, ScriptEngine aScriptApp, LocalLoader aLoader, Token aManifest) {
 		super(aServer, aAppName, aAppPath, aScriptApp, aLoader);
 
 		try {
 			File lAppTemplate = new File(JWebSocketConfig.getConfigFolder("ScriptingPlugIn/js/AppTemplate.js"));
 			if (!lAppTemplate.exists()) {
-				throw new RuntimeException("The JavaScript application template does not exists in expected location: "
+				throw new RuntimeException("The JavaScript application template does not exists on expected location: "
 						+ lAppTemplate.getPath() + "!");
 			}
+			// loading the App micro framework 
+			eval(lAppTemplate);
 
-			eval(lAppTemplate.getPath());
+			// loading description and version values from manifest
+			getScriptApp().eval("App.setDescription(\"" + aManifest.getString(ManifestProcessor.ATTR_DESCRIPTION, "") + "\");");
+			getScriptApp().eval("App.setVersion(\"" + aManifest.getString(ManifestProcessor.ATTR_VERSION, "1.0.0") + "\");");
+
+			// supporting NPM
+			if (aManifest.getBoolean(ManifestProcessor.ATTR_NPM_ENABLED, false)) {
+				File lJvmNpm = new File(aServer.getExtensionsDirectoryPath() + "/js/jvm-npm.js");
+				if (!lJvmNpm.exists()) {
+					throw new RuntimeException("The JVM NPM support library does not exists on expected location: "
+							+ lJvmNpm.getPath() + "!");
+				}
+				eval(lJvmNpm);
+			}
+
 			mApp = aScriptApp.get("App");
 		} catch (Exception lEx) {
 			throw new RuntimeException(lEx);
@@ -77,13 +95,13 @@ public class JavaScriptApp extends BaseScriptApp {
 	}
 
 	@Override
-	public Object eval(String aScriptFile) throws Exception {
+	public Object eval(File aScriptFile) throws Exception {
 		// loading app
 		if (getScriptApp().getFactory().getEngineName().toLowerCase().contains("nashorn")) {
 			// nashorn file load 
-			return getScriptApp().eval("load(\"" + aScriptFile.replace("\\", "/") + "\");");
+			return getScriptApp().eval("load(\"" + aScriptFile.getPath() + "\");");
 		} else {
-			return getScriptApp().eval(FileUtils.readFileToString(new File(aScriptFile)));
+			return getScriptApp().eval(FileUtils.readFileToString(aScriptFile));
 		}
 	}
 

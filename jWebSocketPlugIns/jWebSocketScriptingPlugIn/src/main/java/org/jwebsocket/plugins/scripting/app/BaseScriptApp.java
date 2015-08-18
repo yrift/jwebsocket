@@ -378,17 +378,18 @@ abstract public class BaseScriptApp {
 
 		// add the script extension (example: .js)
 		String lScriptPath = aFile + "." + getScriptLanguageExt();
-		eval(lScriptPath);
+		
+		eval(new File(lScriptPath));
 	}
 
 	/**
 	 * Evaluate an script file into the app script engine.
 	 *
-	 * @param aScriptFilePath The script file path to evaluate.
+	 * @param aFile The script file path to evaluate.
 	 * @return
 	 * @throws Exception
 	 */
-	public abstract Object eval(String aScriptFilePath) throws Exception;
+	public abstract Object eval(File aFile) throws Exception;
 
 	/**
 	 * Send a token to a given connector.
@@ -668,7 +669,7 @@ abstract public class BaseScriptApp {
 	 * Broadcast a Token to a given collection of connectors.
 	 *
 	 * @param aConnectors The collection of connectors
-	 * @param aToken The Token to be broascasted
+	 * @param aToken The Token to be broadcasted
 	 */
 	public void broadcast(Collection<WebSocketConnector> aConnectors, Map aToken) {
 		for (WebSocketConnector aConnector : aConnectors) {
@@ -677,9 +678,9 @@ abstract public class BaseScriptApp {
 	}
 
 	/**
-	 * Broadcast a Token to a given collection of connectors.
+	 * Broadcast a Token to all server active connectors.
 	 *
-	 * @param aToken The Token to be broascasted
+	 * @param aToken The Token to be broadcasted
 	 */
 	public void broadcast(Map aToken) {
 		mPlugIn.broadcastToken(null, toToken(aToken));
@@ -951,5 +952,15 @@ abstract public class BaseScriptApp {
 	 */
 	public boolean isClusterEnabled() {
 		return mPlugIn.isClusterEnabled();
+	}
+
+	/**
+	 * Return TRUE if the running node is declared as worker. Transparent
+	 * support for clusters.
+	 *
+	 * @return
+	 */
+	public boolean isWorkerNode() {
+		return mPlugIn.isWorkerNode();
 	}
 }

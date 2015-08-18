@@ -1,7 +1,7 @@
 //	---------------------------------------------------------------------------
 //	jWebSocket - Manifest (Community Edition, CE)
 //	---------------------------------------------------------------------------
-//	Copyright 2010-2015 Innotrade GmbH (jWebSocket.org)
+//	Copyright 2010-2014 Innotrade GmbH (jWebSocket.org)
 //	Alexander Schulze, Germany (NRW)
 //
 //	Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,16 +18,22 @@
 //	---------------------------------------------------------------------------
 package org.jwebsocket.plugins.scripting.app;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.security.AccessControlException;
 import java.security.AccessController;
 import java.security.Permissions;
 import java.security.PrivilegedAction;
 import java.util.List;
+import java.util.Map;
 import org.apache.commons.lang.StringUtils;
 import org.jwebsocket.api.WebSocketPlugIn;
 import org.jwebsocket.config.JWebSocketConfig;
 import org.jwebsocket.factory.JWebSocketFactory;
 import org.jwebsocket.instance.JWebSocketInstance;
+import org.jwebsocket.token.Token;
+import org.jwebsocket.token.TokenFactory;
 import org.jwebsocket.util.Tools;
 import org.springframework.util.Assert;
 
@@ -37,27 +43,43 @@ import org.springframework.util.Assert;
  *
  * @author Rolando Santamaria Maso
  */
-public class Manifest {
+public class ManifestProcessor {
 
 	/**
 	 *
 	 */
-	public final static String LANGUAGE_EXT = "language_ext";
+	public final static String ATTR_LANGUAGE_EXT = "language_ext";
 
 	/**
 	 *
 	 */
-	public final static String JWEBSOCKET_PLUGINS_DEPENDENCIES = "jws_dependencies";
+	public final static String ATTR_JWEBSOCKET_PLUGINS_DEPENDENCIES = "jws_dependencies";
 
 	/**
 	 *
 	 */
-	public final static String JWEBSOCKET_VERSION = "jws_version";
+	public final static String ATTR_JWEBSOCKET_VERSION = "jws_version";
 
 	/**
 	 *
 	 */
-	public final static String PERMISSIONS = "permissions";
+	public final static String ATTR_PERMISSIONS = "permissions";
+	/**
+	 *
+	 */
+	public final static String ATTR_NPM_ENABLED = "npm_enabled";
+	/**
+	 *
+	 */
+	public final static String ATTR_MAIN = "main";
+	/**
+	 *
+	 */
+	public final static String ATTR_VERSION = "version";
+	/**
+	 *
+	 */
+	public final static String ATTR_DESCRIPTION = "description";
 
 	/**
 	 * Checks the app jWebSocket version dependency.
@@ -92,7 +114,7 @@ public class Manifest {
 	}
 
 	/**
-	 * Checks the app sandbox security permissions dependecy.
+	 * Checks the app sandbox security permissions dependency.
 	 *
 	 * @param aPerms
 	 * @param aGrantedPerms
@@ -117,5 +139,33 @@ public class Manifest {
 						+ lPerm + "' not satisfied!");
 			}
 		}
+	}
+
+	public static Token readManifest(String aAppName, String aAppPath) throws Exception {
+		// parsing app manifest
+		boolean lIsNodeModule = false;
+		File lFile = new File(aAppPath + "/manifest.json");
+		if (!lFile.exists() || !lFile.canRead()) {
+			// supporting NPM packages
+			lFile = new File(aAppPath + "/package.json");
+			if (!lFile.exists() || !lFile.canRead()) {
+				String lMsg = "Unable to load '" + aAppName + "' application. Manifest file no found!";
+				throw new FileNotFoundException(lMsg);
+			}
+			lIsNodeModule = true;
+		}
+
+		// parsing app manifest file
+		ObjectMapper lMapper = new ObjectMapper();
+		Map<String, Object> lTree = lMapper.readValue(lFile, Map.class);
+		Token lManifest = TokenFactory.createToken();
+		lManifest.setMap(lTree);
+
+		if (lIsNodeModule) {
+			// supporting NPM on node modules by default
+			lManifest.setBoolean(ATTR_NPM_ENABLED, true);
+		}
+
+		return lManifest;
 	}
 }

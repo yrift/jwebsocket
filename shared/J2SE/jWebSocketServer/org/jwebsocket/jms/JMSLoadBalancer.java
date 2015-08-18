@@ -24,6 +24,7 @@ import javax.jms.Message;
 import javax.jms.MessageConsumer;
 import javax.jms.MessageListener;
 import javax.jms.MessageProducer;
+import javax.jms.Queue;
 import javax.jms.Session;
 import javax.jms.TextMessage;
 import javax.jms.Topic;
@@ -35,8 +36,8 @@ import org.jwebsocket.util.JWSTimerTask;
 import org.jwebsocket.util.Tools;
 
 /**
- * jWebSocket cluster server node load balancer component. Redirect the requests to the less loaded
- * node in the cluster.
+ * jWebSocket cluster server node load balancer component. Redirect the requests
+ * to the less loaded node in the cluster.
  *
  * @author Rolando Santamaria Maso
  */
@@ -85,12 +86,12 @@ public class JMSLoadBalancer implements IInitializable {
 		// initializing nodes manager
 		mNodesManager.initialize();
 
-		// clients topic
-		final Topic lClientsTopic = mClientsSession.createTopic(mServerDestination);
+		// clients queue
+		final Queue lClientsQueue = mClientsSession.createQueue(mServerDestination);
 		// nodes topic
 		final Topic lNodesTopic = mServerSession.createTopic(mServerDestination + "_nodes");
 
-		mClientsMessagesConsumer = mClientsSession.createConsumer(lClientsTopic,
+		mClientsMessagesConsumer = mClientsSession.createConsumer(lClientsQueue,
 				Attributes.MESSAGE_TYPE + " IS NOT NULL" + " AND " + Attributes.MESSAGE_ID + " IS NOT NULL");
 		mNodesMessagesProducer = mServerSession.createProducer(lNodesTopic);
 
@@ -102,10 +103,7 @@ public class JMSLoadBalancer implements IInitializable {
 					String lMsgId = aMessage.getStringProperty(Attributes.MESSAGE_ID);
 					String lReplySelector = aMessage.getStringProperty(Attributes.REPLY_SELECTOR);
 					String lSessionId = aMessage.getStringProperty(Attributes.SESSION_ID);
-
-					if (null == lMsgId || null == lReplySelector
-							|| !mNodesManager.getSynchronizer().getWorkerTurn(lMsgId)) {
-						// LB not turn to work
+					if (null == lMsgId || null == lReplySelector) {
 						return;
 					}
 
@@ -237,7 +235,7 @@ public class JMSLoadBalancer implements IInitializable {
 		Map<String, String> lConsumerData = mNodesManager.getConsumerAdviceTempStorage().getData(mNodeId);
 		// registering node
 		mNodesManager.register(lConsumerData.get(Attributes.CONSUMER_ID),
-				mNodeId, mNodesManager.getNodeDescription(),
+				mNodeId, mNodesManager.getNodeType(), mNodesManager.getNodeDescription(),
 				InetAddress.getByName(mHostname).getHostAddress(),
 				Tools.getCpuUsage());
 
@@ -249,7 +247,7 @@ public class JMSLoadBalancer implements IInitializable {
 					@Override
 					public void run() {
 						try {
-							mNodesManager.updateCPU(mNodeId, Tools.getCpuUsage());
+							mNodesManager.updateCPU(mNodeId, Tools.getCpuUsage() / mNodesManager.getNodePerformanceFactor());
 						} catch (Exception lEx) {
 							mLog.error(Logging.getSimpleExceptionMessage(lEx,
 									"updating node '" + mNodeId + "' CPU usage"));

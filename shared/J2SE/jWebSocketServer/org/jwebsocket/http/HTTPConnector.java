@@ -18,6 +18,7 @@
 //	---------------------------------------------------------------------------
 package org.jwebsocket.http;
 
+import java.io.File;
 import java.net.InetAddress;
 import java.util.Map;
 import javax.servlet.http.HttpServletResponse;
@@ -26,6 +27,7 @@ import org.jwebsocket.api.WebSocketEngine;
 import org.jwebsocket.api.WebSocketPacket;
 import org.jwebsocket.async.IOFuture;
 import org.jwebsocket.connectors.BaseConnector;
+import org.jwebsocket.engines.ServletUtils;
 import org.jwebsocket.kit.CloseReason;
 import org.jwebsocket.kit.RawPacket;
 import org.jwebsocket.kit.RequestHeader;
@@ -36,15 +38,15 @@ import org.jwebsocket.kit.RequestHeader;
  */
 public class HTTPConnector extends BaseConnector {
 
-	private final String mId;
-	private InetAddress mRemoteHost;
-	private final IConnectorsPacketQueue mPacketsQueue;
+	protected final String mId;
+	protected InetAddress mRemoteHost;
+	protected final IConnectorsPacketQueue mPacketsQueue;
 
 	/**
 	 *
 	 */
 	public final static String CLOSE_COMMAND = "http.command.close";
-	private HttpServletResponse mHttpResponse;
+	private Object mHttpResponse;
 
 	/**
 	 *
@@ -66,18 +68,23 @@ public class HTTPConnector extends BaseConnector {
 	 *
 	 * @param aHttpResponse
 	 */
-	public void setHttpResponse(HttpServletResponse aHttpResponse) {
+	public void setHttpResponse(Object aHttpResponse) {
 		mHttpResponse = aHttpResponse;
+	}
+
+	public void sendFile(File aFile) throws Exception {
+		ServletUtils.sendFile((HttpServletResponse) mHttpResponse, aFile);
+		mHttpResponse = null;
 	}
 
 	/**
 	 *
 	 * @return
 	 */
-	public HttpServletResponse getHttpResponse() {
+	public Object getHttpResponse() {
 		return mHttpResponse;
 	}
-	
+
 	@Override
 	public InetAddress getRemoteHost() {
 		return mRemoteHost;
@@ -126,7 +133,7 @@ public class HTTPConnector extends BaseConnector {
 				mPacketsQueue.enqueue(mId, aDataPacket.getString());
 			} else {
 				// sending packet directly through the HttpServletResponse instance
-				HTTPServlet.sendMessage(200, aDataPacket.getString(), mHttpResponse);
+				HTTPServlet.sendMessage(200, aDataPacket.getString(), (HttpServletResponse) mHttpResponse);
 				mHttpResponse = null;
 			}
 		} catch (Exception lEx) {
