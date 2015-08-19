@@ -24,7 +24,8 @@ import org.jwebsocket.token.Token;
 import org.jwebsocket.token.TokenFactory;
 
 /**
- * The component allows Java developers to easily invoke methods on remote action plug-ins.
+ * The component allows Java developers to easily invoke methods on remote
+ * action plug-ins.
  *
  * @author Rolando Santamaria Maso
  */
@@ -61,15 +62,17 @@ public abstract class ActionPlugInAPIWrapper {
 	 * Invoke a method on remote action plug-in.
 	 *
 	 * @param aMethodName The method name.
-	 * @param aParams The parameters to be passed. The last parameter ALWAYS require to be the
-	 * abstract client response listener.
+	 * @param aParams The parameters to be passed. The last parameter ALWAYS
+	 * require to be the abstract client response listener.
 	 * @throws Exception
 	 */
 	public void invoke(String aMethodName, Object... aParams) throws Exception {
 		for (Map<String, Object> lMethod : mMethods) {
 			if (aMethodName.equals((String) lMethod.get("name"))) {
 				Token lRequest = TokenFactory.createToken(getNS(), aMethodName);
-
+				if (lMethod.containsKey("service")) {
+					lRequest.setString("_service", (String) lMethod.get("service"));
+				}
 				List<Map> lMethodParams = (List) lMethod.get("params");
 				for (int lIndex = 0; lIndex < lMethodParams.size(); lIndex++) {
 					// getting the expected parameter type
